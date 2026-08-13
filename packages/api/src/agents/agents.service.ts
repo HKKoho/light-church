@@ -13,6 +13,17 @@ import { AgentRunRepository } from '../db/agent-run.repository.js';
 import { UserAgentRepository } from '../db/user-agent.repository.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
+// Roles allowed to turn browser tools on for an agent. Deliberately narrower than
+// "who can edit an agent at all" (see updateAgent) — browser automation reaches
+// external sites, so it gets its own opt-in gate on top of the normal edit check,
+// same layered pattern as the incidents/keys workspace fix.
+const BROWSER_TOOLS_CONFIG_ROLES = new Set([
+  'super_admin',
+  'senior_pastor',
+  'pastor',
+  'admin_staff',
+]);
+
 @Injectable()
 export class AgentsService {
   constructor(
@@ -56,6 +67,7 @@ export class AgentsService {
     // Only admins may create Public (official) agents; force false otherwise
     // so non-admins can't escalate by setting the flag in the request body.
     const isOfficial = userRole === 'super_admin' ? (input.isOfficial ?? false) : false;
+    this.assertBrowserToolsConfigAllowed(input, userRole);
     return this.agentDefRepo.create({ ...input, createdById, isOfficial });
   }
 
@@ -71,7 +83,23 @@ export class AgentsService {
         throw new ForbiddenException('You can only edit your own custom agent definitions');
       }
     }
+    this.assertBrowserToolsConfigAllowed(input, userRole);
     return this.agentDefRepo.update(id, input);
+  }
+
+  /**
+   * Browser automation reaches external sites, so enabling it is gated to
+   * pastoral/admin-staff tiers even when the caller already passed the
+   * general edit check above (e.g. a non-admin owner of their own custom agent).
+   */
+  private assertBrowserToolsConfigAllowed(
+    input: UpdateAgentDefinitionInput & { readonly isActive?: boolean },
+    userRole?: string,
+  ): void {
+    if (input.toolConfig?.browserToolsEnabled !== true) return;
+    if (!userRole || !BROWSER_TOOLS_CONFIG_ROLES.has(userRole)) {
+      throw new ForbiddenException('Only pastoral or admin staff may enable browser tools on an agent');
+    }
   }
 
   async deleteAgent(id: string, userId?: string, userRole?: string): Promise<AgentDefinition> {

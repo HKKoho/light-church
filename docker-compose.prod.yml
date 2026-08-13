@@ -91,6 +91,42 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - default
+      - clawix-browser-egress
+
+  clawix-browser:
+    image: ghcr.io/browserless/chromium:latest
+    container_name: clawix-browser
+    restart: unless-stopped
+    user: '1000:1000'
+    # Note: read_only: true breaks Chromium 1217+ — its crashpad handler
+    # subprocess loses argv when the rootfs is read-only, causing
+    # `chrome_crashpad_handler: --database is required` and aborting launch.
+    # Other isolation (non-root user, cap_drop, no-new-privileges, internal
+    # egress network, resource limits) still applies.
+    cap_drop: [ALL]
+    cap_add: [SYS_ADMIN]
+    security_opt:
+      - no-new-privileges
+    mem_limit: 2g
+    cpus: 2.0
+    pids_limit: 200
+    shm_size: 256m
+    environment:
+      MAX_CONCURRENT_SESSIONS: '${BROWSER_SIDECAR_MAX_SESSIONS:-25}'
+      TOKEN: '${BROWSER_AUTH_TOKEN}'
+      # Disable Browserless' built-in queue; we queue at the API layer.
+      QUEUED: '0'
+      HEALTHCHECK: 'true'
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O - "http://127.0.0.1:3000/active?token=$$TOKEN"']
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - clawix-browser-egress
+      - clawix-browser-net
 
   web:
     build:
@@ -112,3 +148,23 @@ services:
 volumes:
   postgres_data:
   redis_data:
+
+networks:
+  # `default` is deliberately left undeclared here so Compose keeps
+  # auto-creating it exactly as before (postgres, redis, web stay on it,
+  # undisturbed) — only api picks up the two new networks below, by
+  # referencing them explicitly in its own `networks:` list.
+  clawix-browser-egress:
+    # Prefixed (not just `clawix-browser-egress`) because pinned network names
+    # are global to the Docker host — an unprefixed name collided with another
+    # Clawix fork's identically-named network on this machine, silently
+    # sharing a network across unrelated projects.
+    name: clawix-christianity-browser-egress
+    driver: bridge
+    internal: true # blocks traffic from this network to the host/internet
+  clawix-browser-net:
+    name: clawix-christianity-browser-net
+    driver: bridge
+    # External default: this network reaches the public internet by default.
+    # RFC1918 blocking is enforced by the deploy environment's firewall rules
+    # or a sidecar egress proxy.

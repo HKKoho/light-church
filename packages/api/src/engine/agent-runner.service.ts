@@ -70,6 +70,12 @@ import { ContextBuilderService } from './context-builder.service.js';
 import { WorkspaceSeederService } from './workspace-seeder.service.js';
 import { SearchProviderRegistry } from './tools/web/search-provider.js';
 import { registerWebTools } from './tools/web/index.js';
+import { BrowserSessionManager } from './tools/browser/browser-session-manager.js';
+import { BrowserProviderRegistry } from './tools/browser/browser-provider-registry.js';
+import { BrowserQuotaCache } from './tools/browser/browser-quota-cache.service.js';
+import { registerBrowserTools } from './tools/browser/tools/index.js';
+import { resolveVisionConfig } from './tools/browser/vision-config-resolver.js';
+import type { RunContext } from './tools/browser/tools/browser-navigate.js';
 import { resolveWorkspacePaths } from './workspace-resolver.js';
 import type { TaskExecutorService } from './task-executor.service.js';
 import { SystemSettingsService } from '../system-settings/system-settings.service.js';
@@ -115,6 +121,9 @@ export class AgentRunnerService {
     private readonly taskRunMessageRepo: TaskRunMessageRepository,
     private readonly systemSettingsService: SystemSettingsService,
     private readonly compressor: CompressorService,
+    private readonly browserSessionManager: BrowserSessionManager,
+    private readonly browserProviderRegistry: BrowserProviderRegistry,
+    private readonly browserQuotaCache: BrowserQuotaCache,
   ) {}
 
   /** Lazy accessor to break circular dependency with TaskExecutorService. */
@@ -419,6 +428,43 @@ export class AgentRunnerService {
         settings.defaultTimezone,
       );
 
+      // Step 13b: Wire browser tools — gated by BrowserProviderRegistry.getActive()
+      // (no sidecar/provider configured) and by agentDef.toolConfig.browserToolsEnabled
+      // (admin-gated per-agent opt-in; see assertBrowserToolsConfigAllowed).
+      const browserToolsEnabled =
+        (agentDef.toolConfig as { browserToolsEnabled?: boolean } | null)?.browserToolsEnabled ===
+        true;
+      if (browserToolsEnabled) {
+        await this.browserQuotaCache.warm(userId);
+        const visionConfig = await resolveVisionConfig(
+          {
+            findAgentById: (id) => this.agentDefRepo.findById(id),
+            resolveProvider: (name) => this.providerConfig.resolveProvider(name),
+          },
+          {
+            agentDef,
+            resolvedApiKey: resolved.apiKey,
+            resolvedApiBaseUrl: agentDef.apiBaseUrl ?? resolved.apiBaseUrl ?? undefined,
+            policy,
+            budgetTracker,
+          },
+        );
+        const getRunContext = (): RunContext => ({
+          runId: agentRun.id,
+          userId,
+          activeModel: agentDef.model,
+          toolConfig: (agentDef.toolConfig ?? {}) as RunContext['toolConfig'],
+          policy: { allowBrowserCdp: policy.allowBrowserCdp },
+          vision: visionConfig,
+        });
+        registerBrowserTools(
+          registry,
+          this.browserProviderRegistry,
+          this.browserSessionManager,
+          getRunContext,
+        );
+      }
+
       // Step 14: Create ReasoningLoop
       const loop = new ReasoningLoop(provider, registry, this.compressor, {
         provider: agentDef.provider,
@@ -563,6 +609,7 @@ export class AgentRunnerService {
       } else if (usePool) {
         this.containerPool.release(session!.id);
       }
+      await this.browserSessionManager.releaseIfActive(agentRun.id).catch(() => {});
     }
   }
 

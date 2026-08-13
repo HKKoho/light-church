@@ -423,6 +423,11 @@ describe('AgentRunnerService', () => {
       } as unknown as import('../../db/task-run-message.repository.js').TaskRunMessageRepository,
       mocks.mockSystemSettings as unknown as import('../../system-settings/system-settings.service.js').SystemSettingsService,
       { compress: vi.fn() } as unknown as import('../compressor.js').CompressorService,
+      {
+        releaseIfActive: vi.fn().mockResolvedValue(undefined),
+      } as unknown as import('../tools/browser/browser-session-manager.js').BrowserSessionManager,
+      {} as unknown as import('../tools/browser/browser-provider-registry.js').BrowserProviderRegistry,
+      {} as unknown as import('../tools/browser/browser-quota-cache.service.js').BrowserQuotaCache,
     );
   });
 
@@ -1050,6 +1055,11 @@ describe('AgentRunnerService — with messageStore', () => {
       } as unknown as import('../../db/task-run-message.repository.js').TaskRunMessageRepository,
       mocks.mockSystemSettings as unknown as import('../../system-settings/system-settings.service.js').SystemSettingsService,
       { compress: vi.fn() } as unknown as import('../compressor.js').CompressorService,
+      {
+        releaseIfActive: vi.fn().mockResolvedValue(undefined),
+      } as unknown as import('../tools/browser/browser-session-manager.js').BrowserSessionManager,
+      {} as unknown as import('../tools/browser/browser-provider-registry.js').BrowserProviderRegistry,
+      {} as unknown as import('../tools/browser/browser-quota-cache.service.js').BrowserQuotaCache,
     );
   });
 
@@ -1130,6 +1140,11 @@ describe('AgentRunnerService — recovery integration', () => {
       } as unknown as import('../../db/task-run-message.repository.js').TaskRunMessageRepository,
       mocks.mockSystemSettings as unknown as import('../../system-settings/system-settings.service.js').SystemSettingsService,
       { compress: vi.fn() } as unknown as import('../compressor.js').CompressorService,
+      {
+        releaseIfActive: vi.fn().mockResolvedValue(undefined),
+      } as unknown as import('../tools/browser/browser-session-manager.js').BrowserSessionManager,
+      {} as unknown as import('../tools/browser/browser-provider-registry.js').BrowserProviderRegistry,
+      {} as unknown as import('../tools/browser/browser-quota-cache.service.js').BrowserQuotaCache,
     );
   });
 

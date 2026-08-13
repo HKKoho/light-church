@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { Module } from '@nestjs/common';
+import { Module, type OnModuleInit, type OnModuleDestroy } from '@nestjs/common';
 
 import { createLogger } from '@clawix/shared';
 
@@ -27,6 +27,18 @@ import { CompressorService } from './compressor.js';
 import { SearchProviderRegistry } from './tools/web/search-provider.js';
 import { BraveSearchProvider } from './tools/web/providers/brave.js';
 import { DuckDuckGoProvider } from './tools/web/providers/duckduckgo.js';
+import { BrowserProviderRegistry } from './tools/browser/browser-provider-registry.js';
+import { BrowserSessionSemaphore } from './tools/browser/browser-session-semaphore.js';
+import { BrowserSessionManager } from './tools/browser/browser-session-manager.js';
+import { LocalProvider } from './tools/browser/providers/local-provider.js';
+import { BrowserbaseProvider } from './tools/browser/providers/browserbase-provider.js';
+import { CdpProvider } from './tools/browser/providers/cdp-provider.js';
+import {
+  BrowserProviderConfigError,
+  BrowserProviderUnavailableError,
+} from './tools/browser/browser-provider.js';
+import { BrowserQuotaCache } from './tools/browser/browser-quota-cache.service.js';
+import { AgentRunSourceAdapter } from './tools/browser/agent-run-source.adapter.js';
 
 @Module({
   imports: [DbModule, SystemSettingsModule, ProviderConfigModule],
@@ -92,6 +104,19 @@ import { DuckDuckGoProvider } from './tools/web/providers/duckduckgo.js';
         return registry;
       },
     },
+    BrowserProviderRegistry,
+    BrowserQuotaCache,
+    AgentRunSourceAdapter,
+    {
+      provide: BrowserSessionSemaphore,
+      useFactory: (browserQuotaCache: BrowserQuotaCache) =>
+        new BrowserSessionSemaphore({
+          getQuota: (userId: string) => browserQuotaCache.read(userId),
+          queueTimeoutMs: Number(process.env['BROWSER_QUEUE_TIMEOUT_MS'] ?? 30_000),
+        }),
+      inject: [BrowserQuotaCache],
+    },
+    BrowserSessionManager,
   ],
   exports: [
     AgentRunnerService,
@@ -103,4 +128,74 @@ import { DuckDuckGoProvider } from './tools/web/providers/duckduckgo.js';
     SkillLoaderService,
   ],
 })
-export class EngineModule {}
+export class EngineModule implements OnModuleInit, OnModuleDestroy {
+  private readonly logger = createLogger('engine:module');
+  private sweepInterval: ReturnType<typeof setInterval> | null = null;
+
+  constructor(
+    private readonly browserProviderRegistry: BrowserProviderRegistry,
+    private readonly browserSessionManager: BrowserSessionManager,
+    private readonly agentRunSourceAdapter: AgentRunSourceAdapter,
+  ) {}
+
+  onModuleDestroy(): void {
+    if (this.sweepInterval) {
+      clearInterval(this.sweepInterval);
+      this.sweepInterval = null;
+    }
+  }
+
+  async onModuleInit(): Promise<void> {
+    const providerName = (process.env['BROWSER_PROVIDER'] ?? 'local').toLowerCase();
+    try {
+      if (providerName === 'browserbase') {
+        this.browserProviderRegistry.register(new BrowserbaseProvider());
+      } else if (providerName === 'cdp') {
+        this.browserProviderRegistry.register(new CdpProvider());
+      } else {
+        this.browserProviderRegistry.register(new LocalProvider());
+        await this.healthCheckSidecar();
+      }
+      this.browserProviderRegistry.activate();
+      // Attach orphan-sweep source and start 60 s periodic sweep
+      this.browserSessionManager.attachAgentRunSource(this.agentRunSourceAdapter);
+      this.sweepInterval = setInterval(() => {
+        void this.browserSessionManager.sweepOrphans().catch(() => {});
+      }, 60_000);
+    } catch (err) {
+      if (
+        err instanceof BrowserProviderConfigError ||
+        err instanceof BrowserProviderUnavailableError
+      ) {
+        // Soft-fail: log and disable browser tools so the API still serves
+        // everything else.
+        this.logger.warn(`[engine] browser tools disabled: ${err.message}`);
+        this.browserProviderRegistry.disable();
+      } else {
+        throw err;
+      }
+    }
+  }
+
+  private async healthCheckSidecar(): Promise<void> {
+    const wsUrl = process.env['BROWSER_SIDECAR_URL'] ?? 'ws://clawix-browser:3000';
+    const token = process.env['BROWSER_AUTH_TOKEN'] ?? '';
+    const base = wsUrl.replace(/^ws/, 'http').replace(/\/$/, '');
+    const httpUrl = `${base}/active?token=${encodeURIComponent(token)}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 5_000);
+    try {
+      const res = await fetch(httpUrl, { signal: controller.signal });
+      if (!res.ok) {
+        throw new BrowserProviderUnavailableError(`sidecar health check returned ${res.status}`);
+      }
+    } catch (err) {
+      if (err instanceof BrowserProviderUnavailableError) throw err;
+      throw new BrowserProviderUnavailableError(
+        `sidecar health check failed: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+}
