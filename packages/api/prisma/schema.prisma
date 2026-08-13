@@ -18,23 +18,27 @@ datasource db {
 // ============================================================================
 
 model Policy {
-  id                  String   @id @default(cuid())
-  name                String   @unique // "Free", "Pro", "Enterprise"
-  description         String?
-  maxTokenBudget      Int? // monthly budget in USD cents (null = unlimited)
-  maxAgents           Int      @default(5)
-  maxSkills           Int      @default(10)
-  maxMemoryItems      Int      @default(1000)
-  maxGroupsOwned      Int      @default(5)
-  allowedProviders    String[] // ["anthropic", "openai"]
-  features            Json     @default("{}") // feature flags
-  maxScheduledTasks   Int      @default(5)
-  minCronIntervalSecs Int      @default(300)
-  maxTokensPerCronRun Int?
-  cronEnabled         Boolean  @default(false)
-  isActive            Boolean  @default(true)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                           String   @id @default(cuid())
+  name                         String   @unique // "Free", "Pro", "Enterprise"
+  description                  String?
+  maxTokenBudget               Int? // monthly budget in USD cents (null = unlimited)
+  maxAgents                    Int      @default(5)
+  maxSkills                    Int      @default(10)
+  maxMemoryItems               Int      @default(1000)
+  maxGroupsOwned               Int      @default(5)
+  allowedProviders             String[] // ["anthropic", "openai"]
+  features                     Json     @default("{}") // feature flags
+  maxScheduledTasks            Int      @default(5)
+  minCronIntervalSecs          Int      @default(300)
+  maxTokensPerCronRun          Int?
+  cronEnabled                  Boolean  @default(false)
+  /// Gates the raw browser_cdp tool specifically — stricter than toolConfig.browserToolsEnabled,
+  /// which only controls whether an agent has browser tools at all.
+  allowBrowserCdp              Boolean  @default(false)
+  maxConcurrentBrowserSessions Int      @default(2)
+  isActive                     Boolean  @default(true)
+  createdAt                    DateTime @default(now())
+  updatedAt                    DateTime @updatedAt
 
   users User[]
 }
@@ -68,21 +72,23 @@ enum Department {
   finance
   outreach
   scripture_literacy
+  discipleship
+  church_administration
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String     @id @default(cuid())
+  email        String     @unique
   name         String
   passwordHash String
   role         UserRole   @default(guest)
   department   Department @default(all)
   policyId     String
-  isActive     Boolean  @default(true)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  telegramId   String?  @unique
-  whatsappJid  String?  @unique
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  telegramId   String?    @unique
+  whatsappJid  String?    @unique
 
   policy                  Policy            @relation(fields: [policyId], references: [id])
   sessions                Session[]
@@ -116,6 +122,10 @@ model AgentDefinition {
   skillIds         String[] // references to Skill.id
   maxTokensPerRun  Int       @default(100000)
   containerConfig  Json      @default("{}")
+  /// { browserToolsEnabled?: boolean, modelOverrides?: { [toolName: string]: string } }
+  /// browserToolsEnabled gates registerBrowserTools(); modelOverrides lets a tool
+  /// (e.g. browser_vision) pin a model that differs from the agent's default.
+  toolConfig       Json      @default("{}")
   isActive         Boolean   @default(true)
   isOfficial       Boolean   @default(true)
   /// When true, intermediate model prose is streamed to the channel as

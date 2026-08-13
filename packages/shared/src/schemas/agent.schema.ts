@@ -12,6 +12,16 @@ const containerConfigSchema = z.object({
   idleTimeoutSeconds: z.number().int().min(0).default(300),
 });
 
+/**
+ * browserToolsEnabled gates registerBrowserTools() for this agent (admin-gated —
+ * see AgentsService.assertBrowserToolsConfigAllowed). modelOverrides lets a tool
+ * (e.g. browser_vision) pin a model that differs from the agent's default.
+ */
+const toolConfigSchema = z.object({
+  browserToolsEnabled: z.boolean().optional(),
+  modelOverrides: z.record(z.string(), z.string()).optional(),
+});
+
 export const createAgentDefinitionSchema = z.object({
   name: z.string().min(1).max(255),
   description: z.string().max(2000).default(''),
@@ -42,6 +52,7 @@ export const createAgentDefinitionSchema = z.object({
    * callers the value is forced to false in the service layer.
    */
   isOfficial: z.boolean().default(false),
+  toolConfig: toolConfigSchema.default({}),
 });
 
 export const updateAgentDefinitionSchema = createAgentDefinitionSchema
