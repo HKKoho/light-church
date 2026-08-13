@@ -46,6 +46,13 @@ Your job is to understand what the user needs, then either answer directly (for 
 | \`finance-assistant\` | Ledger entries, budget-vs-actual reports, ledger export, reconciliation prep — fund-tagged, drafts only | "Log this expense", "How are we doing against budget?", "Export the ledger for our bookkeeper" |
 | \`evangelism-outreach\` | Outreach campaign plans, gospel-proclamation content, church-planting support briefs — voluntary participation always, drafts only | "Plan an outreach event", "Draft a testimony piece", "Help us plant a church in X" |
 | \`scripture-literacy\` | Bible translation project status, Scripture distribution records, mother-tongue literacy programmes | "What's the status of the translation project?", "Log this Scripture distribution", "Plan a literacy programme" |
+| \`church-sermon-prep\` | Passage exegesis, sermon outlines, illustrations, application points, closing prayers | "Help me prepare a sermon on X", "Outline a message for Sunday", "Illustration for this passage" |
+| \`church-sunday-school\` | Age-appropriate lesson plans, crafts, memory verses, VBS curriculum | "Sunday School lesson for age 7-9", "VBS curriculum", "Children's church lesson" |
+| \`church-bible-study\` | Small-group curriculum, multi-week series outlines, discussion questions, passage analysis | "Bible study series on X", "Discussion questions for this passage", "Small group curriculum" |
+| \`church-worship-planner\` | Song selection, service liturgical flow, seasonal worship planning, special services | "Plan the worship set", "Order of service for Easter", "Song selection for this sermon theme" |
+| \`church-communications\` | Church-facing social posts, newsletter articles, welcome emails, event invitations | "Draft a welcome email", "Social media post for this event", "Announcement for Sunday" |
+| \`church-prayer-journal\` | Prayer meeting guides, intercession lists, corporate prayer liturgies, fasting guides | "Prayer meeting guide", "Intercession list", "Lectio Divina guide" |
+| \`church-admin-coordinator\` | Event planning, bulletins, volunteer rotas, facility booking, membership, meeting minutes, calendar — single worker for all church back-office tasks | "Plan this event", "Build the bulletin", "Volunteer rota", "Book the hall", "Meeting minutes" |
 
 Each specialist has a system prompt that describes exactly what it can and cannot do. Trust those constraints — do not ask a specialist to do something outside its declared scope.
 
@@ -126,6 +133,21 @@ scripture/
 consent/
   records/      — consent records (pseudonyms only) — the source of truth, not the frontmatter flag
   keys/         — identity-pseudonym maps (human access only)
+discipleship/
+  sermons/      — sermon prep outlines and drafts
+  lessons/      — Sunday School lesson plans
+  studies/      — Bible study series and discussion guides
+  worship/      — worship service plans and song selections
+  prayer/       — prayer meeting guides and intercession lists
+church-admin/
+  events/       — event plans and briefs
+  bulletins/    — bulletins, orders of service, newsletters
+  calendar/     — annual ministry calendar and scheduling
+  facility/     — room booking and facility management
+  finance/      — stewardship templates (no real financial figures — see finance/ for that)
+  membership/   — visitor follow-up and membership workflows
+  meetings/     — agendas, minutes, governance documents
+  volunteers/   — rotas, recruitment, onboarding
 skills/         — reference knowledge packages (read-only)
 .clawix/
   audit.log     — append-only action log
@@ -200,6 +222,19 @@ const WORKSPACE_FOLDERS = [
   'scripture/literacy-programs',
   'consent/records',
   'consent/keys',
+  'discipleship/sermons',
+  'discipleship/lessons',
+  'discipleship/studies',
+  'discipleship/worship',
+  'discipleship/prayer',
+  'church-admin/events',
+  'church-admin/bulletins',
+  'church-admin/calendar',
+  'church-admin/facility',
+  'church-admin/finance',
+  'church-admin/membership',
+  'church-admin/meetings',
+  'church-admin/volunteers',
   '.clawix',
 ];
 
@@ -302,7 +337,7 @@ async function main() {
   if (!existsSync(readmePath)) {
     writeFileSync(readmePath, `# NGO Workspace
 
-This workspace is managed by Clawix. Ten specialist agents operate within it.
+This workspace is managed by Clawix. Seventeen specialist agents operate within it.
 
 ## Agents
 
@@ -317,6 +352,13 @@ This workspace is managed by Clawix. Ten specialist agents operate within it.
 | \`finance-assistant\` | Ledger, budget-vs-actual, ledger export, reconciliation prep |
 | \`evangelism-outreach\` | Outreach campaigns, gospel-proclamation content, church-planting briefs |
 | \`scripture-literacy\` | Bible translation status, Scripture distribution, literacy programmes |
+| \`church-sermon-prep\` | Sermon exegesis, outlines, illustrations |
+| \`church-sunday-school\` | Sunday School and children's ministry lessons |
+| \`church-bible-study\` | Small-group Bible study curriculum |
+| \`church-worship-planner\` | Worship service and liturgical planning |
+| \`church-communications\` | Church-facing announcements, welcome emails |
+| \`church-prayer-journal\` | Prayer meeting guides, intercession lists |
+| \`church-admin-coordinator\` | Events, bulletins, rotas, facility, membership, meetings |
 
 ## Key rules
 

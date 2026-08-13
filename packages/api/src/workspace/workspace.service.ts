@@ -142,6 +142,8 @@ export class WorkspaceService {
     '/proposals': Department.donor_engagement,
     '/reports': Department.donor_engagement,
     '/donor-research': Department.donor_engagement,
+    '/discipleship': Department.discipleship,
+    '/church-admin': Department.church_administration,
   };
 
   // Roles that see every department's folders regardless of their own `department`

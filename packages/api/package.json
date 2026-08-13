@@ -16,6 +16,7 @@
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
     "seed:ngo": "tsx prisma/seed-ngo-agents.ts",
+    "seed:church": "tsx prisma/seed-church-agents.ts",
     "setup:ngo": "tsx prisma/setup-ngo.ts"
   },
   "prisma": {
