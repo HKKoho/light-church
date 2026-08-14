@@ -1,9 +1,9 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: clawix-postgres
+    container_name: lightchurch-postgres
     ports:
-      - '5433:5432'
+      - '5443:5432'
     environment:
       POSTGRES_USER: clawix
       POSTGRES_PASSWORD: clawix_dev
@@ -18,9 +18,9 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: clawix-redis
+    container_name: lightchurch-redis
     ports:
-      - '6379:6379'
+      - '6390:6379'
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
@@ -32,11 +32,11 @@ services:
 
   api-server:
     image: node:22-slim
-    container_name: clawix-api
+    container_name: lightchurch-api
     env_file: .env
     working_dir: /app
     ports:
-      - '3001:3001'
+      - '3011:3001'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
@@ -67,7 +67,7 @@ services:
       JWT_SECRET: change-me-in-production
       BCRYPT_SALT_ROUNDS: '12'
       TEMPLATES_DIR: /app/infra/templates
-      CORS_ALLOWED_ORIGINS: http://localhost:3000
+      CORS_ALLOWED_ORIGINS: http://localhost:3010
       WORKSPACE_BASE_PATH: /data
       WORKSPACE_HOST_BASE_PATH: ${CLAWIX_HOST_DATA_DIR:-${PWD}/data}
       SKILLS_BUILTIN_DIR: /app/skills/builtin
@@ -103,7 +103,7 @@ services:
 
   clawix-browser:
     image: ghcr.io/browserless/chromium:latest
-    container_name: clawix-browser
+    container_name: lightchurch-browser
     restart: unless-stopped
     user: '1000:1000'
     # Note: read_only: true breaks Chromium 1217+ — its crashpad handler
@@ -136,10 +136,10 @@ services:
 
   web-server:
     image: node:22-slim
-    container_name: clawix-web
+    container_name: lightchurch-web
     working_dir: /app
     ports:
-      - '3000:3000'
+      - '3010:3000'
     volumes:
       - ./packages/web/src:/app/packages/web/src
       - ./packages/web/public:/app/packages/web/public
@@ -162,7 +162,7 @@ services:
       PORT: '3000'
       HOST: '0.0.0.0'
       NODE_ENV: development
-      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_API_URL: http://localhost:3011
     command: >
       sh -c "cp /app/pnpm-lock.yaml.host /app/pnpm-lock.yaml &&
              corepack enable &&
@@ -186,15 +186,17 @@ networks:
   # it, undisturbed) — only api-server picks up the two new networks below,
   # by referencing them explicitly in its own `networks:` list.
   clawix-browser-egress:
-    # Prefixed (not just `clawix-browser-egress`) because pinned network names
-    # are global to the Docker host — an unprefixed name collided with another
-    # Clawix fork's identically-named network on this machine, silently
-    # sharing a network across unrelated projects.
-    name: clawix-christianity-browser-egress
+    # Prefixed (not just `clawix-browser-egress`) because pinned network names,
+    # like container_name, are global to the Docker host — an unprefixed name
+    # previously collided with another Clawix fork's identically-named network
+    # and container names on this machine, silently sharing infra (including
+    # its live database) across unrelated projects. `lightchurch-` here must
+    # stay unique across every Clawix checkout on this host.
+    name: lightchurch-browser-egress
     driver: bridge
     internal: true # blocks traffic from this network to the host/internet
   clawix-browser-net:
-    name: clawix-christianity-browser-net
+    name: lightchurch-browser-net
     driver: bridge
     # External default: this network reaches the public internet by default.
     # RFC1918 blocking is enforced by the deploy environment's firewall rules

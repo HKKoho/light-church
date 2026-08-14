@@ -100,8 +100,11 @@ async function main() {
     deployMode = 'production';
   }
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  const apiPort = deployMode === 'production' ? 3003 : 3001;
-  const webPort = deployMode === 'production' ? 3002 : 3000;
+  // Same host ports in both modes — see docker-compose.{dev,prod}.yml and .env
+  // for why these are non-default (avoids colliding with sibling Clawix
+  // checkouts' containers on a shared host).
+  const apiPort = 3011;
+  const webPort = 3010;
 
   console.log(`\n${bold('=== Clawix Updater ===')} (${deployMode})\n`);
 
@@ -125,7 +128,7 @@ async function main() {
       const pgStart = Date.now();
       while (Date.now() - pgStart < 30_000) {
         try {
-          execSync('docker exec clawix-postgres pg_isready -U clawix', { stdio: 'ignore' });
+          execSync('docker exec lightchurch-postgres pg_isready -U clawix', { stdio: 'ignore' });
           pgReady = true;
           break;
         } catch {
@@ -134,8 +137,8 @@ async function main() {
       }
       if (pgReady) {
         try {
-          execSync(`docker exec clawix-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD '${pgPass}';"`, { stdio: 'ignore' });
-          execSync('docker restart clawix-api', { stdio: 'ignore' });
+          execSync(`docker exec lightchurch-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD '${pgPass}';"`, { stdio: 'ignore' });
+          execSync('docker restart lightchurch-api', { stdio: 'ignore' });
           ok('Postgres credentials synced — API restarted');
         } catch {
           warn('Could not sync Postgres credentials');

@@ -133,8 +133,11 @@ async function main() {
   }
   const deployMode = mode === '1' ? 'production' : 'development';
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  const apiPort = deployMode === 'production' ? 3003 : 3001;
-  const webPort = deployMode === 'production' ? 3002 : 3000;
+  // Same host ports in both modes — see docker-compose.{dev,prod}.yml and .env
+  // for why these are non-default (avoids colliding with sibling Clawix
+  // checkouts' containers on a shared host).
+  const apiPort = 3011;
+  const webPort = 3010;
   ok(`${deployMode} — ${composeFile.replace(ROOT + '/', '')}`);
 
   // Short-circuit if .env exists: we don't re-prompt or overwrite secrets.
@@ -530,7 +533,7 @@ async function main() {
       const pgStart = Date.now();
       while (Date.now() - pgStart < 30_000) {
         try {
-          run('docker exec clawix-postgres pg_isready -U clawix', { stdio: 'ignore' });
+          run('docker exec lightchurch-postgres pg_isready -U clawix', { stdio: 'ignore' });
           pgReady = true;
           break;
         } catch {
@@ -539,11 +542,11 @@ async function main() {
       }
       if (pgReady) {
         try {
-          run(`docker exec clawix-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD '${pgPass}';"`, { stdio: 'ignore' });
-          run('docker restart clawix-api', { stdio: 'ignore' });
+          run(`docker exec lightchurch-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD '${pgPass}';"`, { stdio: 'ignore' });
+          run('docker restart lightchurch-api', { stdio: 'ignore' });
           ok('Postgres credentials synced — API restarted');
         } catch {
-          warn('Could not sync Postgres credentials — if API fails to connect, run:\n  docker exec clawix-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD \'<your POSTGRES_PASSWORD>\';"');
+          warn('Could not sync Postgres credentials — if API fails to connect, run:\n  docker exec lightchurch-postgres psql -U clawix -d clawix -c "ALTER USER clawix WITH PASSWORD \'<your POSTGRES_PASSWORD>\';"');
         }
       } else {
         warn('Postgres not ready within 30s — skipping credential sync');

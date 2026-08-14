@@ -200,29 +200,40 @@ ok "Docker Compose available"
 if ! $SKIP_CLEAN; then
   step "Checking for existing Clawix Docker resources"
 
-  # Named containers: clawix-postgres, clawix-redis, clawix-api, clawix-web
+  # Named containers: lightchurch-postgres, lightchurch-redis, lightchurch-api,
+  # lightchurch-web, lightchurch-browser. Scoped to the `lightchurch-` prefix
+  # (not a bare `clawix-`/`clawix_` pattern) deliberately — this host runs
+  # several sibling Clawix checkouts side by side, each with their own live
+  # containers/volumes/networks, and a generic pattern here previously risked
+  # this cleanup step detecting and offering to delete another project's
+  # running production stack (including its database) as if it were this
+  # repo's own leftovers.
   EXISTING_CONTAINERS=$(docker ps -a --format '{{.Names}}\t{{.Status}}\t{{.Image}}' \
-    | grep -E '^clawix-' || true)
+    | grep -E '^lightchurch-' || true)
 
-  # Agent containers spawned at runtime (random names but clawix-agent image)
+  # Agent containers spawned at runtime (random names but clawix-agent image —
+  # shared image tag across sibling checkouts, so this can't be scoped further)
   AGENT_CONTAINERS=$(docker ps -a --format '{{.Names}}\t{{.Status}}\t{{.Image}}' \
-    | grep 'clawix-agent' | grep -vE '^clawix-' || true)
+    | grep 'clawix-agent' | grep -vE '^lightchurch-' || true)
 
-  # Images: clawix-agent:latest, clawix-api:latest, clawix-web:latest
-  EXISTING_IMAGES=$(docker images --format '{{.Repository}}:{{.Tag}}' \
-    | grep -E '^clawix-(agent|api|web):' || true)
+  # Images: clawix-agent:latest, clawix-api:latest, clawix-web:latest — these
+  # tags are shared across sibling checkouts (not project-scoped), so we can't
+  # safely offer to remove them here; left undetected rather than risk
+  # deleting an image another project's running containers still reference.
+  EXISTING_IMAGES=""
 
-  # Volumes prefixed clawix_ (postgres_data, redis_data, node_modules volumes)
+  # Volumes prefixed light-church_ (the Compose project-name prefix for this
+  # checkout's postgres_data, redis_data, node_modules volumes)
   EXISTING_VOLUMES=$(docker volume ls --format '{{.Name}}' \
-    | grep -E '^clawix_' || true)
+    | grep -E '^light-church_' || true)
 
   # Networks
   EXISTING_NETWORKS=$(docker network ls --format '{{.Name}}' \
-    | grep -E '^clawix[_-]' || true)
+    | grep -E '^lightchurch[_-]' || true)
 
-  # Port conflicts on ports Clawix uses
+  # Port conflicts on ports this checkout uses
   PORT_CONFLICTS=""
-  for PORT in 3000 3001 5433 6379; do
+  for PORT in 3010 3011 5443 6390; do
     if lsof -iTCP:"$PORT" -sTCP:LISTEN &>/dev/null 2>&1; then
       PROC=$(lsof -iTCP:"$PORT" -sTCP:LISTEN -Fp 2>/dev/null | head -1 | sed 's/^p//')
       PNAME=$(ps -p "$PROC" -o comm= 2>/dev/null || echo "unknown")
@@ -463,7 +474,7 @@ ok "Containers started"
 
 step "Waiting for API /health  $(dim '(up to 3 min on first run)')"
 DEADLINE=$(( $(date +%s) + 180 ))
-until curl -sf http://localhost:3001/health &>/dev/null; do
+until curl -sf http://localhost:3011/health &>/dev/null; do
   if [[ $(date +%s) -ge $DEADLINE ]]; then
     fail "API did not become healthy within 3 minutes."
     info "Check logs: docker compose -f docker-compose.dev.yml logs api"
@@ -482,8 +493,8 @@ node scripts/setup-ngo.mjs && ok "NGO workspace and skills seeded" || warn "NGO 
 echo
 echo "$(bold "$(green '=== Installation complete ===')")"
 echo
-echo "  $(bold 'Dashboard:')  $(cyan 'http://localhost:3000')"
-echo "  $(bold 'API:')        $(cyan 'http://localhost:3001')"
+echo "  $(bold 'Dashboard:')  $(cyan 'http://localhost:3010')"
+echo "  $(bold 'API:')        $(cyan 'http://localhost:3011')"
 echo
 echo "  $(bold 'Log in with:')"
 echo "    Email:    ${INITIAL_ADMIN_EMAIL:-aibyml.ngo@gmail.com}"
