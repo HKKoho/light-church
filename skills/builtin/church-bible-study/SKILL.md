@@ -1,6 +1,6 @@
 ---
 name: church-bible-study
-description: "Use this skill for Bible study group preparation, small group curriculum design, individual book studies, topical studies, and character studies. Generates: multi-week series outlines, session-by-session study guides, deep passage analysis, discussion question banks, cross-references, and historical-cultural context. Triggers: 'Bible study', 'small group', 'study series', 'book study', 'exegesis', 'passage analysis', 'discussion questions', 'inductive Bible study'."
+description: "Use this skill for Bible study group preparation, small group curriculum design, individual book studies, topical studies, character studies, and daily reading plans. Generates: multi-week series outlines, session-by-session study guides, deep passage analysis, discussion question banks, cross-references, historical-cultural context, and shared daily/weekly reading plans with reflection prompts. Triggers: 'Bible study', 'small group', 'study series', 'book study', 'exegesis', 'passage analysis', 'discussion questions', 'inductive Bible study', 'reading plan', 'daily devotional', 'read through the Bible'."
 license: MIT
 pack: church
 ---
@@ -63,6 +63,39 @@ Characters covered: Abraham · Moses · Esther · Ruth · David · Elijah · Mar
 - Moments of faith and transformation
 - How their story points to Christ
 - Application: "What does [character]'s journey reveal about God and about us?"
+
+---
+
+## Daily Reading Plan Generator
+
+For the whole congregation (not just facilitators) to read Scripture together outside of group meetings — ties individual devotion back into shared community life, and can double as an on-ramp for newcomers who aren't ready to join a small group yet.
+
+**When to use:** a facilitator or church admin wants a plan the congregation can follow between sessions of a current series, during a season (Advent, Lent, a fast), or as a standalone read-through.
+
+**Output:**
+```
+READING PLAN: [Title]
+LENGTH: [X days/weeks]
+PACE: [X min/day reading]
+TIES TO: [Current sermon series / small group study / standalone]
+
+DAY 1
+  PASSAGE: [Reference]
+  ONE-LINE FOCUS: [What to watch for while reading]
+  REFLECT: [Single short question — answerable in 1-2 sentences]
+  SHARE PROMPT: [Optional line members can post in a group chat or say aloud at the next gathering]
+
+DAY 2
+  [...]
+
+WEEKLY COMMUNITY TOUCHPOINT
+  [A short prompt for the following small group / family / online check-in that pulls the week's readings together — "what stood out," "what was hard," "who could you share this with"]
+```
+
+**Guidance:**
+- Keep daily entries short enough to read in under 5 minutes — the goal is consistency, not depth (depth belongs in the group session).
+- The SHARE PROMPT and WEEKLY COMMUNITY TOUCHPOINT exist specifically so solitary daily reading resurfaces in community — a plan with no communal touchpoint is just a devotional, not a discipleship-and-community tool.
+- When the plan runs during an outreach season, bias reflection questions toward things easy to explain to a friend, so participants have something natural to invite others into.
 
 ---
 
