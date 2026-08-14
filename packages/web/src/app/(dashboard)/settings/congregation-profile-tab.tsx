@@ -5,9 +5,11 @@ import { Loader2 } from 'lucide-react';
 import {
   AGE_BANDS,
   ECONOMIC_TIERS,
+  GOVERNANCE_MODELS,
   type AgeBand,
   type CongregationProfileInput,
   type EconomicTier,
+  type GovernanceModel,
 } from '@clawix/shared';
 import { authFetch } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
@@ -16,6 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { EditableStringList } from '@/components/dashboard/editable-string-list';
+import { cn } from '@/lib/utils';
 import { useT, type Messages } from '@/lib/i18n';
 
 type AgePctField =
@@ -53,6 +56,7 @@ const ECONOMIC_FIELD_MAP: Record<EconomicTier, EconomicPctField> = {
 };
 
 const EMPTY: CongregationProfileInput = {
+  governanceModel: 'centralized',
   ageUnder11Pct: 0,
   age11to17Pct: 0,
   age18to24Pct: 0,
@@ -71,6 +75,18 @@ const EMPTY: CongregationProfileInput = {
 
 const messages = {
   en: {
+    governanceSection: 'Church governance model',
+    governanceDescription:
+      'How pastoral care is organized in this church — changes which nav items are promoted into the sidebar for everyone.',
+    governanceModelLabels: {
+      centralized: 'Centralized',
+      decentralized: 'Decentralized (cell groups)',
+    },
+    governanceModelDescriptions: {
+      centralized: 'A pastor or staff team owns pastoral care top-down.',
+      decentralized:
+        'Cell/small-group leaders own care for their own group and escalate up as needed.',
+    },
     ageSection: 'Age bands',
     ageDescription: 'Percentage of the congregation in each age band.',
     economicSection: 'Economic background',
@@ -106,6 +122,16 @@ const messages = {
     },
   },
   'zh-TW': {
+    governanceSection: '教會治理模式',
+    governanceDescription: '本教會牧養關懷的組織方式──會決定側邊欄為所有人顯示哪些功能項目。',
+    governanceModelLabels: {
+      centralized: '集中式',
+      decentralized: '分散式（小組／細胞小組）',
+    },
+    governanceModelDescriptions: {
+      centralized: '由主任牧師或同工團隊由上而下負責牧養關懷。',
+      decentralized: '各小組／細胞小組領袖負責自己小組的關懷，並視需要向上呈報。',
+    },
     ageSection: '年齡層',
     ageDescription: '會眾各年齡層所佔百分比。',
     economicSection: '經濟背景',
@@ -139,6 +165,10 @@ const messages = {
     },
   },
 } satisfies Messages<{
+  governanceSection: string;
+  governanceDescription: string;
+  governanceModelLabels: Record<GovernanceModel, string>;
+  governanceModelDescriptions: Record<GovernanceModel, string>;
   ageSection: string;
   ageDescription: string;
   economicSection: string;
@@ -256,6 +286,33 @@ export function CongregationProfileTab() {
           {error}
         </div>
       )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t.governanceSection}</CardTitle>
+          <CardDescription>{t.governanceDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {GOVERNANCE_MODELS.map((model) => (
+            <button
+              key={model}
+              type="button"
+              onClick={() => setForm((f) => ({ ...f, governanceModel: model }))}
+              className={cn(
+                'flex flex-col gap-1 rounded-lg border p-3 text-left transition-colors',
+                form.governanceModel === model
+                  ? 'border-primary bg-primary/5'
+                  : 'border-border hover:bg-muted/50',
+              )}
+            >
+              <span className="text-sm font-medium">{t.governanceModelLabels[model]}</span>
+              <span className="text-xs text-muted-foreground">
+                {t.governanceModelDescriptions[model]}
+              </span>
+            </button>
+          ))}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>

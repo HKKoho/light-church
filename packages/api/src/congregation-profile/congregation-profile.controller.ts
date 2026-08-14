@@ -13,6 +13,18 @@ import { CongregationProfileService } from './congregation-profile.service.js';
 export class CongregationProfileController {
   constructor(private readonly service: CongregationProfileService) {}
 
+  // Any authenticated role — not just super_admin — needs to know the church's
+  // governance model to render the correct sidebar layout, so this route
+  // overrides the controller-level @Roles(super_admin) with an empty role list
+  // (RolesGuard treats no required roles as "any authenticated user"). It
+  // intentionally exposes only this one field, not the full demographic profile.
+  @Get('governance-model')
+  @Roles()
+  async getGovernanceModel() {
+    const { governanceModel } = await this.service.get();
+    return { success: true, data: { governanceModel } };
+  }
+
   @Get()
   async get() {
     return { success: true, data: await this.service.get() };

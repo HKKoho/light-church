@@ -53,9 +53,13 @@ export const ENNEAGRAM_TYPES = [
 ] as const;
 export type EnneagramType = (typeof ENNEAGRAM_TYPES)[number];
 
+export const GOVERNANCE_MODELS = ['centralized', 'decentralized'] as const;
+export type GovernanceModel = (typeof GOVERNANCE_MODELS)[number];
+
 const pct = z.number().min(0).max(100);
 
 export const congregationProfileSchema = z.object({
+  governanceModel: z.enum(GOVERNANCE_MODELS).default('centralized'),
   ageUnder11Pct: pct.default(0),
   age11to17Pct: pct.default(0),
   age18to24Pct: pct.default(0),

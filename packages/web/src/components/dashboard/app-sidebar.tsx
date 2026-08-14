@@ -45,6 +45,7 @@ import { useTheme } from 'next-themes';
 import anime from 'animejs';
 import { EASING } from '@/lib/anime';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
+import { useGovernanceModel } from '@/hooks/use-governance-model';
 import { Phase2RoadmapCard } from '@/components/dashboard/phase2-roadmap-card';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -104,6 +105,16 @@ export const ngoItems: readonly NavItem[] = [
   { key: 'pastoralCare', href: '/ngo/pastoral-care', icon: HeartHandshake },
 ];
 
+// Pillar-anchored items (community care, mission, discipleship/Bible) — pulled
+// out of `ngoItems` and promoted into a persistent sidebar group only when the
+// church runs a decentralized (cell-group) governance model, since a lay group
+// leader needs one-click daily access rather than the header ministries dropdown.
+const CARE_ITEM_KEYS = ['prayer', 'pastoralCare', 'scripture', 'outreach'] as const;
+const ngoItemsByKey = new Map(ngoItems.map((item) => [item.key, item]));
+const careItems: readonly NavItem[] = CARE_ITEM_KEYS.map((key) => ngoItemsByKey.get(key)).filter(
+  (item): item is NavItem => item !== undefined,
+);
+
 const governanceItems: readonly NavItem[] = [
   { key: 'dashboard', href: '/dashboard', icon: BookOpen },
   { key: 'tokenUsage', href: '/governance/tokens', icon: Coins },
@@ -122,6 +133,7 @@ const messages = {
   en: {
     brandTagline: 'Gospel Mission AI',
     groupWorkspace: 'Work with Agents',
+    groupCare: 'Care & Discipleship',
     groupGovernance: 'Governance',
     nav: {
       conversations: 'Conversations',
@@ -168,6 +180,7 @@ const messages = {
   'zh-TW': {
     brandTagline: '福音宣教 AI',
     groupWorkspace: '與代理協作',
+    groupCare: '關懷與門徒訓練',
     groupGovernance: '治理',
     nav: {
       conversations: '對話',
@@ -214,6 +227,7 @@ const messages = {
 } satisfies Messages<{
   brandTagline: string;
   groupWorkspace: string;
+  groupCare: string;
   groupGovernance: string;
   nav: Record<string, string>;
   lightMode: string;
@@ -240,6 +254,7 @@ export function AppSidebar() {
   const { resolvedTheme, setTheme } = useTheme();
   const { lang, toggleLang } = useLanguage();
   const t = useT(messages);
+  const { governanceModel } = useGovernanceModel();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -309,6 +324,31 @@ export function AppSidebar() {
             ))}
           </SidebarMenu>
         </SidebarGroup>
+
+        {governanceModel === 'decentralized' && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
+              {t.groupCare}
+            </SidebarGroupLabel>
+            <SidebarMenu>
+              {careItems.map((item) => (
+                <SidebarMenuItem key={item.key}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.href)}
+                    tooltip={t.nav[item.key as keyof typeof t.nav]}
+                    className={navButtonClass}
+                  >
+                    <Link href={item.href}>
+                      <item.icon />
+                      <span>{t.nav[item.key as keyof typeof t.nav]}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
 
         <SidebarGroup>
           <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">

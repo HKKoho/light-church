@@ -508,21 +508,27 @@ model SystemSettings {
   updatedAt DateTime @updatedAt
 }
 
+enum GovernanceModel {
+  centralized
+  decentralized
+}
+
 model CongregationProfile {
-  id                  String   @id @default("default")
-  ageUnder11Pct       Float    @default(0)
-  age11to17Pct        Float    @default(0)
-  age18to24Pct        Float    @default(0)
-  age25to34Pct        Float    @default(0)
-  age35to49Pct        Float    @default(0)
-  age50to74Pct        Float    @default(0)
-  ageOver75Pct        Float    @default(0)
-  economicPoorPct     Float    @default(0)
-  economicBelowAvgPct Float    @default(0)
-  economicAveragePct  Float    @default(0)
-  economicAboveAvgPct Float    @default(0)
-  economicRichPct     Float    @default(0)
-  ethnicGroups        String[] @default([])
-  educationLevels     String[] @default([])
-  updatedAt           DateTime @updatedAt
+  id                  String          @id @default("default")
+  governanceModel     GovernanceModel @default(centralized)
+  ageUnder11Pct       Float           @default(0)
+  age11to17Pct        Float           @default(0)
+  age18to24Pct        Float           @default(0)
+  age25to34Pct        Float           @default(0)
+  age35to49Pct        Float           @default(0)
+  age50to74Pct        Float           @default(0)
+  ageOver75Pct        Float           @default(0)
+  economicPoorPct     Float           @default(0)
+  economicBelowAvgPct Float           @default(0)
+  economicAveragePct  Float           @default(0)
+  economicAboveAvgPct Float           @default(0)
+  economicRichPct     Float           @default(0)
+  ethnicGroups        String[]        @default([])
+  educationLevels     String[]        @default([])
+  updatedAt           DateTime        @updatedAt
 }
