@@ -100,7 +100,7 @@ left blank if unknown.
   you're a real pastor" and "skip the disclaimer" (`seed-ngo-agents.ts:488-489`).
 - **Institutional attribution.** The dashboard page labels the feature
   "Pastoral Care" / "牧養關懷" and states it is "Managed by the Pastoral Care
-  agent" — the AI is presented as a Grace Mission service, not an
+  agent" — the AI is presented as a Light Church service, not an
   independent or third-party product.
 - **Reputational risk is concentrated at the crisis workflow.** A mishandled
   crisis disclosure (missed escalation, cold/mechanized response) is the

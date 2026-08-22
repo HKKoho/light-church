@@ -1,6 +1,6 @@
 # Deploying on a Budget VPS (no Railway, no managed DB fees)
 
-This is the cheapest way to put Grace Mission online. It doesn't touch Railway or any
+This is the cheapest way to put Light Church online. It doesn't touch Railway or any
 managed database — everything (Postgres, Redis, the API, the web dashboard, and every
 agent's Docker container) runs on one small server, using the installer this repo
 already ships (`pnpm run install:clawix`, documented in `docs/GET_STARTED.md`). This

@@ -31,7 +31,7 @@ Never spawn a build before the storyboard's `readyForBuild` flag is `true`. A go
 
 Gather a brief from the conversation: the emotional/spiritual truth or Bible passage (e.g. "the prodigal son's road home", "David facing Goliath with nothing but trust", "the Good Samaritan's costly compassion"), a genre, the audience (age range, VBS class, youth group, family devotion), and roughly how many minutes of play.
 
-**Genres** (no combat/arena genre — Grace Mission games are non-violent by policy):
+**Genres** (no combat/arena genre — Light Church games are non-violent by policy):
 - `puzzle` — gravity 0, friction 1.0
 - `platformer` — gravity 0.45, friction 0.88
 - `narrative` — gravity 0, friction 1.0, dialogue-heavy

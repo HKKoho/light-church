@@ -1,6 +1,6 @@
 # Hetzner Deployment Guide
 
-The cheapest way to run Grace Mission in production: one Hetzner Cloud VPS
+The cheapest way to run Light Church in production: one Hetzner Cloud VPS
 running everything (Postgres, Redis, the API, the web dashboard, and every
 agent's Docker container) via the installer this repo already ships
 (`pnpm run install:clawix`), fronted by Caddy for free automatic TLS.

@@ -47,7 +47,7 @@ const messages = {
     placeholder: 'Type / for commands or send a message...',
     connected: 'Connected',
     disconnected: 'Disconnected',
-    disclaimer: 'Grace Mission agents can make errors — always apply prayerful discernment.',
+    disclaimer: 'Light Church agents can make errors — always apply prayerful discernment.',
     scenarios: {
       campaign: {
         title: 'Gospel Outreach',
@@ -107,7 +107,7 @@ const messages = {
     placeholder: '輸入 / 使用指令，或傳送訊息…',
     connected: '已連線',
     disconnected: '已斷線',
-    disclaimer: '恩典宣教代理可能出錯 — 請以禱告與辨別恩賜查驗輸出。',
+    disclaimer: '光教會代理可能出錯 — 請以禱告與辨別恩賜查驗輸出。',
     scenarios: {
       campaign: {
         title: '福音外展',

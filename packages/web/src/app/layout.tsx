@@ -7,7 +7,7 @@ import { LanguageProvider } from '@/lib/i18n';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Grace Mission',
+  title: 'Light Church',
   description: 'AI-powered platform for gospel mission, discipleship, and ministry administration',
 };
 

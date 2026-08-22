@@ -13,7 +13,7 @@ import { useLanguage, useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    heading: 'Welcome to Grace Mission',
+    heading: 'Welcome to Light Church',
     subheading: 'Sign in to serve — enter your email to access the ministry platform',
     email: 'Email',
     password: 'Password',
@@ -23,7 +23,7 @@ const messages = {
     switchLanguage: 'Switch language',
   },
   'zh-TW': {
-    heading: '歡迎來到恩典宣教',
+    heading: '歡迎來到光教會',
     subheading: '請輸入您的電子郵件以進入宣教平台',
     email: '電子郵件',
     password: '密碼',
@@ -116,7 +116,7 @@ function LoginForm() {
             <div className="flex size-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <GalleryVerticalEnd className="size-4" />
             </div>
-            <span className="text-sm font-medium">Grace Mission</span>
+            <span className="text-sm font-medium">Light Church</span>
           </div>
           <Button
             type="button"

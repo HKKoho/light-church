@@ -7,7 +7,7 @@ import { useLanguage, useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    brand: 'Grace Mission',
+    brand: 'Light Church',
     howItWorks: 'How it works',
     capabilities: 'Capabilities',
     trust: 'Faithfulness',
@@ -15,7 +15,7 @@ const messages = {
     switchLanguage: 'Switch language',
   },
   'zh-TW': {
-    brand: '恩典宣教',
+    brand: '光教會',
     howItWorks: '運作方式',
     capabilities: '功能',
     trust: '忠心管理',

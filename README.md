@@ -1,5 +1,5 @@
 <p align="center">
-  <h1 align="center">Grace Mission</h1>
+  <h1 align="center">Light Church</h1>
   <p align="center">
     <strong>Your ministry's own team of AI assistants.</strong>
     <br />
@@ -11,22 +11,22 @@
 
 > **Who this guide is for**
 >
-> This page is written for the people who **use** Grace Mission every day — ministry coordinators, stewardship and grants staff, discipleship/impact teams, communications teams and field or mission-trip coordinators. **You do not need to be technical.** If you can send a message in a chat app, you can use Grace Mission.
+> This page is written for the people who **use** Light Church every day — ministry coordinators, stewardship and grants staff, discipleship/impact teams, communications teams and field or mission-trip coordinators. **You do not need to be technical.** If you can send a message in a chat app, you can use Light Church.
 >
-> If you are the person who *installs or maintains* Grace Mission on a server, skip to [**For administrators**](#for-administrators-technical-setup) at the bottom.
+> If you are the person who *installs or maintains* Light Church on a server, skip to [**For administrators**](#for-administrators-technical-setup) at the bottom.
 
 ---
 
-## What is Grace Mission?
+## What is Light Church?
 
-Grace Mission gives your ministry or mission organization a small **team of AI assistants** that work the way your real team does. Instead of one generic chatbot, you get a coordinator at the "front desk" and specialists behind it — each trained for a specific part of ministry work, from outreach planning to stewardship letters to Scripture-rooted games for kids' ministry.
+Light Church gives your ministry or mission organization a small **team of AI assistants** that work the way your real team does. Instead of one generic chatbot, you get a coordinator at the "front desk" and specialists behind it — each trained for a specific part of ministry work, from outreach planning to stewardship letters to Scripture-rooted games for kids' ministry.
 
 You talk to them in plain language, the same way you'd brief a colleague. They do the heavy lifting — research, first drafts, structuring data — and hand the result back to **you** to review, finish and send.
 
-Grace Mission is a ministry configuration of **Clawix**, a self-hosted multi-agent AI platform. Its working assumptions come from a simple theological frame: the Great Commission (Matthew 28:19–20), the Great Commandment (Matthew 22:37–39), and faithful stewardship of what's been entrusted to your organisation. Four promises sit underneath everything it does:
+Light Church is a ministry configuration of **Clawix**, a self-hosted multi-agent AI platform. Its working assumptions come from a simple theological frame: the Great Commission (Matthew 28:19–20), the Great Commandment (Matthew 22:37–39), and faithful stewardship of what's been entrusted to your organisation. Four promises sit underneath everything it does:
 
-- 🧑‍⚖️ **A human is always in charge.** Grace Mission only ever produces *drafts*. It never sends an email, posts to social media, publishes a game for children, or submits anything to a supporter on its own. A person always presses "send" — or "approve".
-- 🔒 **Your data stays yours.** Grace Mission runs on your organisation's own server. Beneficiary and congregant names and personal details are deliberately kept out of its memory.
+- 🧑‍⚖️ **A human is always in charge.** Light Church only ever produces *drafts*. It never sends an email, posts to social media, publishes a game for children, or submits anything to a supporter on its own. A person always presses "send" — or "approve".
+- 🔒 **Your data stays yours.** Light Church runs on your organisation's own server. Beneficiary and congregant names and personal details are deliberately kept out of its memory.
 - ✅ **It won't make things up.** If a figure or fact is missing, the assistants mark it clearly (e.g. `[FILL: 2024 baptisms count]`) rather than inventing a number.
 - 🙏 **Prayerful discernment, not autopilot.** Every response carries the reminder that these are drafts from a capable assistant, not spiritual authority — your team's judgment and discernment always finish the work.
 
@@ -63,7 +63,7 @@ This doesn't call an AI agent — it's a direct, lightweight command that saves 
 
 ## Getting started in 4 steps
 
-### 1. Open Grace Mission
+### 1. Open Light Church
 
 Your administrator will give you one of these:
 
@@ -111,7 +111,7 @@ Nothing in a "drafts" folder or on the Projector page has been sent or published
 
 ## The ground rules that keep you safe
 
-These rules are built into Grace Mission. Knowing them helps you trust what it gives you:
+These rules are built into Light Church. Knowing them helps you trust what it gives you:
 
 1. **Drafts only — a human always sends.** Emails, supporter submissions, and social posts are prepared for you, never sent automatically.
 2. **Beneficiary and congregant privacy is protected.** Personal details of the people you serve are kept out of the assistants' memory. When incidents are written up, real names are replaced with pseudonyms; the key linking them is kept in an access-controlled folder.
@@ -123,9 +123,9 @@ These rules are built into Grace Mission. Knowing them helps you trust what it g
 
 ---
 
-## What Grace Mission will *not* do
+## What Light Church will *not* do
 
-So there are no surprises, Grace Mission deliberately **does not**:
+So there are no surprises, Light Church deliberately **does not**:
 
 - Send emails, submit proposals, or publish posts on its own.
 - Store or remember beneficiaries' or congregants' personal information.
@@ -148,7 +148,7 @@ So there are no surprises, Grace Mission deliberately **does not**:
 
 ## Getting help
 
-- **Something looks wrong, or you're stuck?** Contact whoever set Grace Mission up for your organisation (your administrator or IT focal point).
+- **Something looks wrong, or you're stuck?** Contact whoever set Light Church up for your organisation (your administrator or IT focal point).
 - **Want a new kind of assistant or skill?** Those can be added — pass the request to your administrator.
 
 ---
@@ -156,9 +156,9 @@ So there are no surprises, Grace Mission deliberately **does not**:
 
 ## For administrators (technical setup)
 
-> The section above is for everyday users. The rest of this document is for the person installing or maintaining Grace Mission on a server.
+> The section above is for everyday users. The rest of this document is for the person installing or maintaining Light Church on a server.
 
-Grace Mission is a ministry configuration built on **Clawix**, a **self-hosted multi-agent AI orchestration platform**: every agent runs in its own isolated Docker container, with full audit logging, role-based access, token budgets, and encrypted secrets. It's a pnpm monorepo (`packages/api` — NestJS + Fastify; `packages/web` — Next.js dashboard; `packages/shared`). The underlying repository, package name, and Docker services are still named `clawix` — that's the platform layer; "Grace Mission" is the branding and configuration applied on top of it for this deployment.
+Light Church is a ministry configuration built on **Clawix**, a **self-hosted multi-agent AI orchestration platform**: every agent runs in its own isolated Docker container, with full audit logging, role-based access, token budgets, and encrypted secrets. It's a pnpm monorepo (`packages/api` — NestJS + Fastify; `packages/web` — Next.js dashboard; `packages/shared`). The underlying repository, package name, and Docker services are still named `clawix` — that's the platform layer; "Light Church" is the branding and configuration applied on top of it for this deployment.
 
 **Full guides:**
 - **Server / cloud deployment (DigitalOcean, domains, SSL):** see [`DO_deploy.md`](DO_deploy.md)
@@ -204,7 +204,7 @@ node scripts/seed-ngo-agents.mjs    # create the six specialist agents (incl. ga
 node scripts/setup-ngo.mjs          # seed the 31-folder workspace + skill files
 ```
 
-All reference material behind the ministry configuration (agent definitions, skill packages, architecture notes) lives under `reference/Clawix SKILL and Agent/`. Note that those reference docs still use generic "NGO" language throughout — they're the underlying legal/architecture layer that Grace Mission's branding sits on top of, not something end users see.
+All reference material behind the ministry configuration (agent definitions, skill packages, architecture notes) lives under `reference/Clawix SKILL and Agent/`. Note that those reference docs still use generic "NGO" language throughout — they're the underlying legal/architecture layer that Light Church's branding sits on top of, not something end users see.
 
 ### Local development
 
@@ -320,7 +320,7 @@ The dashboard's Phase 2 roadmap card tracks planned features (estimates, not com
 
 ## Security model
 
-Grace Mission follows a **zero-trust architecture** for agent execution:
+Light Church follows a **zero-trust architecture** for agent execution:
 
 | Threat | Mitigation |
 | --- | --- |
@@ -337,7 +337,7 @@ Grace Mission follows a **zero-trust architecture** for agent execution:
 
 ## Acknowledgments
 
-Grace Mission is a ministry configuration of Clawix, which builds on ideas from [nanoClaw](https://github.com/qwibitai/nanoclaw) (container-isolated agent execution) and [nanobot](https://github.com/HKUDS/nanobot) (multi-provider AI design patterns).
+Light Church is a ministry configuration of Clawix, which builds on ideas from [nanoClaw](https://github.com/qwibitai/nanoclaw) (container-isolated agent execution) and [nanobot](https://github.com/HKUDS/nanobot) (multi-provider AI design patterns).
 
 ## License
 
@@ -346,7 +346,7 @@ This project is **dual-licensed**:
 - **Core Clawix platform** — [MIT License](LICENSE). Free to use, modify, and distribute, including commercially.
 - **NGO/ministry-specific components** — [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only — but the PolyForm Noncommercial terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations, and governments, so **NGOs, ministries, and nonprofits may use them freely.**
 
-See the [NOTICE](NOTICE) file for the exact list of paths covered by each license (it's still titled "Clawix for NGOs" — that's the legal/platform identity these paths are governed under, distinct from the "Grace Mission" branding applied in this deployment). The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`, `skills/builtin/aria-foundation/`) also carry their own local `LICENSE` files.
+See the [NOTICE](NOTICE) file for the exact list of paths covered by each license (it's still titled "Clawix for NGOs" — that's the legal/platform identity these paths are governed under, distinct from the "Light Church" branding applied in this deployment). The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`, `skills/builtin/aria-foundation/`) also carry their own local `LICENSE` files.
 
 ---
 

@@ -1,6 +1,6 @@
 # game-builder
 
-Author board game definitions for the Grace Mission board game engine. The engine lives at
+Author board game definitions for the Light Church board game engine. The engine lives at
 `packages/web/src/lib/board-game/` and the UI at `packages/web/src/app/(dashboard)/game/`.
 
 ## How it works

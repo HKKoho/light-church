@@ -292,7 +292,7 @@ export function AppSidebar() {
             <SidebarMenuButton size="lg" asChild>
               <Link href="/conversations">
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Grace Mission</span>
+                  <span className="truncate font-semibold">Light Church</span>
                   <span className="truncate text-xs">{t.brandTagline}</span>
                 </div>
               </Link>

@@ -1,5 +1,5 @@
 # Railway Deployment Guide — Option B
-## Grace Mission · Web + API on Railway · Agent Containers on VPS
+## Light Church · Web + API on Railway · Agent Containers on VPS
 
 ---
 
