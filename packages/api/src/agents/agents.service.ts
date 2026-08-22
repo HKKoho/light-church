@@ -13,6 +13,31 @@ import { AgentRunRepository } from '../db/agent-run.repository.js';
 import { UserAgentRepository } from '../db/user-agent.repository.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
+// Ollama Cloud is a DB-configured custom provider (not in the shared provider
+// registry), so its model suggestions have to be listed here instead of being
+// derived from pricing data. Catalog per https://ollama.com/v1/models.
+const OLLAMA_CLOUD_MODELS = [
+  'gpt-oss:120b',
+  'gpt-oss:20b',
+  'deepseek-v4-pro:preview',
+  'deepseek-v4-pro:0813',
+  'deepseek-v4-flash:preview',
+  'deepseek-v4-flash:0731',
+  'kimi-k2.6',
+  'kimi-k2.7-code',
+  'kimi-k3',
+  'glm-5.1',
+  'glm-5.2',
+  'nemotron-3-nano:30b',
+  'nemotron-3-super',
+  'nemotron-3-ultra',
+  'mistral-large-3:675b',
+  'minimax-m2.7',
+  'minimax-m3',
+  'gemma4:31b',
+  'qwen3.5:397b',
+];
+
 // Roles allowed to turn browser tools on for an agent. Deliberately narrower than
 // "who can edit an agent at all" (see updateAgent) — browser automation reaches
 // external sites, so it gets its own opt-in gate on top of the normal edit check,
@@ -215,8 +240,8 @@ export class AgentsService {
       .map((c) => ({
         name: c.provider,
         displayName: c.displayName,
-        defaultModel: '',
-        models: [] as string[], // Empty array allows custom model input in UI
+        defaultModel: c.provider === 'ollama-cloud' ? 'gpt-oss:120b' : '',
+        models: c.provider === 'ollama-cloud' ? OLLAMA_CLOUD_MODELS : ([] as string[]), // Empty array allows custom model input in UI
       }));
 
     return [...builtinProviders, ...customProviders];
