@@ -5,7 +5,7 @@ running everything (Postgres, Redis, the API, the web dashboard, and every
 agent's Docker container) via the installer this repo already ships
 (`pnpm run install:clawix`), fronted by Caddy for free automatic TLS.
 
-**Domain used throughout this guide:** `gracemission.aibyml.uk`
+**Domain used throughout this guide:** `lightchurch.aibyml.uk`
 (swap in your own if this changes).
 
 **Estimated cost:** ~$5/mo infra (Hetzner CX22 + amortized domain) + variable
@@ -18,7 +18,7 @@ LLM API usage. See [Cost recap](#cost-recap) at the end.
 1. Go to [console.hetzner.cloud](https://console.hetzner.cloud) and sign up /
    log in.
 2. Click **New Project** (or reuse an existing one) → name it e.g.
-   `grace-mission`.
+   `lightchurch`.
 3. Inside the project, click **Add Server**:
    - **Location:** closest to your users
    - **Image:** Ubuntu 24.04
@@ -28,7 +28,7 @@ LLM API usage. See [Cost recap](#cost-recap) at the end.
      `ssh-keygen -t ed25519`)
    - Leave networking/firewall defaults — you'll configure `ufw` on the box
      itself in Step 3
-   - **Name:** `grace-mission-prod`
+   - **Name:** `lightchurch-prod`
 4. Click **Create & Buy Now**.
 5. Note the server's public IPv4 address once it boots (e.g. `95.216.x.x`).
 
@@ -39,13 +39,13 @@ LLM API usage. See [Cost recap](#cost-recap) at the end.
 Add an **A record** at wherever you manage the `aibyml.uk` DNS:
 
 ```
-A   gracemission.aibyml.uk   →   <server IPv4>
+A   lightchurch.aibyml.uk   →   <server IPv4>
 ```
 
 Verify propagation before continuing (can take a few minutes, up to an hour):
 
 ```bash
-dig gracemission.aibyml.uk +short
+dig lightchurch.aibyml.uk +short
 ```
 
 It should return the server's IP.
@@ -111,8 +111,8 @@ group membership takes effect before continuing.
 ## Step 4 — Clone and Run the Installer
 
 ```bash
-git clone https://github.com/aibymlsg-jpg/grace-mission.git
-cd grace-mission
+git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+cd lightchurch
 pnpm run install:clawix
 ```
 
@@ -123,7 +123,7 @@ The installer is interactive. Answer the prompts like this:
 | Deployment mode | `1` (production) |
 | Provider selection | pick one or more (e.g. `1` for Anthropic) + paste your API key |
 | Default model | accept the default, or pick a cheaper one — see cost tip below |
-| Public host or IP | `gracemission.aibyml.uk` (no `https://`, no port) |
+| Public host or IP | `lightchurch.aibyml.uk` (no `https://`, no port) |
 | Use HTTPS? | `y` |
 | Extra CORS origins | leave blank |
 | Admin email / password / name | your admin login |
@@ -144,8 +144,8 @@ the installer waits for `http://localhost:3003/health` to go green.
 ## Step 5 — TLS with Caddy
 
 The installer bakes the **port number** into the URLs it generates
-(`https://gracemission.aibyml.uk:3002` for the dashboard,
-`https://gracemission.aibyml.uk:3003` for the API/WebSocket) — there's no
+(`https://lightchurch.aibyml.uk:3002` for the dashboard,
+`https://lightchurch.aibyml.uk:3003` for the API/WebSocket) — there's no
 built-in option for a clean port-less URL. The simplest fix is to let Caddy
 terminate TLS on those same two ports:
 
@@ -159,11 +159,11 @@ sudo apt-get update -qq && sudo apt-get install -y caddy
 Edit `/etc/caddy/Caddyfile`:
 
 ```caddyfile
-gracemission.aibyml.uk:3002 {
+lightchurch.aibyml.uk:3002 {
 	reverse_proxy localhost:3002
 }
 
-gracemission.aibyml.uk:3003 {
+lightchurch.aibyml.uk:3003 {
 	reverse_proxy localhost:3003
 }
 ```
@@ -176,7 +176,7 @@ Caddy issues and renews Let's Encrypt certificates for both automatically (it
 uses port 80 for the ACME challenge regardless of which port the site block
 listens on — that's why port 80 is open in the firewall).
 
-*(Want the classic port-less `https://gracemission.aibyml.uk` URL instead?
+*(Want the classic port-less `https://lightchurch.aibyml.uk` URL instead?
 That needs `docker-compose.prod.yml`'s port mappings changed and a rebuild —
 ask if you want that.)*
 
@@ -184,14 +184,14 @@ ask if you want that.)*
 
 ## Step 6 — Verify
 
-Open `https://gracemission.aibyml.uk:3002` in a browser and log in with the
+Open `https://lightchurch.aibyml.uk:3002` in a browser and log in with the
 admin credentials from Step 4. Confirm the WebSocket connects (the
 "connected" dot in `/conversations` should be green, not red).
 
 API health check:
 
 ```bash
-curl https://gracemission.aibyml.uk:3003/health
+curl https://lightchurch.aibyml.uk:3003/health
 ```
 
 ---

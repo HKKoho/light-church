@@ -2,7 +2,7 @@
 name: google-drive
 description: Download files or list folder contents from a Google Drive share link. Handles both public ("anyone with the link") and authenticated access. When authentication is required, prompts the user for their OAuth token before retrying — no credentials are ever hardcoded or assumed.
 version: 1.0.0
-author: grace-mission
+author: light-church
 tags: [google-drive, files, download, integration]
 ---
 

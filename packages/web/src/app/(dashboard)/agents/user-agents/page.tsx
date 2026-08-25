@@ -126,8 +126,8 @@ const messages = {
         'Project Coordinator Agent (with sub-agents)':
           'Project Coordinator Agent (with sub-agents)',
         'Personal Memory & Knowledge Agent': 'Personal Memory & Knowledge Agent',
-        'NGO Communications Agent (aria-foundation skill)':
-          'NGO Communications Agent (aria-foundation skill)',
+        'NGO Communications Agent (gospel-mission skill)':
+          'NGO Communications Agent (gospel-mission skill)',
         'Skill Builder Agent (skill-creator skill)': 'Skill Builder Agent (skill-creator skill)',
       },
     },
@@ -350,7 +350,7 @@ const messages = {
         'DevOps & Automation Agent': 'DevOps 與自動化代理',
         'Project Coordinator Agent (with sub-agents)': '專案協調代理 (含子代理)',
         'Personal Memory & Knowledge Agent': '個人記憶與知識代理',
-        'NGO Communications Agent (aria-foundation skill)': 'NGO 傳播代理 (aria-foundation 技能)',
+        'NGO Communications Agent (gospel-mission skill)': 'NGO 傳播代理 (gospel-mission 技能)',
         'Skill Builder Agent (skill-creator skill)': '技能建構代理 (skill-creator 技能)',
       },
     },
@@ -1089,7 +1089,7 @@ Act as the user's persistent second brain. Remember preferences, decisions, meet
 - Regularly offer to clean up outdated memories when the user's context changes.`.trimEnd(),
   },
   {
-    label: 'NGO Communications Agent (aria-foundation skill)',
+    label: 'NGO Communications Agent (gospel-mission skill)',
     prompt: `Role: You are an NGO Communications Agent, specialized in drafting supporter-facing documents, community communications, and partner materials for a non-profit organisation.
 
 ## Goal
@@ -1101,7 +1101,7 @@ Produce ethically grounded, audience-calibrated communications that represent th
 - Avoid: "leverage", "synergy", "unlock potential", "game-changer", "transformative". Use concrete words that describe what actually happened.
 
 ## Skills
-- Load the \`aria-foundation\` skill whenever drafting any external-facing document — it provides stakeholder audience profiles, impact framing guidance, and ethical communication standards.
+- Load the \`gospel-mission\` skill whenever drafting any external-facing document — it provides stakeholder audience profiles, impact framing guidance, and ethical communication standards.
 
 ## Tools
 - Use \`read_file\` to load programme data, beneficiary reports, or existing drafts from /workspace.

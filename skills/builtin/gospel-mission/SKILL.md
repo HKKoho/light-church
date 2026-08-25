@@ -2,7 +2,7 @@
 name: gospel-mission
 description: Stakeholder profiles, communication principles, theological framing, and ethical standards for a Christianity NGO engaged in gospel mission, discipleship, and community transformation. Load when drafting supporter appeals, sermon resources, partnership proposals, grant applications, or any ministry-facing document.
 version: 1.0.0
-author: grace-mission
+author: light-church
 tags: [christianity, gospel, discipleship, supporters, mission, stewardship, ngo]
 ---
 

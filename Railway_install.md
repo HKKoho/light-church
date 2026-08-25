@@ -76,13 +76,13 @@ The agent image must exist on the VPS where Docker runs:
 ssh root@YOUR_VPS_IP
 
 # Clone the repo
-git clone https://github.com/YOUR_ORG/grace-mission /tmp/grace-mission
+git clone https://github.com/YOUR_ORG/lightchurch /tmp/lightchurch
 
 # Build the agent sandbox image
 docker build \
   -t clawix-agent:latest \
-  -f /tmp/grace-mission/infra/docker/agent/Dockerfile \
-  /tmp/grace-mission
+  -f /tmp/lightchurch/infra/docker/agent/Dockerfile \
+  /tmp/lightchurch
 
 # Verify
 docker image ls clawix-agent:latest
@@ -212,7 +212,7 @@ railway redeploy
 To update the VPS agent image after code changes:
 ```bash
 ssh root@YOUR_VPS_IP
-cd /tmp/grace-mission && git pull
+cd /tmp/lightchurch && git pull
 docker build -t clawix-agent:latest -f infra/docker/agent/Dockerfile .
 ```
 

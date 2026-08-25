@@ -27,18 +27,17 @@ government institutions — so NGOs and similar nonprofits may use them freely.
 
   reference/Clawix SKILL and Agent/**     (NGO agents, skills, proposal, docs)
   skills/ARIA/**                          (ARIA Foundation skill)
-  skills/builtin/aria-foundation/**       (ARIA Foundation builtin skill)
   packages/web/src/app/(dashboard)/ngo/** (NGO dashboard pages)
   packages/api/prisma/setup-ngo.ts        (NGO workspace seeding)
   packages/api/prisma/seed-ngo-agents.ts  (NGO agent seeding)
   scripts/setup-ngo.mjs                   (NGO workspace seeding)
   scripts/seed-ngo-agents.mjs             (NGO agent seeding)
 
-The three directories above (reference/Clawix SKILL and Agent, skills/ARIA,
-skills/builtin/aria-foundation) each contain a copy of the full PolyForm
-Noncommercial License text in a local LICENSE file. The remaining NGO files in
-the list live inside otherwise-MIT-licensed packages but are nonetheless
-governed by the PolyForm Noncommercial License per this NOTICE.
+The two directories above (reference/Clawix SKILL and Agent, skills/ARIA) each
+contain a copy of the full PolyForm Noncommercial License text in a local
+LICENSE file. The remaining NGO files in the list live inside otherwise-MIT-
+licensed packages but are nonetheless governed by the PolyForm Noncommercial
+License per this NOTICE.
 
 Precedence
 ----------

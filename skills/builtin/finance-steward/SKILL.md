@@ -2,7 +2,7 @@
 name: finance-steward
 description: Financial analysis techniques, fund-accounting terminology, budget-vs-actual reporting, and calibration examples for NGO/church financial work. Load when preparing ledger entries, budget reports, cash-flow forecasts, or ledger exports for the finance-assistant agent.
 version: 1.0.0
-author: grace-mission
+author: light-church
 tags: [ngo, finance, stewardship, fund-accounting, budget]
 ---
 

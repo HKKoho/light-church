@@ -2,7 +2,7 @@
 name: game-builder
 description: Build short, Scripture-rooted narrative games (parables, Bible stories, discipleship journeys) as self-contained Projector items. Use when asked to build any game, interactive story, or VBS/youth-ministry play experience — enforces a storyboard-first human-approval gate before any code is written.
 version: 1.0.0
-author: grace-mission
+author: light-church
 tags: [games, projector, storyboard, discipleship, youth-ministry]
 ---
 

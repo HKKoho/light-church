@@ -20,10 +20,9 @@ interface MinistryCategory {
 }
 
 const categories: readonly MinistryCategory[] = [
-  { key: 'programPartners', itemKeys: ['programs', 'partners'] },
-  { key: 'financeStewardship', itemKeys: ['donors', 'finance'] },
-  { key: 'missionOutreach', itemKeys: ['fieldOps', 'outreach', 'comms', 'scripture'] },
-  { key: 'careGovernance', itemKeys: ['prayer', 'incidents', 'mne', 'consent', 'pastoralCare'] },
+  { key: 'bibleMinistries', itemKeys: ['comms', 'scripture', 'fieldOps', 'outreach', 'programs'] },
+  { key: 'careGovernance', itemKeys: ['mne', 'pastoralCare', 'prayer', 'incidents'] },
+  { key: 'financeStewardship', itemKeys: ['donors', 'finance', 'consent'] },
 ];
 
 const itemsByKey = new Map<string, NavItem>(ngoItems.map((item) => [item.key, item]));
@@ -31,14 +30,12 @@ const itemsByKey = new Map<string, NavItem>(ngoItems.map((item) => [item.key, it
 const messages = {
   en: {
     category: {
-      programPartners: 'Program & Partners',
+      bibleMinistries: 'Bible & Ministries',
       financeStewardship: 'Finance & Stewardship',
-      missionOutreach: 'Mission & Outreach',
       careGovernance: 'Care & Governance',
     },
     nav: {
-      programs: 'Ministries',
-      partners: 'Partners',
+      programs: 'Other Programs',
       donors: 'Stewardship',
       mne: 'Kingdom Impact',
       comms: 'Proclamation',
@@ -54,14 +51,12 @@ const messages = {
   },
   'zh-TW': {
     category: {
-      programPartners: '事工協調',
+      bibleMinistries: '聖經與事工',
       financeStewardship: '財務治理',
-      missionOutreach: '宣教與外展',
       careGovernance: '牧養與治理',
     },
     nav: {
-      programs: '事工計畫',
-      partners: '夥伴機構',
+      programs: '其他事工',
       donors: '財務管理',
       mne: '國度成效',
       comms: '宣揚福音',

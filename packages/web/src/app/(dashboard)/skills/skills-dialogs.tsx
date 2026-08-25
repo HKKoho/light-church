@@ -424,11 +424,11 @@ Transform raw field notes, activity logs, and supporting files into a profession
 ## Key Features
 - Reads unstructured notes and CSV data from /workspace/field-data/
 - Structures content into the standard NGO report template
-- Applies aria-foundation communication principles (audience-calibrated tone, dignity in storytelling)
+- Applies gospel-mission communication principles (audience-calibrated tone, dignity in storytelling)
 - Saves the final report as a .md or .docx file to /workspace/output/
 
 ## Skills loaded alongside this skill
-- Load \`aria-foundation\` for supporter communication tone, impact framing, and ethical standards
+- Load \`gospel-mission\` for supporter communication tone, impact framing, and ethical standards
 
 ## Usage
 1. **Prepare data**: Place field notes (.txt/.md) and any CSV data in /workspace/field-data/
@@ -440,7 +440,7 @@ Transform raw field notes, activity logs, and supporting files into a profession
 1. \`list_directory\` on /workspace/field-data/ to inventory available files
 2. \`read_file\` each source file to load content into context
 3. Structure into the standard report template (sections below)
-4. Apply aria-foundation tone guidance for the intended audience (default: institutional supporter)
+4. Apply gospel-mission tone guidance for the intended audience (default: institutional supporter)
 5. \`write_file\` the compiled report to /workspace/output/
 
 ## Standard report sections

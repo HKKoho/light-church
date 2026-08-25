@@ -92,8 +92,8 @@ takes effect before continuing.
 ## 4. Clone and run the installer
 
 ```bash
-git clone https://github.com/aibymlsg-jpg/grace-mission.git
-cd grace-mission
+git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+cd lightchurch
 pnpm run install:clawix
 ```
 

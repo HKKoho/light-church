@@ -2,7 +2,7 @@
 name: pastoral-care
 description: Situation-specific conversation guidance for grief, illness, marriage/family crisis, spiritual dryness, and addiction support, plus a care checklist and message templates. Load when having a pastoral-care conversation, for technique beyond the agent's own safety rules.
 version: 1.0.0
-author: grace-mission
+author: light-church
 tags: [pastoral-care, counseling, grief, crisis, wellbeing]
 ---
 
