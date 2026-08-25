@@ -28,6 +28,7 @@ import { TasksModule } from './tasks/index.js';
 import { SystemSettingsModule } from './system-settings/index.js';
 import { TokensModule } from './tokens/index.js';
 import { ProviderConfigModule } from './provider-config/provider-config.module.js';
+import { PacksModule } from './packs/packs.module.js';
 import { WorkspaceModule } from './workspace/index.js';
 import { CongregationProfileModule } from './congregation-profile/congregation-profile.module.js';
 
@@ -65,6 +66,7 @@ import { CongregationProfileModule } from './congregation-profile/congregation-p
     HealthModule,
     SystemSettingsModule,
     ProviderConfigModule,
+    PacksModule,
     WorkspaceModule,
     CongregationProfileModule,
   ],

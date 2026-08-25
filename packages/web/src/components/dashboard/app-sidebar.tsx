@@ -29,6 +29,7 @@ import {
   MessageSquare,
   Moon,
   Newspaper,
+  Package,
   Radio,
   ScrollText,
   Settings2,
@@ -127,6 +128,7 @@ const settingsItems: readonly NavItem[] = [
   { key: 'channels', href: '/settings/channels', icon: Radio },
   { key: 'providers', href: '/settings/providers', icon: Bot },
   { key: 'congregationProfile', href: '/settings/congregation-profile', icon: UsersRound },
+  { key: 'packs', href: '/settings/packs', icon: Package },
 ];
 
 const messages = {
@@ -165,6 +167,7 @@ const messages = {
       channels: 'Channels',
       providers: 'Providers',
       congregationProfile: 'Congregation Profile',
+      packs: 'Ministry Packs',
     },
     lightMode: 'Light mode',
     darkMode: 'Dark mode',
@@ -212,6 +215,7 @@ const messages = {
       channels: '頻道',
       providers: '供應商',
       congregationProfile: '會眾背景設定',
+      packs: '事工套件',
     },
     lightMode: '淺色模式',
     darkMode: '深色模式',

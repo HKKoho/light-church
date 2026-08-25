@@ -7,34 +7,6 @@ interface RoadmapItem {
   readonly eta?: string;
 }
 
-// Phase 2A (the original gospel-mission 8-key-areas backlog) shipped in full —
-// folded in here rather than kept as its own now-empty section.
-const SHIPPED: readonly RoadmapItem[] = [
-  { title: 'Pastoral-care agent' },
-  { title: 'Speech input & read-aloud' },
-  { title: 'Partners Directory' },
-  { title: 'Mission Trip Fields' },
-  { title: 'Kingdom Impact Indicators' },
-  { title: 'Financial Stewardship & Ledger Export' },
-  { title: 'Evangelism & Outreach Agent' },
-  { title: 'Scripture & Literacy Tracker' },
-  { title: 'Consent & Story Permissions Tracker' },
-  { title: 'Game Studio live wiring' },
-  { title: 'Granular RBAC role taxonomy' },
-  { title: 'Categorized ministries top-bar nav' },
-  { title: 'Richer pastoral-care content' },
-  { title: 'Port all ~20 church-* skills' },
-  { title: 'Seed the corresponding agents' },
-  { title: 'Add browser-automation tool suite' },
-];
-
-// Phase 2C — ChurchAIAssistant pack integration, settings half: make packs a
-// first-class, toggleable concept instead of a one-off script.
-const PHASE_2C: readonly RoadmapItem[] = [
-  { title: 'Pack-installer script' },
-  { title: 'Ministry Packs settings tab' },
-];
-
 // Phase 2D — ChurchAIAdmin's Attendance/Roll-Call system has no equivalent in
 // either this repo or ChurchAIAssistant. Doesn't fit 2A (unrelated backlog),
 // 2B (not church-*-skill content), or 2C (not pack infra) — a real gap on its
@@ -81,8 +53,6 @@ export function Phase2RoadmapCard() {
         <CardDescription className="text-[11px]">Planning estimates, not commitments.</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 px-4 text-xs">
-        <RoadmapSection label="Shipped" items={SHIPPED} />
-        <RoadmapSection label="Phase 2C" items={PHASE_2C} />
         <RoadmapSection label="Phase 2D" items={PHASE_2D} />
       </CardContent>
     </Card>

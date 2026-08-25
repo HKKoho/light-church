@@ -197,12 +197,15 @@ pnpm run uninstall:clawix -- --full  # also remove .env, ./data/, ./skills/custo
 
 ### Seed the ministry configuration
 
-The ministry team (six specialists + primary orchestrator) and the workspace folder structure are created by:
+The specialist agent bundles are managed as **Ministry Packs** — install and toggle them from **Settings → Ministry Packs** in the dashboard (super admin only), or headlessly from the CLI:
 
 ```bash
-node scripts/seed-ngo-agents.mjs    # create the six specialist agents (incl. game-studio)
-node scripts/setup-ngo.mjs          # seed the 31-folder workspace + skill files
+node scripts/seed-ngo-agents.mjs      # create the 10 NGO Operations agents (incl. pastoral-care, game-studio)
+node scripts/seed-church-agents.mjs   # create the 7 Church Ministries agents (sermon prep, Sunday school, worship, …)
+node scripts/setup-ngo.mjs            # seed the workspace folder structure + skill files
 ```
+
+Both seed scripts are idempotent — safe to re-run; existing agents are skipped, not duplicated. The dashboard tab and the CLI scripts share the same agent definitions (`packages/api/src/packs/definitions/`), so installing via one is visible in the other.
 
 All reference material behind the ministry configuration (agent definitions, skill packages, architecture notes) lives under `reference/Clawix SKILL and Agent/`. Note that those reference docs still use generic "NGO" language throughout — they're the underlying legal/architecture layer that Light Church's branding sits on top of, not something end users see.
 
@@ -242,22 +245,40 @@ pnpm run dev                         # API on :3001, dashboard on :3000
 
 A complete multi-agent setup for small-to-mid-size mission organizations and NGOs (10–80 staff, multi-supporter, often field-based). All reference files live under `reference/Clawix SKILL and Agent/`.
 
-### The six specialist agents
+### The NGO Operations pack — 10 specialist agents
 
-Created via `scripts/seed-ngo-agents.mjs` — each with `role: worker`, `isOfficial: true`:
+Installed as the `ngo` Ministry Pack (**Settings → Ministry Packs**, or `scripts/seed-ngo-agents.mjs`) — each with `role: worker`, `isOfficial: true`. Definitions live in `packages/api/src/packs/definitions/ngo-agents.data.ts`, the single source shared by the CLI script and the pack-installer API.
 
 | Agent (internal name) | Shown in-app as | Responsibility | Tools | Reads skills |
 |---|---|---|---|---|
 | `program-coordinator` | Ministries | Workplan, partner/church register, activity tracker, weekly status notes | Read, Write, Edit, Grep, Glob | safeguarding, ngo-comms |
-| `donor-engagement` | Stewardship | Proposals, narrative reports, log-frames, supporter research | Read, Write, Edit, Grep, Glob, WebSearch (domain-allowlisted) | donor-proposal, grant-research, impact-report, data-protection |
+| `donor-engagement` | Stewardship | Proposals, narrative reports, log-frames, supporter research | Read, Write, Edit, Grep, Glob, WebSearch (domain-allowlisted) | donor-proposal, grant-research, impact-report, data-protection, gospel-mission |
 | `monitoring-evaluation` | Kingdom Impact | Indicators, data-collection forms, period validation, dashboard summaries | Read, Write, Edit, Grep, Glob, Bash (read-only allowlist) | mne, data-protection |
-| `communications` | Proclamation | Newsletters, social posts, op-eds, advocacy briefs | Read, Write, Edit, Grep, Glob | ngo-comms, data-protection |
+| `communications` | Proclamation | Newsletters, social posts, op-eds, advocacy briefs | Read, Write, Edit, Grep, Glob | ngo-comms, data-protection, gospel-mission |
 | `field-operations` | Mission Field / Safeguarding | Logistics lists, risk register, safeguarding incident records (post-triage only) | Read, Write, Edit, Grep, Glob | safeguarding, data-protection |
 | `game-studio` | Projector (Game Builder) | Short, Scripture-rooted narrative games for VBS/youth ministry, storyboard-first, human-approved before build | Read, Write, Edit, spawn `coder` sub-agent (build phase only) | game-builder, gospel-mission |
+| `pastoral-care` | Pastoral Care | AI-disclosed pastoral/spiritual support conversations — listening, prayer, Scripture; escalates crisis disclosures to a human | Read, Write (`pastoral-care/records/`, `pastoral-care/flagged/`) | pastoral-care |
+| `finance-assistant` | Finance | Ledger entries, budget-vs-actual reports, reconciliation prep, bookkeeping exports — drafts only | Read, Write, Edit | finance-steward |
+| `evangelism-outreach` | Outreach | Outreach campaign plans, gospel-proclamation content, church-planting briefs; never conditions aid on participation | Read, Write, Edit | gospel-mission |
+| `scripture-literacy` | Scripture & Literacy | Bible translation status, Scripture distribution records, mother-tongue literacy programmes | Read, Write, Edit | — |
+
+### The Church Ministries pack — 7 specialist agents
+
+Installed as the `church` Ministry Pack (`scripts/seed-church-agents.mjs`). Definitions live in `packages/api/src/packs/definitions/church-agents.data.ts`.
+
+| Agent (internal name) | Responsibility | Reads skills |
+|---|---|---|
+| `church-sermon-prep` | Passage exegesis, outline construction, illustrations, application points, closing prayers | `church-sermon-prep` |
+| `church-sunday-school` | Age-banded lessons (nursery–senior high): teaching, crafts, memory verses, parent take-home notes | `church-sunday-school` |
+| `church-bible-study` | Small-group study guides, multi-week series, inductive discussion questions | `church-bible-study` |
+| `church-worship-planner` | Song selection, liturgical flow, seasonal and special-service planning | `church-worship-planner` |
+| `church-prayer-journal` | Prayer meeting guides, intercession lists, fasting guides, contemplative prayer | `church-prayer-journal` |
+| `church-communications` | Congregation-facing newsletters, welcome emails, event invitations, testimonies | `church-communications` |
+| `church-admin-coordinator` | Full back-office: events, bulletins, volunteer rotas, facility booking, membership, minutes, calendar | the 9 `church-admin*` skills |
 
 ### The primary orchestrator
 
-The user-facing agent (shown as the Ministry Coordinator / primary assistant). It knows all six specialists, when to spawn each, the full workspace layout, and enforces the security principles:
+The user-facing agent (shown as the Ministry Coordinator / primary assistant). It knows the installed specialists, when to spawn each, the full workspace layout, and enforces the security principles:
 
 - Routes requests to exactly one specialist at a time — no autonomous agent-to-agent chaining
 - Enforces the PII boundary (beneficiary and congregant data never enters agent memory)
@@ -302,7 +323,6 @@ Read-only reference packages — encoded best practice the relevant agent reads 
 | `ngo-comms/SKILL.md` | `reference/…/skills/` | Proclamation, Ministries | Accessible language standards; do-no-harm storytelling; dignity-preserving imagery; advocacy framing; status-note classification |
 | `game-builder/SKILL.md` | `skills/builtin/` | Game Studio | Enforces STORYBOARD → APPROVE → BUILD → DELIVER; games render in a sandboxed, network-free iframe; permitted genres (puzzle, platformer, narrative, collector — no combat/arena); content rules (no fear/shame mechanics, theologically sound, age-appropriate, antagonists drawn with dignity) |
 | `gospel-mission/SKILL.md` | `skills/builtin/` | Game Studio (tone cross-check); available platform-wide | Theological foundation (Great Commission, Great Commandment, stewardship); stakeholder messaging profiles for Christian foundations, church partners, individual supporters/intercessors, beneficiaries, and secular/institutional funders |
-| `aria-foundation/SKILL.md` | `skills/builtin/` | Any specialist (loaded on demand) | Stakeholder audience profiles, communication principles, dignity in storytelling, impact framing (output → outcome → impact) |
 | `projector-creator/SKILL.md` | `skills/builtin/` | Any agent building a Projector tool | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the Projector page (Game Studio is one specialization of this) |
 
 ### Architecture docs
@@ -314,7 +334,7 @@ Read-only reference packages — encoded best practice the relevant agent reads 
 
 ### What's next
 
-The dashboard's Phase 2 roadmap card tracks planned features (estimates, not commitments): Partners Directory, Mission Trip Fields, and Kingdom Impact Indicators in the near term; an Evangelism & Outreach agent and Financial Stewardship & Ledger Export shortly after; and further out, a Scripture & Literacy Tracker, a Consent & Story Permissions Tracker, and finishing the Game Studio build pipeline ("Game Studio live wiring"). See [`docs/PHASE2.md`](docs/PHASE2.md) for the separate engineering hardening backlog.
+Phases 2A–2C are shipped: the original NGO feature backlog, the Church Ministries agent/skill port, and Ministry Packs (the settings tab and pack-installer described above). The dashboard's Phase 2 roadmap card now tracks only what's left — **Phase 2D**: attendance/roll-call tracking and AI survey + QR registration, carried over from a feature audit of ChurchAIAdmin with no equivalent in this repo yet. See [`docs/PHASE2.md`](docs/PHASE2.md) for the separate engineering hardening backlog.
 
 ---
 
@@ -346,7 +366,7 @@ This project is **dual-licensed**:
 - **Core Clawix platform** — [MIT License](LICENSE). Free to use, modify, and distribute, including commercially.
 - **NGO/ministry-specific components** — [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only — but the PolyForm Noncommercial terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations, and governments, so **NGOs, ministries, and nonprofits may use them freely.**
 
-See the [NOTICE](NOTICE) file for the exact list of paths covered by each license (it's still titled "Clawix for NGOs" — that's the legal/platform identity these paths are governed under, distinct from the "Light Church" branding applied in this deployment). The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`, `skills/builtin/aria-foundation/`) also carry their own local `LICENSE` files.
+See the [NOTICE](NOTICE) file for the exact list of paths covered by each license (it's still titled "Clawix for NGOs" — that's the legal/platform identity these paths are governed under, distinct from the "Light Church" branding applied in this deployment). The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own local `LICENSE` files.
 
 ---
 
