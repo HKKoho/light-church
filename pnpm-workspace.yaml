@@ -3,6 +3,24 @@ packages:
 
 onlyBuiltDependencies:
   - '@nestjs/core'
+  - '@prisma/engines'
+  - protobufjs
   - '@swc/core'
+  - '@whiskeysockets/baileys'
   - esbuild
+  - prisma
+  - sharp
   - unrs-resolver
+
+overrides:
+  fast-uri: '>=3.1.2'
+  flatted: '>=3.4.0'
+  defu: '>=6.1.7'
+  path-to-regexp: '>=8.4.0'
+  lodash: '>=4.18.0'
+  picomatch: '>=4.0.4'
+  hono: '>=4.12.21'
+  '@hono/node-server': '>=1.19.10'
+  effect: '>=3.20.0'
+  '@google/genai>protobufjs': '>=7.5.8 <8.0.0'
+  '@whiskeysockets/baileys>protobufjs': '>=7.5.8 <8.0.0'
