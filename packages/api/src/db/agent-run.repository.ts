@@ -121,6 +121,42 @@ export class AgentRunRepository {
     return buildPaginatedResponse(data, total, pagination);
   }
 
+  async findByUserId(
+    userId: string,
+    pagination: PaginationInput,
+  ): Promise<PaginatedResponse<AgentRun & { agentDefinition: { name: string } }>> {
+    const paginationArgs = buildPaginationArgs(pagination);
+    const where: Prisma.AgentRunWhereInput = { session: { userId } };
+
+    const [data, total] = await Promise.all([
+      this.prisma.agentRun.findMany({
+        where,
+        ...paginationArgs,
+        orderBy: { startedAt: 'desc' },
+        include: { agentDefinition: { select: { name: true } } },
+      }),
+      this.prisma.agentRun.count({ where }),
+    ]);
+
+    return buildPaginatedResponse(data, total, pagination);
+  }
+
+  async findByIdForUser(
+    id: string,
+    userId: string,
+  ): Promise<AgentRun & { agentDefinition: { name: string } }> {
+    const agentRun = await this.prisma.agentRun.findFirst({
+      where: { id, session: { userId } },
+      include: { agentDefinition: { select: { name: true } } },
+    });
+
+    if (!agentRun) {
+      throw new NotFoundError('AgentRun', id);
+    }
+
+    return agentRun;
+  }
+
   async findAllByStatus(status: AgentStatus): Promise<readonly AgentRun[]> {
     return this.prisma.agentRun.findMany({
       where: { status },

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { hash } from 'bcryptjs';
 
-import type { PaginatedResponse, PaginationInput } from '@clawix/shared';
+import type { PaginatedResponse, PaginationInput, CreateClientAccountInput } from '@clawix/shared';
 import { ConflictError } from '@clawix/shared';
 import { type Channel, type Policy, Prisma, type User } from '../generated/prisma/client.js';
 import type {
@@ -17,6 +17,8 @@ import { encryptChannelConfig, maskChannelConfig } from '../channels/channel-con
 import { GroupRepository } from '../db/group.repository.js';
 import { PolicyRepository } from '../db/policy.repository.js';
 import { UserRepository } from '../db/user.repository.js';
+import { handlePrismaError } from '../db/utils.js';
+import { PrismaService } from '../prisma/prisma.service.js';
 import { BCRYPT_SALT_ROUNDS_DEFAULT } from '../auth/auth.constants.js';
 
 type SafeUser = Omit<User, 'passwordHash'>;
@@ -49,6 +51,7 @@ export class AdminService {
     private readonly groupRepo: GroupRepository,
     private readonly policyRepo: PolicyRepository,
     private readonly config: ConfigService,
+    private readonly prisma: PrismaService,
   ) {
     this.saltRounds = Number(
       this.config.get<string>('BCRYPT_SALT_ROUNDS') ?? BCRYPT_SALT_ROUNDS_DEFAULT,
@@ -81,6 +84,34 @@ export class AdminService {
     });
 
     return this.stripPassword(user);
+  }
+
+  async createClientAccount(input: CreateClientAccountInput): Promise<SafeUser> {
+    const passwordHash = await hash(input.password, this.saltRounds);
+    try {
+      const user = await this.prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({
+          data: {
+            email: input.email,
+            name: input.name,
+            passwordHash,
+            role: 'client',
+            policyId: input.policyId,
+          },
+        });
+        await tx.userAgent.create({
+          data: {
+            userId: user.id,
+            agentDefinitionId: input.agentDefinitionId,
+            workspacePath: `users/${user.id}/workspace`,
+          },
+        });
+        return user;
+      });
+      return this.stripPassword(user);
+    } catch (error: unknown) {
+      handlePrismaError(error, 'User');
+    }
   }
 
   async updateUser(id: string, input: UpdateUserInput): Promise<SafeUser> {

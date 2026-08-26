@@ -55,6 +55,7 @@ enum UserRole {
   ministry_leader
   volunteer
   guest
+  client
 }
 
 // Department scoping for workspace folder visibility. `all` (the default) preserves

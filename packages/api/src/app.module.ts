@@ -31,6 +31,7 @@ import { ProviderConfigModule } from './provider-config/provider-config.module.j
 import { PacksModule } from './packs/packs.module.js';
 import { WorkspaceModule } from './workspace/index.js';
 import { CongregationProfileModule } from './congregation-profile/congregation-profile.module.js';
+import { ClientModule } from './client/client.module.js';
 
 @Module({
   imports: [
@@ -69,6 +70,7 @@ import { CongregationProfileModule } from './congregation-profile/congregation-p
     PacksModule,
     WorkspaceModule,
     CongregationProfileModule,
+    ClientModule,
   ],
   providers: [
     {

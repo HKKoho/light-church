@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   createUserSchema,
   updateUserSchema,
+  createClientAccountSchema,
   createChannelSchema,
   updateChannelSchema,
   createPolicySchema,
@@ -16,6 +17,7 @@ import {
 import type {
   CreateUserInput,
   UpdateUserInput,
+  CreateClientAccountInput,
   CreateChannelInput,
   UpdateChannelInput,
   CreatePolicyInput,
@@ -63,6 +65,13 @@ export class AdminController {
   @Delete('users/:id')
   removeUser(@Param('id') id: string) {
     return this.adminService.deleteUser(id);
+  }
+
+  @Post('clients')
+  createClient(
+    @Body(new ZodValidationPipe(createClientAccountSchema)) body: CreateClientAccountInput,
+  ) {
+    return this.adminService.createClientAccount(body);
   }
 
   // ---- Channels ---- //

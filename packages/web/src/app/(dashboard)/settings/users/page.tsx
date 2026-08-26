@@ -58,6 +58,7 @@ import { authFetch } from '@/lib/auth';
 import { useAnimeOnMount, staggerFadeUp, STAGGER } from '@/lib/anime';
 import { useT, type Messages } from '@/lib/i18n';
 import { GroupsTab } from '../groups-tab';
+import { ApiClientsTab } from '../api-clients-tab';
 
 // ------------------------------------------------------------------ //
 //  Types                                                              //
@@ -261,6 +262,7 @@ const messages = {
       users: 'Users',
       roles: 'Roles',
       groups: 'Groups',
+      clients: 'API Clients',
     },
     createUser: 'Create User',
     table: {
@@ -411,6 +413,7 @@ const messages = {
       users: '使用者',
       roles: '角色',
       groups: '群組',
+      clients: 'API 用戶端',
     },
     createUser: '建立使用者',
     table: {
@@ -554,7 +557,7 @@ const messages = {
 } satisfies Messages<{
   title: string;
   subtitle: string;
-  tabs: { users: string; roles: string; groups: string };
+  tabs: { users: string; roles: string; groups: string; clients: string };
   createUser: string;
   table: {
     name: string;
@@ -868,30 +871,35 @@ export default function UsersPage() {
     );
     const policyMap = new Map(policies.map((p) => [p.id, p.name]));
 
-    return [...users].sort((a, b) => {
-      for (const { key, dir } of sorts) {
-        let cmp = 0;
-        switch (key) {
-          case 'name':
-            cmp = a.name.localeCompare(b.name);
-            break;
-          case 'email':
-            cmp = a.email.localeCompare(b.email);
-            break;
-          case 'role':
-            cmp = (roleOrder[a.role] ?? 99) - (roleOrder[b.role] ?? 99);
-            break;
-          case 'plan':
-            cmp = (policyMap.get(a.policyId) ?? '').localeCompare(policyMap.get(b.policyId) ?? '');
-            break;
-          case 'status':
-            cmp = Number(b.isActive) - Number(a.isActive);
-            break;
+    // Client (headless API) accounts are managed in the dedicated "API Clients" tab —
+    // hide them from the interactive Users list so the edit dialog can't hit the
+    // client role (which the generic role picker intentionally doesn't offer).
+    return users
+      .filter((u) => u.role !== 'client')
+      .sort((a, b) => {
+        for (const { key, dir } of sorts) {
+          let cmp = 0;
+          switch (key) {
+            case 'name':
+              cmp = a.name.localeCompare(b.name);
+              break;
+            case 'email':
+              cmp = a.email.localeCompare(b.email);
+              break;
+            case 'role':
+              cmp = (roleOrder[a.role] ?? 99) - (roleOrder[b.role] ?? 99);
+              break;
+            case 'plan':
+              cmp = (policyMap.get(a.policyId) ?? '').localeCompare(policyMap.get(b.policyId) ?? '');
+              break;
+            case 'status':
+              cmp = Number(b.isActive) - Number(a.isActive);
+              break;
+          }
+          if (cmp !== 0) return dir === 'desc' ? -cmp : cmp;
         }
-        if (cmp !== 0) return dir === 'desc' ? -cmp : cmp;
-      }
-      return 0;
-    });
+        return 0;
+      });
   }, [users, sorts, policies]);
 
   useAnimeOnMount(staggerFadeUp('[data-animate="user-rows"] tr', { stagger: STAGGER.tight }));
@@ -931,6 +939,9 @@ export default function UsersPage() {
             </TabsTrigger>
             <TabsTrigger value="groups" className="rounded-full px-4">
               {t.tabs.groups}
+            </TabsTrigger>
+            <TabsTrigger value="clients" className="rounded-full px-4">
+              {t.tabs.clients}
             </TabsTrigger>
           </TabsList>
           {tab === 'users' && (
@@ -1145,6 +1156,10 @@ export default function UsersPage() {
 
         <TabsContent value="groups" className="mt-4">
           <GroupsTab />
+        </TabsContent>
+
+        <TabsContent value="clients" className="mt-4">
+          <ApiClientsTab />
         </TabsContent>
       </Tabs>
 
