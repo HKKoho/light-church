@@ -74,8 +74,11 @@ COPY --from=builder /app/packages/api/src/generated/prisma ./src/generated/prism
 # Copy production prisma.config.ts (doesn't need dotenv - reads from env vars)
 COPY infra/docker/api/prisma.config.ts ./prisma.config.ts
 
-# Install prisma CLI for migrations only (client already generated)
-RUN npm install -g prisma
+# Install prisma CLI for migrations only (client already generated).
+# Pinned to match the "prisma" devDependency version in packages/api/package.json —
+# an unpinned global install can silently pick up a newer major with a
+# breaking CLI (e.g. `migrate` renamed to `migration`), breaking migrations.
+RUN npm install -g prisma@7.4.2
 
 # Create directories
 RUN mkdir -p /data /app/skills
@@ -87,10 +90,10 @@ RUN chmod +x /app/entrypoint.sh
 # Note: We run as root to access Docker socket, but the app itself
 # is designed with security in mind. In K8s, use a service account instead.
 
-EXPOSE 3001
+EXPOSE 3003
 
 # Health check (with longer start period for migrations)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD node -e "fetch('http://localhost:3001/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
+    CMD node -e "fetch('http://localhost:3003/health').then(r => r.ok ? process.exit(0) : process.exit(1)).catch(() => process.exit(1))"
 
 ENTRYPOINT ["/app/entrypoint.sh"]
