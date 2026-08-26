@@ -6,6 +6,7 @@ import type { IncomingMessage } from 'node:http';
 import { WebSocketServer, type WebSocket } from 'ws';
 import { createLogger } from '@clawix/shared';
 
+import { PrismaService } from '../../prisma/prisma.service.js';
 import type { WebAdapterExtended } from './web.adapter.js';
 import { serializeServerMessage } from './web.protocol.js';
 
@@ -38,6 +39,7 @@ export class WebChatGateway implements OnModuleInit, OnModuleDestroy {
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly httpAdapterHost: HttpAdapterHost,
+    private readonly prisma: PrismaService,
   ) {}
 
   onModuleInit(): void {
@@ -85,6 +87,16 @@ export class WebChatGateway implements OnModuleInit, OnModuleDestroy {
 
     const userId = payload.sub;
     const userName = payload.email;
+
+    const dbUser = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { isActive: true },
+    });
+    if (!dbUser?.isActive) {
+      logger.warn({ userId }, 'WebSocket connection rejected — user not found or inactive');
+      socket.close(4001, 'unauthorized');
+      return;
+    }
 
     if (!this.adapter) {
       logger.warn('WebSocket connection rejected — adapter not initialized');

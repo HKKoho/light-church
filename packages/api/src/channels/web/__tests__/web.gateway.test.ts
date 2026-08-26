@@ -44,6 +44,9 @@ const mockHttpAdapterHost = {
     getHttpServer: vi.fn().mockReturnValue({}),
   },
 };
+const mockPrisma = {
+  user: { findUnique: vi.fn() },
+};
 
 describe('WebChatGateway', () => {
   let gateway: WebChatGateway;
@@ -54,10 +57,12 @@ describe('WebChatGateway', () => {
     mockConfigService.getOrThrow.mockReturnValue('test-jwt-secret');
     mockAdapter.addConnection.mockReturnValue(true);
     mockAdapter.handleClientMessage.mockResolvedValue(true);
+    mockPrisma.user.findUnique.mockResolvedValue({ isActive: true });
     gateway = new WebChatGateway(
       mockJwtService as never,
       mockConfigService as never,
       mockHttpAdapterHost as never,
+      mockPrisma as never,
     );
     gateway.setAdapter(mockAdapter as never);
   });
@@ -98,6 +103,36 @@ describe('WebChatGateway', () => {
     it('closes socket with 4001 when no token query param', async () => {
       const socket = mockSocket();
       const req = mockRequest('/ws/chat');
+
+      await gateway.handleConnection(socket as never, req);
+
+      expect(socket.close).toHaveBeenCalledWith(4001, 'unauthorized');
+      expect(mockAdapter.addConnection).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleConnection — inactive user', () => {
+    it('closes socket with 4001 when the DB user is inactive', async () => {
+      const payload = { sub: 'user-1', email: 'test@example.com', role: 'developer' };
+      mockJwtService.verifyAsync.mockResolvedValue(payload);
+      mockPrisma.user.findUnique.mockResolvedValue({ isActive: false });
+
+      const socket = mockSocket();
+      const req = mockRequest('/ws/chat?token=valid.jwt.token');
+
+      await gateway.handleConnection(socket as never, req);
+
+      expect(socket.close).toHaveBeenCalledWith(4001, 'unauthorized');
+      expect(mockAdapter.addConnection).not.toHaveBeenCalled();
+    });
+
+    it('closes socket with 4001 when the DB user no longer exists', async () => {
+      const payload = { sub: 'user-1', email: 'test@example.com', role: 'developer' };
+      mockJwtService.verifyAsync.mockResolvedValue(payload);
+      mockPrisma.user.findUnique.mockResolvedValue(null);
+
+      const socket = mockSocket();
+      const req = mockRequest('/ws/chat?token=valid.jwt.token');
 
       await gateway.handleConnection(socket as never, req);
 
