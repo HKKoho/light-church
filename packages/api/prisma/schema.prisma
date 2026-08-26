@@ -100,6 +100,7 @@ model User {
   userAgents              UserAgent[]
   tasks                   Task[]
   createdAgentDefinitions AgentDefinition[] @relation("CreatedAgentDefinitions")
+  serviceAttendances      ServiceAttendance[]
 }
 
 // ============================================================================
@@ -184,6 +185,75 @@ model AgentRun {
   @@index([sessionId])
   @@index([status])
   @@index([parentAgentRunId])
+}
+
+// ============================================================================
+// Worship / Sunday School (attendance + bulletin tracking)
+//
+// Backfilled into schema.prisma from live DB introspection — this migration
+// (20260816141735_add_worship_bulletin_sunday_school) was applied directly to
+// the shared dev database without ever being committed to this repo. See git
+// history around 2026-08-26 for the reconciliation.
+// ============================================================================
+
+enum BulletinStatus {
+  pending
+  generated
+  published
+}
+
+enum SundaySchoolAgeGroup {
+  nursery
+  kindergarten
+  junior
+  preteen
+  juniorHigh
+  seniorHigh
+}
+
+model WorshipService {
+  id               String         @id @default(cuid())
+  date             DateTime
+  serviceLabel     String
+  preacher         String?
+  sermonTitle      String?
+  scriptureRef     String?
+  worshipLeader    String?
+  bulletinStatus   BulletinStatus @default(pending)
+  bulletinFilePath String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  attendances ServiceAttendance[]
+
+  @@index([date])
+}
+
+model SundaySchoolClass {
+  id                 String                @id @default(cuid())
+  ageGroup           SundaySchoolAgeGroup
+  className          String
+  teacherName        String?
+  curriculumTheme    String?
+  lastLessonFilePath String?
+  lastGeneratedAt    DateTime?
+  updatedAt          DateTime              @updatedAt
+
+  @@index([ageGroup])
+}
+
+model ServiceAttendance {
+  id               String   @id @default(cuid())
+  worshipServiceId String
+  headcount        Int
+  breakdown        Json?
+  recordedAt       DateTime @default(now())
+  recordedByUserId String?
+
+  worshipService WorshipService @relation(fields: [worshipServiceId], references: [id], onDelete: Cascade)
+  recordedBy     User?          @relation(fields: [recordedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([worshipServiceId])
 }
 
 // ============================================================================
