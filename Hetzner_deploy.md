@@ -111,7 +111,7 @@ group membership takes effect before continuing.
 ## Step 4 — Clone and Run the Installer
 
 ```bash
-git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+git clone https://github.com/HKKoho/light-church.git lightchurch
 cd lightchurch
 pnpm run install:clawix
 ```
