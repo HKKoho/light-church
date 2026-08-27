@@ -100,11 +100,11 @@ async function main() {
     deployMode = 'production';
   }
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  // Same host ports in both modes — see docker-compose.{dev,prod}.yml and .env
-  // for why these are non-default (avoids colliding with sibling Clawix
-  // checkouts' containers on a shared host).
-  const apiPort = 3011;
-  const webPort = 3010;
+  // Prod binds loopback-only 3001/3000 (see docker-compose.prod.yml + Hetzner_deploy.md
+  // Step 5 — Caddy proxies these). Dev keeps the legacy 3011/3010 mapping to avoid
+  // colliding with sibling Clawix checkouts' containers on a shared host.
+  const apiPort = deployMode === 'production' ? 3001 : 3011;
+  const webPort = deployMode === 'production' ? 3000 : 3010;
 
   console.log(`\n${bold('=== Clawix Updater ===')} (${deployMode})\n`);
 

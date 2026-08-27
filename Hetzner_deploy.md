@@ -74,8 +74,7 @@ su - deploy
 sudo apt-get update -qq && sudo apt-get install -y ufw
 sudo ufw allow 22/tcp    # ssh
 sudo ufw allow 80/tcp    # Caddy's ACME (Let's Encrypt) challenge
-sudo ufw allow 3002/tcp  # web dashboard
-sudo ufw allow 3003/tcp  # API / WebSocket
+sudo ufw allow 443/tcp   # Caddy's HTTPS (web + API, both proxied — see Step 5)
 sudo ufw enable
 ```
 
@@ -143,11 +142,16 @@ the installer waits for `http://localhost:3003/health` to go green.
 
 ## Step 5 — TLS with Caddy
 
-The installer bakes the **port number** into the URLs it generates
-(`https://lightchurch.aibyml.uk:3002` for the dashboard,
-`https://lightchurch.aibyml.uk:3003` for the API/WebSocket) — there's no
-built-in option for a clean port-less URL. The simplest fix is to let Caddy
-terminate TLS on those same two ports:
+Do **not** point a Caddy site block at the same port number the app's Docker
+container publishes on the host (e.g. `lightchurch.aibyml.uk:3010 {
+reverse_proxy localhost:3010 }`) — Caddy would try to bind that port itself
+*and* proxy to it, which is a straight `bind: address already in use`
+conflict with the container. Two processes can't own one host port.
+
+Instead, use a clean port-less URL: Caddy terminates TLS on 443 for the root
+domain (web) and a subdomain (api), each proxying to the container's
+loopback-only host port set in `docker-compose.prod.yml` (3000 for web, 3001
+for api):
 
 ```bash
 sudo apt-get install -y debian-keyring debian-archive-keyring apt-transport-https
@@ -156,15 +160,17 @@ curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo 
 sudo apt-get update -qq && sudo apt-get install -y caddy
 ```
 
-Edit `/etc/caddy/Caddyfile`:
+Add an `api` DNS A/AAAA record pointing at the same server IP as the root
+domain (grey-cloud / DNS-only, same as the root record), then edit
+`/etc/caddy/Caddyfile`:
 
 ```caddyfile
-lightchurch.aibyml.uk:3002 {
-	reverse_proxy localhost:3002
+lightchurch.aibyml.uk {
+	reverse_proxy localhost:3000
 }
 
-lightchurch.aibyml.uk:3003 {
-	reverse_proxy localhost:3003
+api.lightchurch.aibyml.uk {
+	reverse_proxy localhost:3001
 }
 ```
 
@@ -172,26 +178,30 @@ lightchurch.aibyml.uk:3003 {
 sudo systemctl reload caddy
 ```
 
-Caddy issues and renews Let's Encrypt certificates for both automatically (it
-uses port 80 for the ACME challenge regardless of which port the site block
-listens on — that's why port 80 is open in the firewall).
+Caddy issues and renews Let's Encrypt certificates for both automatically
+via the ACME HTTP-01 challenge on port 80 (that's why port 80 is open in the
+firewall) — this only works once the `api` DNS record above resolves.
 
-*(Want the classic port-less `https://lightchurch.aibyml.uk` URL instead?
-That needs `docker-compose.prod.yml`'s port mappings changed and a rebuild —
-ask if you want that.)*
+Set `NEXT_PUBLIC_API_URL`/`NEXT_PUBLIC_WS_URL` to the `api.` subdomain and
+`CORS_ALLOWED_ORIGINS` to the root domain in `.env`, then rebuild the web
+image (these are baked in at build time) and restart the stack:
+
+```bash
+node scripts/update.mjs -- --pull
+```
 
 ---
 
 ## Step 6 — Verify
 
-Open `https://lightchurch.aibyml.uk:3002` in a browser and log in with the
+Open `https://lightchurch.aibyml.uk` in a browser and log in with the
 admin credentials from Step 4. Confirm the WebSocket connects (the
 "connected" dot in `/conversations` should be green, not red).
 
 API health check:
 
 ```bash
-curl https://lightchurch.aibyml.uk:3003/health
+curl https://api.lightchurch.aibyml.uk/health
 ```
 
 ---
