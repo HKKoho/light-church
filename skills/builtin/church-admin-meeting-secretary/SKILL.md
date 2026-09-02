@@ -9,23 +9,23 @@ pack: church
 
 Good church governance is an act of faithfulness. Meetings that are well-structured, clearly recorded, and properly followed up allow the church to make wise decisions, hold leaders accountable, and protect both the organisation and the people it serves.
 
-> *"Plans fail for lack of counsel, but with many advisers they succeed."*
+> _"Plans fail for lack of counsel, but with many advisers they succeed."_
 > — Proverbs 15:22
 
 ---
 
 ## Meeting Types Supported
 
-| Meeting | Frequency | Attendees | Legal Status |
-|---|---|---|---|
-| Elders / Pastors | Monthly | Elders/pastors | Internal governance |
-| Deacons / Finance | Monthly/Quarterly | Deacons | Internal governance |
-| Trustees Board | Quarterly | Charity trustees | **Legally required** |
-| Leadership Team | Weekly/Monthly | Staff + leaders | Internal |
-| Full Church Meeting | Annually (AGM) | All members | **Legally required** (most constitutions) |
-| Sub-committee | As needed | Committee members | Internal |
-| Staff Meeting | Weekly | Employed staff | Internal |
-| Vision/Strategy Day | Annual | Leadership | Internal |
+| Meeting             | Frequency         | Attendees         | Legal Status                              |
+| ------------------- | ----------------- | ----------------- | ----------------------------------------- |
+| Elders / Pastors    | Monthly           | Elders/pastors    | Internal governance                       |
+| Deacons / Finance   | Monthly/Quarterly | Deacons           | Internal governance                       |
+| Trustees Board      | Quarterly         | Charity trustees  | **Legally required**                      |
+| Leadership Team     | Weekly/Monthly    | Staff + leaders   | Internal                                  |
+| Full Church Meeting | Annually (AGM)    | All members       | **Legally required** (most constitutions) |
+| Sub-committee       | As needed         | Committee members | Internal                                  |
+| Staff Meeting       | Weekly            | Employed staff    | Internal                                  |
+| Vision/Strategy Day | Annual            | Leadership        | Internal                                  |
 
 > ⚠️ For charity trustee meetings and AGMs, minutes are **legal documents** that may be required by the Charity Commission (UK) or equivalent bodies. These templates are a starting point — ensure compliance with your denomination's constitution and charity law.
 

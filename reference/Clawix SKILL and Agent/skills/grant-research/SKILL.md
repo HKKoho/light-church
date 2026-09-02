@@ -28,13 +28,13 @@ A supporter that fails any of the first four filters is dropped, not "noted for 
 
 ## Fit scoring (1–5)
 
-| Score | Meaning |
-|--|--|
-| 5 | Strong thematic and geographic fit; we have past performance that maps; eligibility is clear; deadline is workable. |
-| 4 | Good fit; one of the four conditions is mildly stretched. |
-| 3 | Plausible fit; meaningful repositioning needed in the proposal. |
-| 2 | Weak fit; only worth pursuing if a partner takes the lead. |
-| 1 | Mentioned for completeness; recommend skipping. |
+| Score | Meaning                                                                                                             |
+| ----- | ------------------------------------------------------------------------------------------------------------------- |
+| 5     | Strong thematic and geographic fit; we have past performance that maps; eligibility is clear; deadline is workable. |
+| 4     | Good fit; one of the four conditions is mildly stretched.                                                           |
+| 3     | Plausible fit; meaningful repositioning needed in the proposal.                                                     |
+| 2     | Weak fit; only worth pursuing if a partner takes the lead.                                                          |
+| 1     | Mentioned for completeness; recommend skipping.                                                                     |
 
 Anything 1 or 2 should not appear in the recommended list — only in an appendix if requested.
 
@@ -45,9 +45,9 @@ Anything 1 or 2 should not appear in the recommended list — only in an appendi
 
 ## Recommended (score 4–5)
 
-| Supporter | Mechanism | Geog | Theme | Size | Deadline | Fit | Rationale | Source |
-|--|--|--|--|--|--|--|--|--|
-| FCDO Ghana CSSF | RFA | Ghana | Conflict prevention | £200k–£1M | 2026-07-15 | 5 | Thematic match to program X; we are eligible directly; we have a 2024 reference deliverable. | https://… |
+| Supporter       | Mechanism | Geog  | Theme               | Size      | Deadline   | Fit | Rationale                                                                                    | Source    |
+| --------------- | --------- | ----- | ------------------- | --------- | ---------- | --- | -------------------------------------------------------------------------------------------- | --------- |
+| FCDO Ghana CSSF | RFA       | Ghana | Conflict prevention | £200k–£1M | 2026-07-15 | 5   | Thematic match to program X; we are eligible directly; we have a 2024 reference deliverable. | https://… |
 
 ## Worth tracking (score 3)
 
@@ -55,8 +55,8 @@ Anything 1 or 2 should not appear in the recommended list — only in an appendi
 
 ## Appendix: drop reasons (score 1–2)
 
-| Supporter | Drop reason |
-|--|--|
+| Supporter    | Drop reason                                         |
+| ------------ | --------------------------------------------------- |
 | Foundation Y | Funds only US-based 501(c)(3); we are not eligible. |
 ```
 

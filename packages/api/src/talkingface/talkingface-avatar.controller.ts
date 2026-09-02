@@ -24,7 +24,8 @@ import { UserRole } from '../generated/prisma/enums.js';
 const logger = createLogger('talkingface:avatar');
 
 /** Where uploaded avatar photos are stored on disk. */
-export const AVATAR_STORE_DIR = process.env['TALKINGFACE_AVATAR_DIR'] ?? './data/talkingface-avatars';
+export const AVATAR_STORE_DIR =
+  process.env['TALKINGFACE_AVATAR_DIR'] ?? './data/talkingface-avatars';
 
 const ALLOWED_MIME = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const MAX_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
@@ -53,14 +54,14 @@ export interface AvatarListItem {
 export class TalkingFaceAvatarController {
   /** POST /api/v1/talkingface/avatar/upload */
   @Post('upload')
-  async upload(
-    @Req() req: FastifyRequest & { user: JwtPayload },
-  ): Promise<AvatarUploadResult> {
+  async upload(@Req() req: FastifyRequest & { user: JwtPayload }): Promise<AvatarUploadResult> {
     const data = await req.file();
     if (!data) throw new BadRequestException('No file uploaded');
 
     if (!ALLOWED_MIME.has(data.mimetype)) {
-      throw new BadRequestException(`Unsupported image type: ${data.mimetype}. Use JPEG, PNG, or WebP.`);
+      throw new BadRequestException(
+        `Unsupported image type: ${data.mimetype}. Use JPEG, PNG, or WebP.`,
+      );
     }
 
     const buffer = await data.toBuffer();
@@ -69,7 +70,8 @@ export class TalkingFaceAvatarController {
     }
 
     const photoId = crypto.randomUUID();
-    const ext = data.mimetype === 'image/png' ? '.png' : data.mimetype === 'image/webp' ? '.webp' : '.jpg';
+    const ext =
+      data.mimetype === 'image/png' ? '.png' : data.mimetype === 'image/webp' ? '.webp' : '.jpg';
     const storedFilename = `${photoId}${ext}`;
 
     await fs.mkdir(AVATAR_STORE_DIR, { recursive: true });
@@ -104,13 +106,11 @@ export class TalkingFaceAvatarController {
 
   /** GET /api/v1/talkingface/avatar/:photoId — serve the image */
   @Get(':photoId')
-  async serve(
-    @Param('photoId') photoId: string,
-    @Res() reply: FastifyReply,
-  ): Promise<void> {
+  async serve(@Param('photoId') photoId: string, @Res() reply: FastifyReply): Promise<void> {
     const file = await this.resolvePhotoPath(photoId);
     const buffer = await fs.readFile(file.fullPath);
-    const mime = file.ext === '.png' ? 'image/png' : file.ext === '.webp' ? 'image/webp' : 'image/jpeg';
+    const mime =
+      file.ext === '.png' ? 'image/png' : file.ext === '.webp' ? 'image/webp' : 'image/jpeg';
     void reply.type(mime).send(buffer);
   }
 

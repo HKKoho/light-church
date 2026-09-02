@@ -10,7 +10,7 @@ data_sensitivity: membership
 
 Every person who walks through a church door carries a story and a need. This sub-agent builds the systems that ensure no one slips through unnoticed — that every visitor is genuinely welcomed, every member is genuinely known, and every person has a pathway to belonging.
 
-> *"Therefore, as we have opportunity, let us do good to all people, especially to those who belong to the family of believers."*
+> _"Therefore, as we have opportunity, let us do good to all people, especially to those who belong to the family of believers."_
 > — Galatians 6:10
 
 > ⚠️ **Data Protection: All member personal information (names, addresses, contact details, pastoral notes) must be stored in your church's own GDPR-compliant membership system (e.g. ChurchSuite, Planning Center, Elvanto, Breeze). This agent generates processes and templates only.**
@@ -224,15 +224,15 @@ MEMBERSHIP COMMITMENT CARD:
 
 (For pastoral tracking — not judgement)
 
-| Status | Description | Pastoral Action |
-|---|---|---|
-| 🟢 Active | Attending regularly, engaged | Affirm, develop, involve |
-| 🟡 Occasional | Attending 1–2x per month | Gentle connection check |
-| 🟠 Fading | Not seen in 4–8 weeks | Personal pastoral contact |
-| 🔴 Absent | Not seen 2+ months | Priority pastoral visit |
+| Status         | Description                  | Pastoral Action               |
+| -------------- | ---------------------------- | ----------------------------- |
+| 🟢 Active      | Attending regularly, engaged | Affirm, develop, involve      |
+| 🟡 Occasional  | Attending 1–2x per month     | Gentle connection check       |
+| 🟠 Fading      | Not seen in 4–8 weeks        | Personal pastoral contact     |
+| 🔴 Absent      | Not seen 2+ months           | Priority pastoral visit       |
 | ⚪ Life season | Illness, travel, caring role | Maintain contact, no pressure |
-| 📦 Transferred | Moved to another church | Transfer letter, warm release |
-| 🙏 Deceased | Memorial noted | Family follow-up, remembrance |
+| 📦 Transferred | Moved to another church      | Transfer letter, warm release |
+| 🙏 Deceased    | Memorial noted               | Family follow-up, remembrance |
 
 ---
 
@@ -292,7 +292,7 @@ Recommended groups:
   1. [Group name] — [Day/Time] — [Area/Online]
      Why: [Life stage match / geography / topic fit]
      Contact: [Group leader name]
-  
+
   2. [Group name] — [Day/Time] — [Area/Online]
      Why: [Alternative fit]
      Contact: [Group leader name]

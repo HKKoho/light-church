@@ -368,7 +368,8 @@ const messages = {
     },
     tools: {
       summary: '可用工具 — 點擊任一工具以了解它',
-      intro: '這些是你的代理可呼叫的能力。在系統提示中以名稱引用它們，以引導代理何時及如何使用每一項。',
+      intro:
+        '這些是你的代理可呼叫的能力。在系統提示中以名稱引用它們，以引導代理何時及如何使用每一項。',
       misconception: '常見誤解：',
       tip: '系統提示提示：',
       groupShell: 'Shell',
@@ -386,12 +387,14 @@ const messages = {
         },
         read_file: {
           what: '從容器內的 /workspace 或 /skills 目錄讀取檔案。',
-          clarify: '只能讀取 /workspace 與 /skills 內的檔案 — 不能讀取任意主機路徑或其他使用者的工作區。',
+          clarify:
+            '只能讀取 /workspace 與 /skills 內的檔案 — 不能讀取任意主機路徑或其他使用者的工作區。',
           tip: '「編輯檔案前一律先讀取」可避免盲目覆寫。',
         },
         write_file: {
           what: '在 /workspace 內指定路徑建立或完全覆寫檔案。',
-          clarify: '會取代整個檔案。小幅變更請優先使用 edit_file — write_file 適用於新檔案或完整重寫。',
+          clarify:
+            '會取代整個檔案。小幅變更請優先使用 edit_file — write_file 適用於新檔案或完整重寫。',
           tip: '「用 write_file 建立新檔案，用 edit_file 做針對性變更。」',
         },
         edit_file: {
@@ -416,27 +419,32 @@ const messages = {
         },
         save_memory: {
           what: '儲存一則帶標籤的筆記或事實，於此使用者未來所有工作階段中持續保留。',
-          clarify: '記憶範圍限於個別使用者 — 預設不與他人共用，除非明確分享，否則也不會在不同代理間延續。',
+          clarify:
+            '記憶範圍限於個別使用者 — 預設不與他人共用，除非明確分享，否則也不會在不同代理間延續。',
           tip: '「在被要求時，儲存使用者的偏好、決策與關鍵事實。」',
         },
         search_memory: {
           what: '依關鍵字或標籤搜尋已儲存的記憶並回傳符合項目。',
-          clarify: '代理不會自動回想記憶 — 必須呼叫 search_memory 查找。沒有此呼叫，它無法存取過往工作階段。',
+          clarify:
+            '代理不會自動回想記憶 — 必須呼叫 search_memory 查找。沒有此呼叫，它無法存取過往工作階段。',
           tip: '「在新任務開始時一律搜尋記憶，以檢查相關脈絡。」',
         },
         share_memory: {
           what: '將已儲存的記憶項目分享給某個群組或整個組織。',
-          clarify: '分享是明確且單向的 — 共用記憶對目標群組可見，但代理無法讀取其他使用者的私人記憶。',
+          clarify:
+            '分享是明確且單向的 — 共用記憶對目標群組可見，但代理無法讀取其他使用者的私人記憶。',
           tip: '「當使用者說『把這個分享給團隊』時，使用 share_memory 將其發布至全組織。」',
         },
         spawn: {
           what: '建立子代理容器，傳送任務提示給它，等待其完成並回傳輸出。',
-          clarify: '子代理不會自動建立。代理只在決定呼叫此工具時才產生。每個產生的代理都是短暫的 — 任務結束後即無記憶。',
+          clarify:
+            '子代理不會自動建立。代理只在決定呼叫此工具時才產生。每個產生的代理都是短暫的 — 任務結束後即無記憶。',
           tip: '「使用 spawn 將研究任務委派給 Research 代理，同時你撰寫大綱。」',
         },
         cron: {
           what: '建立、列出或刪除一個會以設定間隔觸發代理的循環排程任務。',
-          clarify: '不會讓代理持續執行。它登錄一個排程；每次排程觸發時代理會重新被喚起，僅以 cron 提示作為輸入。',
+          clarify:
+            '不會讓代理持續執行。它登錄一個排程；每次排程觸發時代理會重新被喚起，僅以 cron 提示作為輸入。',
           tip: '「只在使用者要求排程循環任務時使用 cron — 建立前一律確認排程。」',
         },
       },
@@ -719,9 +727,7 @@ function SkillPicker({
 }) {
   const t = useT(messages);
   if (skills.length === 0) {
-    return (
-      <p className="text-xs text-muted-foreground">{t.skills.none}</p>
-    );
+    return <p className="text-xs text-muted-foreground">{t.skills.none}</p>;
   }
 
   return (
@@ -739,9 +745,7 @@ function SkillPicker({
               className="mt-0.5 shrink-0"
               checked={checked}
               onChange={() => {
-                onChange(
-                  checked ? selected.filter((d) => d !== dirName) : [...selected, dirName],
-                );
+                onChange(checked ? selected.filter((d) => d !== dirName) : [...selected, dirName]);
               }}
             />
             <div className="min-w-0">
@@ -884,7 +888,8 @@ const SYSTEM_PROMPT_TEMPLATE = `You are [role name], a specialist in [domain / e
 const SAMPLE_PROMPTS: { label: string; prompt: string }[] = [
   {
     label: 'Financial Analysis Agent',
-    prompt: `Role: You are an AI Assistant for the organization, specialized in supporting financial analysis and reporting.
+    prompt:
+      `Role: You are an AI Assistant for the organization, specialized in supporting financial analysis and reporting.
 
 ## Capabilities
 - Generate financial reports based on provided data.
@@ -920,7 +925,8 @@ const SAMPLE_PROMPTS: { label: string; prompt: string }[] = [
   },
   {
     label: 'Event Organizer Agent',
-    prompt: `Role: You are an AI Event Organizer Assistant, specialized in planning and executing events with attention to detail and coordination.
+    prompt:
+      `Role: You are an AI Event Organizer Assistant, specialized in planning and executing events with attention to detail and coordination.
 
 ## Capabilities
 - Develop comprehensive event plans and schedules.
@@ -957,7 +963,8 @@ const SAMPLE_PROMPTS: { label: string; prompt: string }[] = [
   },
   {
     label: 'Research & Intelligence Agent',
-    prompt: `Role: You are a Research and Intelligence Agent, specialized in gathering, synthesizing, and presenting information from the web and the workspace.
+    prompt:
+      `Role: You are a Research and Intelligence Agent, specialized in gathering, synthesizing, and presenting information from the web and the workspace.
 
 ## Goal
 Help the user discover, verify, and summarize information. Produce well-structured research briefs, literature reviews, and competitive analyses on demand.
@@ -990,7 +997,8 @@ Help the user discover, verify, and summarize information. Produce well-structur
   },
   {
     label: 'DevOps & Automation Agent',
-    prompt: `Role: You are a DevOps and Automation Agent, specialized in running scripts, managing files, and automating repetitive workspace tasks.
+    prompt:
+      `Role: You are a DevOps and Automation Agent, specialized in running scripts, managing files, and automating repetitive workspace tasks.
 
 ## Goal
 Execute technical tasks inside the workspace: run builds, process data files, manage directory structures, and set up scheduled jobs — always confirming before any destructive action.
@@ -1024,7 +1032,8 @@ Execute technical tasks inside the workspace: run builds, process data files, ma
   },
   {
     label: 'Project Coordinator Agent (with sub-agents)',
-    prompt: `Role: You are a Project Coordinator Agent, specialized in breaking down complex projects into parallel workstreams and delegating them to specialist sub-agents.
+    prompt:
+      `Role: You are a Project Coordinator Agent, specialized in breaking down complex projects into parallel workstreams and delegating them to specialist sub-agents.
 
 ## Goal
 Help the user plan, track, and execute multi-part projects. Decompose large requests into focused sub-tasks, delegate each to the right specialist agent using spawn, and synthesize results into a coherent output.
@@ -1058,7 +1067,8 @@ Help the user plan, track, and execute multi-part projects. Decompose large requ
   },
   {
     label: 'Personal Memory & Knowledge Agent',
-    prompt: `Role: You are a Personal Memory and Knowledge Agent, specialized in capturing, organizing, and recalling information across sessions so nothing important is ever forgotten.
+    prompt:
+      `Role: You are a Personal Memory and Knowledge Agent, specialized in capturing, organizing, and recalling information across sessions so nothing important is ever forgotten.
 
 ## Goal
 Act as the user's persistent second brain. Remember preferences, decisions, meeting notes, and key facts. Surface the right memory at the right moment without being asked.
@@ -1090,7 +1100,8 @@ Act as the user's persistent second brain. Remember preferences, decisions, meet
   },
   {
     label: 'NGO Communications Agent (gospel-mission skill)',
-    prompt: `Role: You are an NGO Communications Agent, specialized in drafting supporter-facing documents, community communications, and partner materials for a non-profit organisation.
+    prompt:
+      `Role: You are an NGO Communications Agent, specialized in drafting supporter-facing documents, community communications, and partner materials for a non-profit organisation.
 
 ## Goal
 Produce ethically grounded, audience-calibrated communications that represent the organisation with integrity. Help the team tell real impact stories without overpromising, poverty-porn framing, or jargon.
@@ -1126,7 +1137,8 @@ Produce ethically grounded, audience-calibrated communications that represent th
   },
   {
     label: 'Skill Builder Agent (skill-creator skill)',
-    prompt: `Role: You are a Skill Builder Agent, specialized in designing, writing, validating, and packaging new skills for the Clawix platform.
+    prompt:
+      `Role: You are a Skill Builder Agent, specialized in designing, writing, validating, and packaging new skills for the Clawix platform.
 
 ## Goal
 Help the user create high-quality, context-efficient skills. Guide them through understanding the use case, planning skill contents, writing SKILL.md, bundling resources, and validating the result.
@@ -1170,7 +1182,10 @@ Help the user create high-quality, context-efficient skills. Guide them through 
 // descriptions live in the i18n dictionary under `tools.entries` / `tools.group*`.
 const TOOL_GROUPS: { groupKey: keyof (typeof messages)['en']['tools']; tools: string[] }[] = [
   { groupKey: 'groupShell', tools: ['shell'] },
-  { groupKey: 'groupFileSystem', tools: ['read_file', 'write_file', 'edit_file', 'list_directory'] },
+  {
+    groupKey: 'groupFileSystem',
+    tools: ['read_file', 'write_file', 'edit_file', 'list_directory'],
+  },
   { groupKey: 'groupWeb', tools: ['web_search', 'web_fetch'] },
   { groupKey: 'groupMemory', tools: ['save_memory', 'search_memory', 'share_memory'] },
   { groupKey: 'groupAgents', tools: ['spawn'] },
@@ -1218,7 +1233,8 @@ function ToolsReference() {
                           {toolName}
                         </code>
                         <span className="flex-1 text-muted-foreground">
-                          {entry.what.slice(0, 72)}{entry.what.length > 72 ? '…' : ''}
+                          {entry.what.slice(0, 72)}
+                          {entry.what.length > 72 ? '…' : ''}
                         </span>
                         <ChevronDown
                           className={`size-3 shrink-0 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
@@ -1228,11 +1244,17 @@ function ToolsReference() {
                         <div className="flex flex-col gap-2 border-t bg-muted/20 px-3 py-2">
                           <p className="text-foreground">{entry.what}</p>
                           <div className="rounded border border-amber-200 bg-amber-50 px-2 py-1.5 dark:border-amber-800 dark:bg-amber-950/30">
-                            <span className="font-semibold text-amber-700 dark:text-amber-400">{t.tools.misconception}</span>
-                            <span className="text-amber-800 dark:text-amber-300">{entry.clarify}</span>
+                            <span className="font-semibold text-amber-700 dark:text-amber-400">
+                              {t.tools.misconception}
+                            </span>
+                            <span className="text-amber-800 dark:text-amber-300">
+                              {entry.clarify}
+                            </span>
                           </div>
                           <div className="rounded border border-blue-200 bg-blue-50 px-2 py-1.5 dark:border-blue-800 dark:bg-blue-950/30">
-                            <span className="font-semibold text-blue-700 dark:text-blue-400">{t.tools.tip}</span>
+                            <span className="font-semibold text-blue-700 dark:text-blue-400">
+                              {t.tools.tip}
+                            </span>
                             <span className="text-blue-800 dark:text-blue-300">{entry.tip}</span>
                           </div>
                         </div>
@@ -1336,7 +1358,9 @@ function CreateAgentDialog({
                     if (sample) setSystemPrompt(sample.prompt);
                   }}
                 >
-                  <option value="" disabled>{t.form.loadExample}</option>
+                  <option value="" disabled>
+                    {t.form.loadExample}
+                  </option>
                   {SAMPLE_PROMPTS.map((s) => (
                     <option key={s.label} value={s.label}>
                       {t.templates.labels[s.label as keyof typeof t.templates.labels] ?? s.label}
@@ -1397,7 +1421,11 @@ function CreateAgentDialog({
           <div className="flex flex-col gap-2">
             <Label>{t.form.skills}</Label>
             <p className="text-xs text-muted-foreground">{t.form.skillsHelp}</p>
-            <SkillPicker skills={skills} selected={selectedSkillIds} onChange={setSelectedSkillIds} />
+            <SkillPicker
+              skills={skills}
+              selected={selectedSkillIds}
+              onChange={setSelectedSkillIds}
+            />
           </div>
 
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -1543,7 +1571,11 @@ function EditAgentDialog({
           <div className="flex flex-col gap-2">
             <Label>{t.form.skills}</Label>
             <p className="text-xs text-muted-foreground">{t.form.skillsHelp}</p>
-            <SkillPicker skills={skills} selected={selectedSkillIds} onChange={setSelectedSkillIds} />
+            <SkillPicker
+              skills={skills}
+              selected={selectedSkillIds}
+              onChange={setSelectedSkillIds}
+            />
           </div>
 
           <div className="flex items-center justify-between rounded-lg border p-4">
@@ -1959,8 +1991,7 @@ function AgentRunDialog({
               </DialogTitle>
               <DialogDescription>
                 {t.run.startedAt(formatTime(run.startedAt))}
-                {run.completedAt &&
-                  t.run.duration(formatDuration(run.startedAt, run.completedAt))}
+                {run.completedAt && t.run.duration(formatDuration(run.startedAt, run.completedAt))}
               </DialogDescription>
             </DialogHeader>
             <div className="flex flex-col gap-4">
@@ -2044,7 +2075,9 @@ function AgentRunDialog({
                         ) : msg.toolCallId ? (
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs text-muted-foreground">{t.run.toolResult}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {t.run.toolResult}
+                              </span>
                             </div>
                             <pre className="whitespace-pre-wrap text-xs text-muted-foreground bg-background/50 p-2 rounded max-h-[150px] overflow-y-auto">
                               {(() => {

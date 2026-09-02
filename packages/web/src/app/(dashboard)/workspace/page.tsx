@@ -115,38 +115,44 @@ function WorkspacePageContent() {
 
   useAnimeOnMount(staggerFadeUp('[data-animate="workspace-rows"] tr', { stagger: STAGGER.tight }));
 
-  const fetchDirectory = useCallback(async (dirPath: string) => {
-    setIsLoadingDir(true);
-    setError(null);
-    try {
-      const data = await authFetch<DirectoryListing>(
-        `/api/v1/workspace/files?path=${encodeURIComponent(dirPath)}`,
-      );
-      setListing(data);
-      setCurrentPath(data.path);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.errors.loadDirectory);
-    } finally {
-      setIsLoadingDir(false);
-    }
-  }, [t]);
+  const fetchDirectory = useCallback(
+    async (dirPath: string) => {
+      setIsLoadingDir(true);
+      setError(null);
+      try {
+        const data = await authFetch<DirectoryListing>(
+          `/api/v1/workspace/files?path=${encodeURIComponent(dirPath)}`,
+        );
+        setListing(data);
+        setCurrentPath(data.path);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t.errors.loadDirectory);
+      } finally {
+        setIsLoadingDir(false);
+      }
+    },
+    [t],
+  );
 
-  const fetchFileContent = useCallback(async (entry: FileEntry) => {
-    setSelectedPath(entry.path);
-    setIsLoadingFile(true);
-    setError(null);
-    try {
-      const data = await authFetch<FileContent>(
-        `/api/v1/workspace/files/content?path=${encodeURIComponent(entry.path)}`,
-      );
-      setSelectedFile(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.errors.loadFile);
-      setSelectedFile(null);
-    } finally {
-      setIsLoadingFile(false);
-    }
-  }, [t]);
+  const fetchFileContent = useCallback(
+    async (entry: FileEntry) => {
+      setSelectedPath(entry.path);
+      setIsLoadingFile(true);
+      setError(null);
+      try {
+        const data = await authFetch<FileContent>(
+          `/api/v1/workspace/files/content?path=${encodeURIComponent(entry.path)}`,
+        );
+        setSelectedFile(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t.errors.loadFile);
+        setSelectedFile(null);
+      } finally {
+        setIsLoadingFile(false);
+      }
+    },
+    [t],
+  );
 
   const handleNavigate = useCallback(
     (path: string) => {
@@ -257,29 +263,32 @@ function WorkspacePageContent() {
     [moveTarget, currentPath, fetchDirectory, t],
   );
 
-  const handleDownload = useCallback(async (entry: FileEntry) => {
-    try {
-      const accessToken = await getAccessToken();
-      if (!accessToken) return;
+  const handleDownload = useCallback(
+    async (entry: FileEntry) => {
+      try {
+        const accessToken = await getAccessToken();
+        if (!accessToken) return;
 
-      const apiBase = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
-      const res = await fetch(
-        `${apiBase}/api/v1/workspace/files/download?path=${encodeURIComponent(entry.path)}`,
-        { headers: { Authorization: `Bearer ${accessToken}` } },
-      );
-      if (!res.ok) throw new Error(t.errors.downloadFailed);
+        const apiBase = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+        const res = await fetch(
+          `${apiBase}/api/v1/workspace/files/download?path=${encodeURIComponent(entry.path)}`,
+          { headers: { Authorization: `Bearer ${accessToken}` } },
+        );
+        if (!res.ok) throw new Error(t.errors.downloadFailed);
 
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = entry.name;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.errors.download);
-    }
-  }, [t]);
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = entry.name;
+        a.click();
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : t.errors.download);
+      }
+    },
+    [t],
+  );
 
   const handleEdit = useCallback(() => {
     setEditing(true);

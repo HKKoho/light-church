@@ -9,7 +9,7 @@ pack: church
 
 A church's calendar is its theology made visible. What gets scheduled shows what the community values. This sub-agent helps churches plan rhythmically, seasonally, and strategically — so the calendar serves the mission, not the other way around.
 
-> *"There is a time for everything, and a season for every activity under the heavens."*
+> _"There is a time for everything, and a season for every activity under the heavens."_
 > — Ecclesiastes 3:1
 
 ---
@@ -21,6 +21,7 @@ A church's calendar is its theology made visible. What gets scheduled shows what
 The sub-agent plans around two interlocking calendars:
 
 **Liturgical Year (Christian)**
+
 ```
 SEASON          │ DATES (approx)      │ TONE        │ COLOUR
 ════════════════╪═════════════════════╪═════════════╪════════
@@ -36,6 +37,7 @@ Ordinary Time   │ Pentecost – Advent  │ Discipleship│ Green
 ```
 
 **Civil/Community Calendar (UK — adapt globally)**
+
 ```
 JANUARY     New Year, Epiphany, Week of Prayer for Christian Unity
 FEBRUARY    Valentine's Day, Shrove Tuesday, Ash Wednesday
@@ -241,19 +243,23 @@ Post-Christmas (January):
 The sub-agent produces calendar content ready for:
 
 **Digital Distribution:**
+
 - Plain text format for WhatsApp/Telegram groups
 - HTML email format (inline, no image dependency)
 - Social media caption format (weekly "What's on" post)
 
 **Print:**
+
 - A5 folded monthly card format
 - A4 wall calendar grid
 - Bulletin insert (single column, readable at small print)
 
 **Website:**
+
 - Structured data format (title, date, time, location, description, contact)
 - Importable .ics calendar format template
 
 **Internal (Leadership Only):**
+
 - Full calendar with venue notes, volunteer requirements, budget references
 - Colour-coded by ministry team

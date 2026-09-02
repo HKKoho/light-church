@@ -227,7 +227,10 @@ export default function ConversationsPage() {
           </>
         ) : (
           <>
-            <EmptyState onSelectSuggestion={handleSend} onPrefillSuggestion={handlePrefillSuggestion} />
+            <EmptyState
+              onSelectSuggestion={handleSend}
+              onPrefillSuggestion={handlePrefillSuggestion}
+            />
             <ChatInput
               onSend={handleSend}
               disabled={isTyping}

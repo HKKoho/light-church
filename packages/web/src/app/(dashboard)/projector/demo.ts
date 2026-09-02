@@ -89,7 +89,8 @@ const COPY: Record<Lang, DemoCopy> = {
     savedOk: '✓ Saved. Open the Workspace → Output/Projector/demo-skill to see it.',
     savedErr: '✗ Could not save: ',
     mdWhen: 'Use when the user wants a quick visual progress widget for a fundraising goal.',
-    mdHow: 'Render a self-contained HTML page with two inputs (raised, goal) and a progress bar; recompute on input.',
+    mdHow:
+      'Render a self-contained HTML page with two inputs (raised, goal) and a progress bar; recompute on input.',
     mdOut: 'A single Projector micro-tool saved under /Output/Projector.',
   },
   'zh-TW': {
@@ -147,7 +148,8 @@ const COPY: Record<Lang, DemoCopy> = {
     savedOk: '✓ 已儲存。開啟「工作區 → Output/Projector/demo-skill」即可查看。',
     savedErr: '✗ 無法儲存：',
     mdWhen: '當使用者想要一個快速、視覺化的募款目標進度小工具時使用。',
-    mdHow: '渲染一個獨立的 HTML 頁面，包含兩個輸入欄位（已募得、目標）與一條進度條；輸入時即時重算。',
+    mdHow:
+      '渲染一個獨立的 HTML 頁面，包含兩個輸入欄位（已募得、目標）與一條進度條；輸入時即時重算。',
     mdOut: '一個儲存於 /Output/Projector 下的投影台微型工具。',
   },
 };

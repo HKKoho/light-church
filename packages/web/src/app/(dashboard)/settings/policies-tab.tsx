@@ -91,8 +91,7 @@ const messages = {
     },
     deleteDialog: {
       title: '刪除政策',
-      description: (name: string) =>
-        `確定要刪除 ${name} 嗎？必須先重新指派使用此政策的使用者。`,
+      description: (name: string) => `確定要刪除 ${name} 嗎？必須先重新指派使用此政策的使用者。`,
       cancel: '取消',
       confirm: '刪除',
     },
@@ -233,9 +232,7 @@ export function PoliciesTab() {
       });
       setCreateOpen(false);
       await fetchData();
-      setSuccessMessage(
-        t.createdMessage((data as { name?: string }).name ?? t.defaultPolicyName),
-      );
+      setSuccessMessage(t.createdMessage((data as { name?: string }).name ?? t.defaultPolicyName));
     } catch (err) {
       setError(err instanceof Error ? err.message : t.errors.create);
     } finally {

@@ -21,7 +21,8 @@ const messages = {
     title: 'Ministries',
     subtitle: 'discipleship · outreach · church planting',
     startConversation: 'Start conversation',
-    descBefore: 'Workplans, partner register, activity tracker and weekly status notes. Managed by the ',
+    descBefore:
+      'Workplans, partner register, activity tracker and weekly status notes. Managed by the ',
     descAgent: 'Ministry Coordinator',
     descAfter: ' agent.',
   },
@@ -53,9 +54,7 @@ export default function ProgramsPage() {
     setError('');
     const results = await Promise.allSettled(
       FOLDERS.map((f) =>
-        authFetch<DirectoryListing>(
-          `/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`,
-        ),
+        authFetch<DirectoryListing>(`/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`),
       ),
     );
     const next: Record<string, readonly FileEntry[]> = {};

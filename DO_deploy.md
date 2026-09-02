@@ -86,16 +86,16 @@ pnpm run install:clawix
 
 The installer is interactive. Answer the prompts like this for a production deployment:
 
-| Prompt | Answer |
-| --- | --- |
-| Deployment mode | `1` (production) |
-| Provider + API key | e.g. Anthropic / OpenAI + your key |
-| Default model | accept the default, or enter your own |
-| **Public host or IP** | `clawix.aibyml.com` |
-| **Use HTTPS?** | `y` (Nginx terminates TLS in Step 6–7) |
-| Extra CORS origins | leave blank |
-| Initial admin email / password / name | your admin login |
-| Telegram bot token | optional |
+| Prompt                                | Answer                                 |
+| ------------------------------------- | -------------------------------------- |
+| Deployment mode                       | `1` (production)                       |
+| Provider + API key                    | e.g. Anthropic / OpenAI + your key     |
+| Default model                         | accept the default, or enter your own  |
+| **Public host or IP**                 | `clawix.aibyml.com`                    |
+| **Use HTTPS?**                        | `y` (Nginx terminates TLS in Step 6–7) |
+| Extra CORS origins                    | leave blank                            |
+| Initial admin email / password / name | your admin login                       |
+| Telegram bot token                    | optional                               |
 
 The installer then automatically:
 
@@ -293,12 +293,13 @@ pnpm run uninstall:clawix -- --full  # also remove .env, ./data/, ./skills/custo
 
 Log in to wherever you manage `aibyml.com` DNS and add two A records:
 
-| Type | Name | Value | TTL |
-|------|------|-------|-----|
-| A | `clawix` | `<your droplet IP>` | 3600 |
-| A | `api.clawix` | `<your droplet IP>` | 3600 |
+| Type | Name         | Value               | TTL  |
+| ---- | ------------ | ------------------- | ---- |
+| A    | `clawix`     | `<your droplet IP>` | 3600 |
+| A    | `api.clawix` | `<your droplet IP>` | 3600 |
 
 This creates:
+
 - `clawix.aibyml.com` → web dashboard
 - `api.clawix.aibyml.com` → API + WebSocket
 
@@ -319,6 +320,7 @@ dig api.clawix.aibyml.com +short
 The orange proxy breaks WebSocket connections, which the app uses for live agent output.
 
 In the Cloudflare dashboard:
+
 1. DNS → Records
 2. Find `clawix` and `api.clawix`
 3. Click the orange cloud icon on each → switch to grey (DNS only)
@@ -328,16 +330,19 @@ In the Cloudflare dashboard:
 ### C. Common Registrar Instructions
 
 **Namecheap**
+
 1. Domain List → Manage → Advanced DNS
 2. Add Record → A Record → Host: `clawix` → Value: `<IP>`
 3. Add Record → A Record → Host: `api.clawix` → Value: `<IP>`
 
 **GoDaddy**
+
 1. My Products → DNS → Manage
 2. Add → Type: A → Name: `clawix` → Value: `<IP>`
 3. Add → Type: A → Name: `api.clawix` → Value: `<IP>`
 
 **Cloudflare**
+
 1. Select `aibyml.com` → DNS → Records → Add record
 2. Type: A → Name: `clawix` → IPv4: `<IP>` → Proxy: **DNS only**
 3. Repeat for `api.clawix`

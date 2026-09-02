@@ -47,28 +47,35 @@ record-sealed: false
 ---
 
 # Summary
+
 One paragraph in plain language, pseudonyms only.
 
 # Timeline
+
 - YYYY-MM-DD HH:MM — what happened, source.
 - ...
 
 # Survivor support
+
 - Immediate actions taken.
 - Referrals made.
 - Consent for follow-up: yes | no | declined.
 
 # Alleged perpetrator (if applicable)
+
 Pseudonym, role category (e.g., "external community member"; "NGO field staff"), action taken.
 
 # Mandatory reporting
+
 Triggered: yes | no
 If yes: jurisdiction, authority, reference number, date filed, who filed.
 
 # Follow-up actions
+
 - [ ] ...
 
 # Notes appended
+
 (Empty until new info arrives. Notes are appended; never overwritten.)
 ```
 

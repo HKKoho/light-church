@@ -144,10 +144,7 @@ const FILE_ICONS: Record<FileType, typeof File> = {
   unknown: File,
 };
 
-function formatRelativeDate(
-  isoDate: string,
-  t: (typeof messages)['en']['relative'],
-): string {
+function formatRelativeDate(isoDate: string, t: (typeof messages)['en']['relative']): string {
   const date = new Date(isoDate);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();

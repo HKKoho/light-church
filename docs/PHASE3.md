@@ -17,6 +17,7 @@ app exposes an API or documentation. Findings:
 **`ai-sunday-school.vercel.app`** — "基督教主日學AI" (Christian Sunday School
 AI), zh-Hant / en. A **student-facing Biblical Hebrew & Greek language-learning
 tool**:
+
 - Letter/vocabulary lessons, pronunciation practice using the browser's speech
   recognition (mic permission, Chrome/Edge/Safari only) with AI-scored feedback
 - "Character Decision Game" — choose-your-own-adventure scenarios built on
@@ -30,6 +31,7 @@ tool**:
 **`ai-admin-sunday-school.vercel.app`** — "主日學教師支援" (Sunday School
 Teacher Support). Despite the name, this is a **much broader church-admin
 prototype**, not just Sunday school:
+
 - Pastoral care AI assistant + sensitive-questionnaire generator
 - "WhatsApp secretary" — QR-code connect flow, forwards receipts/invoices
 - Attendance CSV upload + AI trend analysis (PandasAI/OpenAI mentioned in UI copy)
@@ -45,6 +47,7 @@ prototype**, not just Sunday school:
 - Login screen literally says "Demo: use any email and password"
 
 **Architecture, both apps:**
+
 - Vite + React 19, pulling `react`/`react-dom`/`@google/genai` from
   `aistudiocdn.com` at runtime (no bundled deps) — consistent with apps
   exported from Google AI Studio / Opal rather than hand-built
@@ -67,10 +70,11 @@ prototype**, not just Sunday school:
 
 Every one of Clawix's stated invariants (`CLAUDE.md`) cuts against embedding
 these as-is:
-- *"No direct LLM calls outside the engine"* — both apps call Gemini directly
+
+- _"No direct LLM calls outside the engine"_ — both apps call Gemini directly
   from client JS with an exposed key; token accounting and provider
   encryption are bypassed entirely.
-- *"Zod-validated inputs at the API boundary"* / *"Append-only audit log"* —
+- _"Zod-validated inputs at the API boundary"_ / _"Append-only audit log"_ —
   neither exists; `localStorage` has no audit trail and no admin visibility.
 - Demo-only auth means there's no way to tie usage to a real `User` row, so
   RBAC (`@Roles`) can't apply.
@@ -94,18 +98,18 @@ learning).
 
 ## Feature-parity map
 
-| Prototype feature | Already covered natively? | Plan item |
-|---|---|---|
-| Pastoral care AI + sensitive questionnaires | Yes — `skills/builtin/pastoral-care` | none needed |
-| WhatsApp "secretary" (QR connect, forward receipts) | Yes — native WhatsApp channel (`baileys`) | none needed; verify admin UI exposes a connect flow (P3-05) |
-| Event planning → publish to site | Yes — `church-admin-event-planner`, `church-admin-calendar` | none needed |
-| Mentorship/legacy AI persona | Partial — general chat via any agent | none needed, low value to formalize |
-| Bookkeeping / receipts entry | **Guidance-only today** — `finance-steward`/`church-admin-finance-steward` explicitly generate templates, never store real figures | P3-01 (optional, low priority — real bookkeeping is a deliberate non-goal per those skills' `data_sensitivity` stance; confirm with user before building) |
-| Attendance CSV + AI trend analysis | **Gap** — membership skill is guidance-only, no real headcount storage | P3-02 |
-| Sunday-school class/curriculum scheduling | **Gap** — `church-sunday-school` skill drafts lesson content but has no persisted class list/schedule | P3-03 |
-| PDF upload → AI analysis/regeneration | Partial — agents can read/write files via `file-io`; no dedicated PDF-analysis flow | not planned; low value vs. effort |
-| Biblical Hebrew/Greek pronunciation learning | **Net-new** — nothing like this exists | P3-04 |
-| YouTube-to-quiz | **Net-new**, smaller scope | P3-06 (optional stretch) |
+| Prototype feature                                   | Already covered natively?                                                                                                          | Plan item                                                                                                                                                 |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Pastoral care AI + sensitive questionnaires         | Yes — `skills/builtin/pastoral-care`                                                                                               | none needed                                                                                                                                               |
+| WhatsApp "secretary" (QR connect, forward receipts) | Yes — native WhatsApp channel (`baileys`)                                                                                          | none needed; verify admin UI exposes a connect flow (P3-05)                                                                                               |
+| Event planning → publish to site                    | Yes — `church-admin-event-planner`, `church-admin-calendar`                                                                        | none needed                                                                                                                                               |
+| Mentorship/legacy AI persona                        | Partial — general chat via any agent                                                                                               | none needed, low value to formalize                                                                                                                       |
+| Bookkeeping / receipts entry                        | **Guidance-only today** — `finance-steward`/`church-admin-finance-steward` explicitly generate templates, never store real figures | P3-01 (optional, low priority — real bookkeeping is a deliberate non-goal per those skills' `data_sensitivity` stance; confirm with user before building) |
+| Attendance CSV + AI trend analysis                  | **Gap** — membership skill is guidance-only, no real headcount storage                                                             | P3-02                                                                                                                                                     |
+| Sunday-school class/curriculum scheduling           | **Gap** — `church-sunday-school` skill drafts lesson content but has no persisted class list/schedule                              | P3-03                                                                                                                                                     |
+| PDF upload → AI analysis/regeneration               | Partial — agents can read/write files via `file-io`; no dedicated PDF-analysis flow                                                | not planned; low value vs. effort                                                                                                                         |
+| Biblical Hebrew/Greek pronunciation learning        | **Net-new** — nothing like this exists                                                                                             | P3-04                                                                                                                                                     |
+| YouTube-to-quiz                                     | **Net-new**, smaller scope                                                                                                         | P3-06 (optional stretch)                                                                                                                                  |
 
 ---
 
@@ -153,7 +157,7 @@ no-PII stance in `church-admin-membership`):
 4. `packages/api/src/worship-services/` module (controller/service/module),
    mirroring `packages/api/src/congregation-profile/` for Zod-pipe + RBAC
    conventions; `@Roles(super_admin, senior_pastor, pastor, admin_staff,
-   ministry_leader)`.
+ministry_leader)`.
 5. CSV upload endpoint accepts a CSV of `date,headcount[,adults,children,visitors]`
    rows (server-side parse — do **not** let an agent container touch the raw
    file directly; agent containers have no DB-query tool per

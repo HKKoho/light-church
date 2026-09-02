@@ -12,11 +12,14 @@ const messages = {
     description:
       'Build short, Scripture-rooted narrative games for VBS and youth ministry through a storyboard-first, human-approved pipeline. Spawn the game-studio agent from a conversation — it drafts a storyboard for your review, and only builds after you approve it. Finished games play on the Projector page.',
     step1: 'Ask for a game',
-    step1Body: 'In a conversation, describe the passage, audience, and length — or use the built-in "Game Builder" suggestion.',
+    step1Body:
+      'In a conversation, describe the passage, audience, and length — or use the built-in "Game Builder" suggestion.',
     step2: 'Review the storyboard',
-    step2Body: 'The agent drafts a scene-by-scene storyboard first. Nothing gets built until you approve it.',
+    step2Body:
+      'The agent drafts a scene-by-scene storyboard first. Nothing gets built until you approve it.',
     step3: 'Play it on Projector',
-    step3Body: 'Once approved, the agent builds the game and it appears on your Projector page, ready to play.',
+    step3Body:
+      'Once approved, the agent builds the game and it appears on your Projector page, ready to play.',
     cta: 'Start a conversation',
   },
   'zh-TW': {

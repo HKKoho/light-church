@@ -16,14 +16,14 @@ This skill is the heart of the Church AI pack for children's ministry. Inspired 
 
 Before generating ANY lesson content, the Age Adapter sub-agent calibrates the output:
 
-| Age Group | Label | Developmental Stage | Teaching Approach |
-|---|---|---|---|
-| 2–4 years | 🐣 Nursery/Toddler | Pre-operational, sensory learning | Simple repetition, tactile activities, short attention (5–8 min) |
-| 5–6 years | 🌱 Kindergarten | Concrete thinking, loves stories | Story-based, visual, lots of movement, 8–12 min segments |
-| 7–9 years | 🌟 Junior (Primary) | Logical development begins, loves heroes | Hero narratives, active Q&A, memory activities, cause-and-effect |
-| 10–12 years | 🔥 Pre-teen (Intermediate) | Abstract thinking emerging, peer identity | Discussion-heavy, real-life application, challenge activities |
-| 13–15 years | 🌊 Junior High | Identity formation, questions authority | Apologetics-ready, honest about doubt, group dynamics, relevance |
-| 15–17 years | 🚀 Senior High | Worldview formation, leadership potential | Theological depth, cultural engagement, leadership development |
+| Age Group   | Label                      | Developmental Stage                       | Teaching Approach                                                |
+| ----------- | -------------------------- | ----------------------------------------- | ---------------------------------------------------------------- |
+| 2–4 years   | 🐣 Nursery/Toddler         | Pre-operational, sensory learning         | Simple repetition, tactile activities, short attention (5–8 min) |
+| 5–6 years   | 🌱 Kindergarten            | Concrete thinking, loves stories          | Story-based, visual, lots of movement, 8–12 min segments         |
+| 7–9 years   | 🌟 Junior (Primary)        | Logical development begins, loves heroes  | Hero narratives, active Q&A, memory activities, cause-and-effect |
+| 10–12 years | 🔥 Pre-teen (Intermediate) | Abstract thinking emerging, peer identity | Discussion-heavy, real-life application, challenge activities    |
+| 13–15 years | 🌊 Junior High             | Identity formation, questions authority   | Apologetics-ready, honest about doubt, group dynamics, relevance |
+| 15–17 years | 🚀 Senior High             | Worldview formation, leadership potential | Theological depth, cultural engagement, leadership development   |
 
 ---
 
@@ -94,6 +94,7 @@ Simple Explanation: [What this verse means in 1–2 sentences for this age group
 Inspired by ChurchAIAdmin's class arrangement system, this skill maintains curriculum mapping:
 
 ### Curriculum Calendar Output
+
 ```
 MONTH: [Month/Year]
 THEME: [Monthly or series theme]
@@ -109,7 +110,9 @@ TEACHER NOTES: [Any curriculum-wide guidance for this month]
 ```
 
 ### Export Format
+
 All class arrangements can be exported as:
+
 - JSON (for import back into the system)
 - PDF (for printing and bulletin boards)
 - CSV (for Google Sheets / Excel integration)
@@ -120,14 +123,14 @@ All class arrangements can be exported as:
 
 Like ChurchAIAdmin's persona system, teachers can select a teaching style persona:
 
-| Persona | Style | Best For |
-|---|---|---|
-| 🌟 The Storyteller | Narrative-driven, dramatic, immersive | Junior, Primary |
-| 🎮 The Game Master | Activity-first, energetic, competitive | Pre-teen, Junior High |
-| 💬 The Discussion Guide | Question-led, Socratic, reflective | Pre-teen, Senior High |
-| 🎨 The Creative | Arts/crafts-led, expressive, sensory | Nursery, Kindergarten |
-| 📚 The Scholar | Theologically deeper, study skills | Senior High |
-| 🙏 The Prayer Warrior | Worship-and-prayer centred, contemplative | All ages, adapted |
+| Persona                 | Style                                     | Best For              |
+| ----------------------- | ----------------------------------------- | --------------------- |
+| 🌟 The Storyteller      | Narrative-driven, dramatic, immersive     | Junior, Primary       |
+| 🎮 The Game Master      | Activity-first, energetic, competitive    | Pre-teen, Junior High |
+| 💬 The Discussion Guide | Question-led, Socratic, reflective        | Pre-teen, Senior High |
+| 🎨 The Creative         | Arts/crafts-led, expressive, sensory      | Nursery, Kindergarten |
+| 📚 The Scholar          | Theologically deeper, study skills        | Senior High           |
+| 🙏 The Prayer Warrior   | Worship-and-prayer centred, contemplative | All ages, adapted     |
 
 Request format: "Generate a [PERSONA] style lesson on [TOPIC] for [AGE GROUP]"
 
@@ -136,7 +139,9 @@ Request format: "Generate a [PERSONA] style lesson on [TOPIC] for [AGE GROUP]"
 ## Special Programs
 
 ### Vacation Bible School (VBS) Week Planner
+
 Generates a 5-day VBS curriculum:
+
 - Daily theme tied to overarching narrative
 - Opening assembly program
 - Small group lesson with activity
@@ -147,13 +152,16 @@ Generates a 5-day VBS curriculum:
 - Family take-home each day
 
 ### Holiday Programs
+
 - **Christmas Pageant Script**: Nativity story, age-divided roles, narration
 - **Easter Program**: Resurrection narrative, appropriate for children, joyful not frightening
 - **Harvest / Thanksgiving**: Gratitude theology, creation care
 - **Mother's / Father's Day**: Gift activity + lesson on family and God as parent
 
 ### Children's Church Integration
+
 When Sunday School runs parallel to adult service:
+
 - 30-minute condensed lesson format
 - Worship song suggestions (age-appropriate)
 - Transition activities for children joining after worship
@@ -164,6 +172,7 @@ When Sunday School runs parallel to adult service:
 ## Multilingual Support
 
 Lessons can be generated or adapted for:
+
 - 🇬🇧 English
 - 🇭🇰 繁體中文 (Traditional Chinese — for Hong Kong/Taiwan contexts)
 - 🇰🇷 한국어 (Korean)

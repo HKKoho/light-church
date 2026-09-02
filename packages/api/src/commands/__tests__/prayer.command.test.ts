@@ -50,7 +50,11 @@ describe('PrayerCommand', () => {
   it('writes the request to prayer-requests/new and confirms', async () => {
     const cmd = new PrayerCommand(mockWorkspaceService as never);
     const result = await cmd.execute(
-      makeContext({ args: 'Please pray for my mother', senderId: 'John Doe', role: UserRole.admin }),
+      makeContext({
+        args: 'Please pray for my mother',
+        senderId: 'John Doe',
+        role: UserRole.admin,
+      }),
     );
 
     expect(mockWorkspaceService.uploadFile).toHaveBeenCalledTimes(1);

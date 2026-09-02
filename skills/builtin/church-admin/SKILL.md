@@ -9,7 +9,7 @@ pack: church
 
 Church administration is the infrastructure that lets ministry happen. Done well, it is invisible — everything flows smoothly, people are cared for, events happen on time, and no volunteer burns out. This skill builds that infrastructure with grace, efficiency, and theological purpose.
 
-*"So whether you eat or drink or whatever you do, do it all for the glory of God."* — 1 Corinthians 10:31
+_"So whether you eat or drink or whatever you do, do it all for the glory of God."_ — 1 Corinthians 10:31
 
 ---
 
@@ -60,6 +60,7 @@ RISK NOTES:
 ```
 
 ### Event Types Supported
+
 - Sunday services (special, anniversary, guest speaker)
 - Community outreach events
 - Church dinners and socials
@@ -118,6 +119,7 @@ CONNECT WITH US
 ### Monthly Newsletter Template
 
 Sections:
+
 1. Pastor's Letter (space for pastor's own message)
 2. Ministry Highlights (3–4 brief stories/updates)
 3. Upcoming Month Calendar
@@ -135,6 +137,7 @@ Sections:
 Given: ministry areas, volunteers, dates, and availability constraints.
 
 Output:
+
 ```
 VOLUNTEER ROTA: [Month/Quarter]
 MINISTRY: [e.g. Welcome Team]
@@ -149,6 +152,7 @@ NOTES:
 ```
 
 ### Volunteer Onboarding Checklist
+
 ```
 NEW VOLUNTEER WELCOME: [Ministry Area]
 ─────────────────────────────────────────
@@ -163,6 +167,7 @@ NEW VOLUNTEER WELCOME: [Ministry Area]
 ```
 
 ### Volunteer Appreciation Framework
+
 - Monthly thank-you message templates
 - Annual volunteer recognition event planning guide
 - Individual appreciation note templates
@@ -173,6 +178,7 @@ NEW VOLUNTEER WELCOME: [Ministry Area]
 ## 📝 Meeting Support
 
 ### Church Leadership Meeting Agenda Template
+
 ```
 [CHURCH NAME] — LEADERSHIP MEETING
 Date: [Date] | Time: [Time] | Location: [Venue]
@@ -200,6 +206,7 @@ ACTIONS ARISING: (to be recorded during meeting)
 ```
 
 ### AGM Support Package
+
 - Notice of meeting template
 - Annual report structure
 - Treasurer's report template
@@ -211,6 +218,7 @@ ACTIONS ARISING: (to be recorded during meeting)
 ## ✉️ Membership Communication
 
 ### New Member Welcome Email
+
 ```
 Subject: Welcome to [Church Name]! 🎉
 
@@ -226,7 +234,7 @@ Here are a few things to help you find your feet:
   🙏 Our small groups meet [days] — we'd love to connect you
   📋 Download our welcome pack here: [Link]
 
-[Pastor/leader name] would love to meet you personally — 
+[Pastor/leader name] would love to meet you personally —
 please reply to this email to arrange a brief chat.
 
 Looking forward to growing together in faith,
@@ -234,6 +242,7 @@ Looking forward to growing together in faith,
 ```
 
 ### Pastoral Letter Templates
+
 - Illness/hospitalisation (from pastor)
 - Bereavement sympathy
 - New baby/child dedication congratulations
@@ -247,6 +256,7 @@ Looking forward to growing together in faith,
 **This skill generates template content only — all sensitive member data must be managed in your church's own secure database systems, not in this AI assistant.**
 
 Every communication template generated includes a reminder:
+
 > ⚠️ Review before sending. Remove placeholder names. Confirm accuracy. Obtain appropriate approvals. Ensure GDPR/data privacy compliance for your jurisdiction before storing or sharing member personal information.
 
 Human approval is REQUIRED before any communication is sent to congregation members.

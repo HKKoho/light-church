@@ -161,7 +161,10 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
             video = result.video.toString('base64');
           } catch (err) {
             // SadTalker failure falls back to 3D avatar — don't abort the whole run.
-            logger.warn({ err, userId }, 'SadTalker failed for sentence, falling back to 3D avatar');
+            logger.warn(
+              { err, userId },
+              'SadTalker failed for sentence, falling back to 3D avatar',
+            );
           }
         }
 

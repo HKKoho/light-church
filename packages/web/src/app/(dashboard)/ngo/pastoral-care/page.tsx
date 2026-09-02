@@ -26,7 +26,8 @@ const messages = {
     title: 'Pastoral Care',
     subtitle: 'records · flagged · sampled',
     startConversation: 'Start conversation',
-    descBefore: 'Pseudonymized session notes only — no real names or identifying detail. Managed by the ',
+    descBefore:
+      'Pseudonymized session notes only — no real names or identifying detail. Managed by the ',
     descAgent: 'Pastoral Care',
     descAfter: ' agent.',
   },
@@ -63,9 +64,7 @@ export default function PastoralCarePage() {
     setError('');
     const results = await Promise.allSettled(
       folders.map((f) =>
-        authFetch<DirectoryListing>(
-          `/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`,
-        ),
+        authFetch<DirectoryListing>(`/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`),
       ),
     );
     const next: Record<string, readonly FileEntry[]> = {};

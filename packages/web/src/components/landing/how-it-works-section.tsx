@@ -9,7 +9,7 @@ const messages = {
     steps: [
       {
         title: 'Ask',
-        body: "Describe what your ministry needs in plain language — a supporter letter, a field report, a discipleship indicator.",
+        body: 'Describe what your ministry needs in plain language — a supporter letter, a field report, a discipleship indicator.',
       },
       {
         title: 'Dispatch & Draft',

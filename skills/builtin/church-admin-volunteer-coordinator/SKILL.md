@@ -9,7 +9,7 @@ pack: church
 
 Volunteers are the lifeblood of a local church. They give their time, their skills, and their love — often quietly, often sacrificially. This sub-agent helps church leaders honour that gift by making coordination effortless and appreciation intentional.
 
-> *"Each of you should use whatever gift you have received to serve others, as faithful stewards of God's grace in its various forms."*
+> _"Each of you should use whatever gift you have received to serve others, as faithful stewards of God's grace in its various forms."_
 > — 1 Peter 4:10
 
 ---
@@ -20,21 +20,21 @@ The Volunteer Coordinator manages an organisational registry of all ministry tea
 
 Standard church ministry teams supported:
 
-| Ministry | Typical Roles | Min People Needed |
-|---|---|---|
-| 🚪 Welcome / Greeting | Greeters, door team, car park | 3–8 per service |
-| 🎵 Worship & Music | Singers, musicians, sound, projection | 4–12 |
-| 👶 Children's Ministry | Teachers, assistants, nursery workers | 2+ per class |
-| 🍞 Communion Servers | Stewards, preppers | 2–6 |
-| 💻 AV & Technology | Sound desk, projection, livestream | 2–4 |
-| 🌸 Flowers & Décor | Flower arrangers, seasonal décor | 1–3 |
-| ☕ Hospitality | Coffee/tea, kitchen, setup/clear | 4–10 |
-| 📚 Bible Study Leaders | Facilitators, assistants | 2+ per group |
-| 🙏 Prayer Ministry | Prayer team at service, intercession | 2–6 |
-| 🚌 Transport | Drivers for elderly/mobility needs | 2–8 |
-| 🏥 Pastoral Care Visitors | Visitors, phone contacts | Variable |
-| 📣 Communications | Social media, newsletter | 1–3 |
-| 🔒 Safeguarding | DSL, deputy DSL | 1–2 minimum |
+| Ministry                  | Typical Roles                         | Min People Needed |
+| ------------------------- | ------------------------------------- | ----------------- |
+| 🚪 Welcome / Greeting     | Greeters, door team, car park         | 3–8 per service   |
+| 🎵 Worship & Music        | Singers, musicians, sound, projection | 4–12              |
+| 👶 Children's Ministry    | Teachers, assistants, nursery workers | 2+ per class      |
+| 🍞 Communion Servers      | Stewards, preppers                    | 2–6               |
+| 💻 AV & Technology        | Sound desk, projection, livestream    | 2–4               |
+| 🌸 Flowers & Décor        | Flower arrangers, seasonal décor      | 1–3               |
+| ☕ Hospitality            | Coffee/tea, kitchen, setup/clear      | 4–10              |
+| 📚 Bible Study Leaders    | Facilitators, assistants              | 2+ per group      |
+| 🙏 Prayer Ministry        | Prayer team at service, intercession  | 2–6               |
+| 🚌 Transport              | Drivers for elderly/mobility needs    | 2–8               |
+| 🏥 Pastoral Care Visitors | Visitors, phone contacts              | Variable          |
+| 📣 Communications         | Social media, newsletter              | 1–3               |
+| 🔒 Safeguarding           | DSL, deputy DSL                       | 1–2 minimum       |
 
 ---
 
@@ -73,7 +73,7 @@ DISTRIBUTION GUIDANCE
   [Sun, DD MMM] │ [Name]        │ [Name], [Name], [Name]
   [Sun, DD MMM] │ [Name]        │ [Name], [Name]
 ──────────────────────────────────────────────────────────
-  
+
 NOTES
   ★ = New volunteer — please welcome and mentor
   ⚠ = DBS due for renewal within 3 months
@@ -87,6 +87,7 @@ SWAP LOG (for team lead to manage)
 ### Intelligent Rota Rules
 
 The rota engine applies these balancing principles:
+
 1. **No one serves two Sundays in a row** (without consent) — rest is a spiritual principle
 2. **Team leads rotate** — no single person always carries the weight
 3. **New volunteers paired with experienced** — mentorship built into the rota
@@ -155,6 +156,7 @@ Transport Driver      | Standard DBS        | As per diocese/org policy
 ```
 
 **Renewal Reminder Template:**
+
 ```
 Subject: DBS/Safeguarding renewal — action needed
 
@@ -225,12 +227,14 @@ STAGE 5 — INTEGRATION & REVIEW
 This sub-agent monitors for signs of over-serving and surfaces proactive care prompts.
 
 **Burnout Risk Indicators:**
+
 - Same person on the rota every week for 3+ consecutive months
 - Team Lead also serving in another team same day
 - No holidays or rests recorded in quarterly rota
 - Volunteer in a caregiving role (pastoral, children's) with no pastoral care themselves
 
 **Burnout Prevention Actions:**
+
 ```
 WELLBEING PROMPT — [Volunteer / Team Name]
 ─────────────────────────────────────────────
@@ -254,13 +258,16 @@ A rested volunteer serves from abundance, not depletion.
 ## Volunteer Appreciation Programme
 
 ### Monthly Appreciation Toolkit
+
 - Personalised thank-you note templates (for team leads to customise)
 - "Volunteer of the Month" nomination framework
 - Public bulletin acknowledgement template
 - Private pastoral thank-you from pastor template
 
 ### Annual Volunteer Appreciation Event
+
 Planning pack includes:
+
 - Event agenda (dinner, awards, testimonies, prayer)
 - Award categories (faithful service, above and beyond, new starter, team spirit)
 - Certificate templates (text for printing)
@@ -268,7 +275,9 @@ Planning pack includes:
 - Budget guide per head
 
 ### Small Gestures That Mean a Lot
+
 The sub-agent generates personalised micro-appreciation prompts:
+
 - Birthday acknowledgement for active volunteers
 - Anniversary of first serve message
 - After a hard service (challenging funeral, emotional service): "checking in" message template

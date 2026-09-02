@@ -59,7 +59,10 @@ declare module '@met4citizen/talkinghead' {
 
   export class TalkingHead {
     constructor(container: HTMLElement, options?: TalkingHeadOptions);
-    showAvatar(avatar: ShowAvatarOptions, onprogress?: ((progress: number) => void) | null): Promise<void>;
+    showAvatar(
+      avatar: ShowAvatarOptions,
+      onprogress?: ((progress: number) => void) | null,
+    ): Promise<void>;
     speakAudio(options: SpeakAudioOptions, opt?: unknown, onsubtitles?: unknown): void;
     start(): void;
     stop(): void;

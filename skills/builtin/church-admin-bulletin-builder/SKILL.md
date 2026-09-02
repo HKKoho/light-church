@@ -152,7 +152,9 @@ ORDER OF SERVICE
 ## Special Service Programs
 
 ### Christmas Eve / Day Program
+
 Expanded format with:
+
 - Carol lyrics (public domain only — pre-1928 publication or out of copyright)
 - Nativity program script section
 - Special candle-lighting liturgy
@@ -160,14 +162,18 @@ Expanded format with:
 - "Invite a friend" perforated section
 
 ### Good Friday Service
+
 Solemn, stripped-back format:
+
 - Stations of the Cross numbering (if used)
 - Responsive readings: Isaiah 53, Psalm 22, Lamentations
 - Silence indicators (a rarity in church bulletins — specify duration)
 - No upbeat notices — pastoral and focused
 
 ### Easter Sunday Program
+
 Celebratory, vibrant format:
+
 - Resurrection call-and-response liturgy
 - "He is risen! He is risen indeed!" moments marked
 - Baptism section (if applicable)
@@ -175,13 +181,16 @@ Celebratory, vibrant format:
 - Children's activities noted
 
 ### Baptism Service Order
+
 - Candidate names and brief testimony space
 - Meaning of baptism explanation (for visitors unfamiliar)
 - Vows text printed for congregation to witness
 - Space for photos/celebration note
 
 ### Funeral / Memorial Service Order
+
 Gentle, dignified format:
+
 - No notices, no giving appeals
 - Longer Scripture section
 - Space for eulogy timing
@@ -229,7 +238,7 @@ FROM THE PASTOR
 🙏  PRAYER FOCUS
     This month, we are praying for:
     • Our local community: [Specific need]
-    • Our nation: [Current prayer focus]  
+    • Our nation: [Current prayer focus]
     • Our global mission partners: [Name + brief update]
     • Our congregation: [General pastoral focus]
 
@@ -255,12 +264,14 @@ CONNECT: [Website] | [Email] | [Social] | [Phone]
 The Bulletin Builder produces output annotated for both:
 
 **For Print:**
+
 - Section headers clearly marked for design layout
 - Note: keep to A4 or A5 folded — max 4 sides
 - Suggest font sizes for readability (body: min 11pt)
 - Flag any content that needs visual hierarchy treatment
 
 **For Digital (Email / WhatsApp / Social):**
+
 - Shorter notices (150 words max per notice)
 - Single-column format
 - Clear call-to-action links

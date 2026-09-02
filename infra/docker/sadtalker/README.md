@@ -6,10 +6,10 @@ for the photo-realistic talking-face pipeline. Called by `SadTalkerService` in
 
 ## API
 
-| Method | Path | Body | Response |
-|---|---|---|---|
-| `GET` | `/health` | — | `{ "status": "ok", "device": "cpu\|cuda" }` |
-| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `audio` (WAV) | `video/mp4` |
+| Method | Path        | Body                                               | Response                                    |
+| ------ | ----------- | -------------------------------------------------- | ------------------------------------------- |
+| `GET`  | `/health`   | —                                                  | `{ "status": "ok", "device": "cpu\|cuda" }` |
+| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `audio` (WAV) | `video/mp4`                                 |
 
 ## Quick start (CPU — no GPU required)
 
@@ -25,6 +25,7 @@ docker run -p 7860:7860 \
 ```
 
 Add to your `.env`:
+
 ```
 SADTALKER_URL=http://localhost:7860
 ```
@@ -52,11 +53,11 @@ services:
   sadtalker:
     image: sadtalker-service:latest
     ports:
-      - "127.0.0.1:7860:7860"
+      - '127.0.0.1:7860:7860'
     volumes:
       - sadtalker-models:/app/checkpoints
     environment:
-      SADTALKER_DEVICE: cpu   # or cuda
+      SADTALKER_DEVICE: cpu # or cuda
     restart: unless-stopped
     # GPU (uncomment if using GPU image):
     # deploy:
@@ -84,11 +85,11 @@ pre-populated `checkpoints/` volume.
 
 ## Hardware requirements
 
-| Mode | RAM | VRAM | Speed (per sentence) |
-|---|---|---|---|
-| CPU | 8 GB | — | ~30–60 s |
-| GPU (T4) | 8 GB | 4 GB | ~2–5 s |
-| GPU (A10) | 8 GB | 4 GB | ~1–2 s |
+| Mode      | RAM  | VRAM | Speed (per sentence) |
+| --------- | ---- | ---- | -------------------- |
+| CPU       | 8 GB | —    | ~30–60 s             |
+| GPU (T4)  | 8 GB | 4 GB | ~2–5 s               |
+| GPU (A10) | 8 GB | 4 GB | ~1–2 s               |
 
 For real-time conversation, a GPU is strongly recommended. On CPU the latency
 is noticeable but the pipeline never blocks — SadTalkerService falls back to

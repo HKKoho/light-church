@@ -99,9 +99,7 @@ export function reduce(def: GameDefinition, state: GameState, action: GameAction
         drawnCard: null,
         phase: won ? 'GAME_OVER' : 'END_TURN',
         winner: won ? updatedPlayer.id : null,
-        log: won
-          ? [...state.log, `🎉 ${updatedPlayer.name} wins!`]
-          : state.log,
+        log: won ? [...state.log, `🎉 ${updatedPlayer.name} wins!`] : state.log,
       };
     }
 

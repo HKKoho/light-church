@@ -53,8 +53,7 @@ function ToolsReference() {
   const [panelOpen, setPanelOpen] = useState(false);
   const [expandedTool, setExpandedTool] = useState<string | null>(null);
 
-  const toggleTool = (name: string) =>
-    setExpandedTool((prev) => (prev === name ? null : name));
+  const toggleTool = (name: string) => setExpandedTool((prev) => (prev === name ? null : name));
 
   return (
     <div className="rounded-md border text-xs">
@@ -64,9 +63,7 @@ function ToolsReference() {
         className="flex w-full items-center justify-between px-3 py-2 text-muted-foreground hover:text-foreground"
       >
         <span className="font-medium">{t.toolsPanelToggle}</span>
-        <ChevronDown
-          className={`size-3.5 transition-transform ${panelOpen ? 'rotate-180' : ''}`}
-        />
+        <ChevronDown className={`size-3.5 transition-transform ${panelOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {panelOpen && (
@@ -93,7 +90,10 @@ function ToolsReference() {
                         <code className="shrink-0 rounded bg-muted px-1.5 py-0.5 font-mono text-[11px]">
                           {name}
                         </code>
-                        <span className="flex-1 text-muted-foreground">{summary.slice(0, 72)}{summary.length > 72 ? '…' : ''}</span>
+                        <span className="flex-1 text-muted-foreground">
+                          {summary.slice(0, 72)}
+                          {summary.length > 72 ? '…' : ''}
+                        </span>
                         <ChevronDown
                           className={`size-3 shrink-0 text-muted-foreground transition-transform ${isOpen ? 'rotate-180' : ''}`}
                         />
@@ -103,11 +103,17 @@ function ToolsReference() {
                         <div className="border-t bg-muted/20 px-3 py-2 flex flex-col gap-2">
                           <p className="text-foreground">{copy.what}</p>
                           <div className="rounded bg-amber-50 border border-amber-200 px-2 py-1.5 dark:bg-amber-950/30 dark:border-amber-800">
-                            <span className="font-semibold text-amber-700 dark:text-amber-400">{t.misconception}</span>
-                            <span className="text-amber-800 dark:text-amber-300">{copy.clarify}</span>
+                            <span className="font-semibold text-amber-700 dark:text-amber-400">
+                              {t.misconception}
+                            </span>
+                            <span className="text-amber-800 dark:text-amber-300">
+                              {copy.clarify}
+                            </span>
                           </div>
                           <div className="rounded bg-blue-50 border border-blue-200 px-2 py-1.5 dark:bg-blue-950/30 dark:border-blue-800">
-                            <span className="font-semibold text-blue-700 dark:text-blue-400">{t.promptTip}</span>
+                            <span className="font-semibold text-blue-700 dark:text-blue-400">
+                              {t.promptTip}
+                            </span>
                             <span className="text-blue-800 dark:text-blue-300">{copy.tip}</span>
                           </div>
                         </div>

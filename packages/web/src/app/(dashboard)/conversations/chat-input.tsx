@@ -174,13 +174,7 @@ const messages = {
   >;
 }>;
 
-type ScenarioKey =
-  | 'campaign'
-  | 'funding'
-  | 'application'
-  | 'cooperation'
-  | 'mne'
-  | 'gameBuilder';
+type ScenarioKey = 'campaign' | 'funding' | 'application' | 'cooperation' | 'mne' | 'gameBuilder';
 
 /* ------------------------------------------------------------------ */
 /*  NGO scenario cards                                                 */
@@ -299,13 +293,7 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
   },
 ];
 
-function NgoScenarioCard({
-  scenario,
-  onClick,
-}: {
-  scenario: NgoScenario;
-  onClick: () => void;
-}) {
+function NgoScenarioCard({ scenario, onClick }: { scenario: NgoScenario; onClick: () => void }) {
   const isFull = scenario.span === 'col-span-3';
 
   return (
@@ -329,9 +317,7 @@ function NgoScenarioCard({
             key={i}
             className={cn(
               'transition-transform duration-200 group-hover:scale-110',
-              i === 0
-                ? cn('size-6', scenario.accentText)
-                : 'size-4 text-muted-foreground/50',
+              i === 0 ? cn('size-6', scenario.accentText) : 'size-4 text-muted-foreground/50',
             )}
           />
         ))}

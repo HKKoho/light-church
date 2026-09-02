@@ -4,10 +4,7 @@ const KEY_PREFIX = 'clawix_boardgame_';
 
 export function saveGame(state: GameState): void {
   try {
-    localStorage.setItem(
-      `${KEY_PREFIX}${state.definitionId}`,
-      JSON.stringify(state),
-    );
+    localStorage.setItem(`${KEY_PREFIX}${state.definitionId}`, JSON.stringify(state));
   } catch {
     // storage unavailable — silently skip
   }

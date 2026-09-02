@@ -223,7 +223,9 @@ export default function DashboardPage() {
     {
       title: t.tokenUsage,
       value: stats ? formatNumber(stats.tokenUsage.totalTokens) : '—',
-      subtitle: stats ? t.tokenUsageSubtitle(stats.tokenUsage.totalEstimatedCostUsd.toFixed(2)) : '',
+      subtitle: stats
+        ? t.tokenUsageSubtitle(stats.tokenUsage.totalEstimatedCostUsd.toFixed(2))
+        : '',
       icon: Coins,
     },
     {

@@ -1,4 +1,5 @@
 # Railway Deployment Guide — Option B
+
 ## Light Church · Web + API on Railway · Agent Containers on VPS
 
 ---
@@ -29,6 +30,7 @@
 ```
 
 **What runs where:**
+
 - Railway: dashboard UI, API server, database, cache
 - VPS: AI agent sandboxes (Docker containers), workspace file storage
 
@@ -57,6 +59,7 @@ ssh root@YOUR_VPS_IP bash /tmp/vps-setup.sh
 ```
 
 The script will:
+
 1. Install Docker
 2. Generate TLS certificates (CA + server + client)
 3. Configure Docker daemon to listen on port 2376 with mutual TLS
@@ -101,6 +104,7 @@ docker image ls clawix-agent:latest
 ### 3b. Add plugins
 
 In the Railway project dashboard:
+
 - Click **+ New** → **Database** → **PostgreSQL** → Add
 - Click **+ New** → **Database** → **Redis** → Add
 
@@ -174,12 +178,14 @@ NEXT_PUBLIC_WS_URL=wss://<api-service>.railway.app
 Click **Deploy** on both services (or push to your main branch — Railway auto-deploys).
 
 **Deployment order Railway handles automatically:**
+
 1. Builds API Docker image (`infra/docker/api/Dockerfile`)
 2. Builds Web Docker image (`infra/docker/web/Dockerfile`)
 3. Runs API entrypoint: waits for Postgres → runs migrations → starts server
 4. Starts Web service
 
 **First deploy health check:**
+
 ```bash
 # API health
 curl https://<api-service>.railway.app/health
@@ -204,12 +210,14 @@ open https://<web-service>.railway.app
 After `git push` to main, Railway rebuilds automatically.
 
 To force a redeploy:
+
 ```bash
 # Using Railway CLI
 railway redeploy
 ```
 
 To update the VPS agent image after code changes:
+
 ```bash
 ssh root@YOUR_VPS_IP
 cd /tmp/lightchurch && git pull
@@ -221,13 +229,17 @@ docker build -t clawix-agent:latest -f infra/docker/agent/Dockerfile .
 ## Troubleshooting
 
 ### API fails to start
+
 ```bash
 railway logs --service api
 ```
+
 Common causes: missing env var, Postgres not ready, TLS cert decode failure.
 
 ### Agents fail to spawn
+
 Check that the VPS Docker daemon is reachable:
+
 ```bash
 # From your local machine (with certs)
 docker \
@@ -240,35 +252,37 @@ docker \
 ```
 
 Check VPS firewall allows port 2376:
+
 ```bash
 ssh root@YOUR_VPS_IP ufw status
 ```
 
 ### TLS certificate expired (after 5 years)
+
 Re-run `vps-setup.sh` — it regenerates certs if they already exist by deleting the old ones first, then update Railway vars with the new base64 values.
 
 ---
 
 ## Cost Estimate
 
-| Service | Provider | Monthly cost |
-|---------|----------|-------------|
-| Web + API | Railway Hobby | ~$5–10 |
-| Postgres | Railway plugin | ~$5 |
-| Redis | Railway plugin | ~$3 |
-| VPS (agent runner) | Hetzner CX22 | ~€4 |
-| **Total** | | **~$17–22/mo** |
+| Service            | Provider       | Monthly cost   |
+| ------------------ | -------------- | -------------- |
+| Web + API          | Railway Hobby  | ~$5–10         |
+| Postgres           | Railway plugin | ~$5            |
+| Redis              | Railway plugin | ~$3            |
+| VPS (agent runner) | Hetzner CX22   | ~€4            |
+| **Total**          |                | **~$17–22/mo** |
 
 ---
 
 ## Files Reference
 
-| File | Purpose |
-|------|---------|
-| `railway.toml` | API service Railway config (auto-detected) |
-| `infra/railway/web.toml` | Web service Railway config |
-| `infra/railway/env-reference.txt` | Full env var reference |
-| `infra/railway/vps-setup.sh` | VPS bootstrap + TLS cert generation |
-| `infra/docker/api/entrypoint.sh` | API entrypoint (handles TLS cert env vars) |
-| `infra/docker/api/Dockerfile` | API production image |
-| `infra/docker/web/Dockerfile` | Web production image |
+| File                              | Purpose                                    |
+| --------------------------------- | ------------------------------------------ |
+| `railway.toml`                    | API service Railway config (auto-detected) |
+| `infra/railway/web.toml`          | Web service Railway config                 |
+| `infra/railway/env-reference.txt` | Full env var reference                     |
+| `infra/railway/vps-setup.sh`      | VPS bootstrap + TLS cert generation        |
+| `infra/docker/api/entrypoint.sh`  | API entrypoint (handles TLS cert env vars) |
+| `infra/docker/api/Dockerfile`     | API production image                       |
+| `infra/docker/web/Dockerfile`     | Web production image                       |

@@ -6,8 +6,7 @@ import type {
 } from './session-command.js';
 import { WorkspaceService } from '../workspace/workspace.service.js';
 
-const USAGE =
-  'Usage: /prayer <your request> — e.g. /prayer Please pray for my mother\'s surgery.';
+const USAGE = "Usage: /prayer <your request> — e.g. /prayer Please pray for my mother's surgery.";
 
 function slugify(input: string): string {
   const slug = input

@@ -11,19 +11,19 @@ applies-to: monitoring-evaluation
 ```yaml
 id: OUT-1.1
 result-level: outcome | output | activity
-statement: "Women-led microenterprises in District X report a sustained income increase 12 months after training."
-unit: "% of trained enterprises"
+statement: 'Women-led microenterprises in District X report a sustained income increase 12 months after training.'
+unit: '% of trained enterprises'
 disaggregation: [sex, age-band, disability, location]
 baseline:
   value: 12
-  source: "mne/baselines/2026-q1.md"
+  source: 'mne/baselines/2026-q1.md'
   date: 2026-03-15
 target:
   value: 45
   date: 2027-12-31
-frequency: "annual, with mid-year pulse check"
-source-of-verification: "follow-up survey, see mne/forms/income-followup.md"
-assumption: "Local market for goods is not disrupted by drought beyond seasonal norms."
+frequency: 'annual, with mid-year pulse check'
+source-of-verification: 'follow-up survey, see mne/forms/income-followup.md'
+assumption: 'Local market for goods is not disrupted by drought beyond seasonal norms.'
 ```
 
 A row missing baseline, target, or source-of-verification is not an indicator. It is a wish.

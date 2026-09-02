@@ -66,6 +66,7 @@ find / -maxdepth 4 -iname "gracemission*" 2>/dev/null
 ```
 
 Note down:
+
 - The directory `gracemission` runs from (call it `$GRACEMISSION_DIR` below)
 - Its compose project name (`docker compose ls` shows this)
 - Whether Caddy or nginx is the reverse proxy, and where its config file is
@@ -124,11 +125,11 @@ pnpm run install:clawix
 
 Answer the installer prompts as in `Hetzner_deploy.md` Step 4, using:
 
-| Prompt | Answer |
-| --- | --- |
-| Deployment mode | `1` (production) |
+| Prompt            | Answer                                  |
+| ----------------- | --------------------------------------- |
+| Deployment mode   | `1` (production)                        |
 | Public host or IP | `<new-domain>` (no `https://`, no port) |
-| Use HTTPS? | `y` |
+| Use HTTPS?        | `y`                                     |
 
 This builds `clawix-agent:latest` and starts the stack via
 `docker-compose.prod.yml`, listening on `3002` (web) / `3003` (API) same as

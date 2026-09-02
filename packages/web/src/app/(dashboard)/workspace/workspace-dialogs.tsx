@@ -56,7 +56,8 @@ const messages = {
       title: (name: string) => `Delete “${name}”?`,
       itemCount: (n: number) =>
         `This folder contains ${n} ${n === 1 ? 'item' : 'items'}. This action cannot be undone.`,
-      folderContents: 'This folder and all its contents will be deleted. This action cannot be undone.',
+      folderContents:
+        'This folder and all its contents will be deleted. This action cannot be undone.',
       fileWarning: 'This action cannot be undone.',
       cancel: 'Cancel',
       deleting: 'Deleting...',
@@ -290,9 +291,7 @@ export function CreateDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{isFile ? t.create.titleFile : t.create.titleFolder}</DialogTitle>
-          <DialogDescription>
-            {isFile ? t.create.descFile : t.create.descFolder}
-          </DialogDescription>
+          <DialogDescription>{isFile ? t.create.descFile : t.create.descFolder}</DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
           <Label htmlFor="entry-name">{t.create.nameLabel}</Label>

@@ -27,7 +27,7 @@ const env = parseEnv(ENV_FILE);
 
 const pgUser = env['POSTGRES_USER'] || 'clawix';
 const pgPass = env['POSTGRES_PASSWORD'];
-const pgDb   = env['POSTGRES_DB']   || 'clawix';
+const pgDb = env['POSTGRES_DB'] || 'clawix';
 
 if (!pgPass) {
   console.error('❌  POSTGRES_PASSWORD not found in .env — cannot connect to database.');
@@ -48,7 +48,10 @@ try {
       DATABASE_URL,
       DEFAULT_PROVIDER: env['DEFAULT_PROVIDER'] || process.env['DEFAULT_PROVIDER'] || 'openai',
       DEFAULT_LLM_MODEL: env['DEFAULT_LLM_MODEL'] || process.env['DEFAULT_LLM_MODEL'] || 'gpt-4o',
-      AGENT_CONTAINER_IMAGE: env['AGENT_CONTAINER_IMAGE'] || process.env['AGENT_CONTAINER_IMAGE'] || 'clawix-agent:latest',
+      AGENT_CONTAINER_IMAGE:
+        env['AGENT_CONTAINER_IMAGE'] ||
+        process.env['AGENT_CONTAINER_IMAGE'] ||
+        'clawix-agent:latest',
     },
   });
 } catch {

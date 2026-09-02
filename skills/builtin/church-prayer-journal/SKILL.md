@@ -9,13 +9,14 @@ pack: church
 
 Prayer is the breath of the church. This skill helps individuals and communities pray with structure without losing spontaneity, with depth without losing accessibility, and with perseverance without losing heart.
 
-*"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."* — Philippians 4:6
+_"Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God."_ — Philippians 4:6
 
 ---
 
 ## Prayer Meeting Guide Generator
 
 ### Input: Theme, duration, group size
+
 ### Output: Complete facilitated prayer meeting structure
 
 ```
@@ -48,24 +49,24 @@ CONFESSION & RENEWAL (7 min)
 ────────────────────────────────────────
 INTERCESSION STATIONS (20 min)
   [4–5 focused prayer topics — 4 minutes each]
-  
+
   Station 1: [Topic — e.g. Our church family]
     → Specific request: [...]
     → Scripture to pray: [...]
     → Suggested prayer posture: [spoken | silent | written]
-  
+
   Station 2: [Topic — e.g. Our city/neighbourhood]
     → Specific request: [...]
     → Scripture to pray: [...]
-  
+
   Station 3: [Topic — e.g. National/global situation]
     → Specific request: [...]
     → Scripture to pray: [...]
-  
+
   Station 4: [Topic — e.g. Specific individuals or families]
     → Names submitted for prayer: [from pastoral list — populated by church team]
     → Pray for: healing | provision | peace | faith | specific need
-  
+
   Station 5: [Topic — e.g. Mission & evangelism]
     → Local outreach | Global mission partners
     → Scripture: Matthew 9:37–38
@@ -83,6 +84,7 @@ CLOSING: LISTENING & COMMISSION (5 min)
 ## Personal Prayer Journal Prompts
 
 ### Daily Framework (ACTS Model)
+
 ```
 📅 DATE: ___________
 
@@ -105,12 +107,13 @@ SUPPLICATION — What am I asking for?
   For my family: ___
   For my church: ___
   For the world: ___
-  
+
 LISTENING — What did I sense God saying?
   [Space for reflection, Scripture that came to mind, impression, image]
 ```
 
 ### Weekly Deep Reflection Prompts
+
 - "Where have I seen God's faithfulness this week?"
 - "What fear or worry have I been holding instead of releasing to God?"
 - "Is there anyone I need to forgive, or anyone I need to ask forgiveness from?"
@@ -190,7 +193,7 @@ BREAKING THE FAST:
   Break with thanksgiving and a small, simple meal
   Don't rush back to fullness — let the spiritual sensitivity linger
 
-PASTORAL NOTE: Always advise those with medical conditions, pregnancy, or eating disorder 
+PASTORAL NOTE: Always advise those with medical conditions, pregnancy, or eating disorder
 history to choose a non-food fast or consult their doctor.
 ```
 
@@ -215,4 +218,4 @@ PLEASE FORWARD: [To next person on chain] | [Reply to confirm you've prayed]
 
 ---
 
-*"The prayer of a righteous person is powerful and effective."* — James 5:16b
+_"The prayer of a righteous person is powerful and effective."_ — James 5:16b

@@ -543,7 +543,7 @@ Every ledger entry, budget report, export, and reconciliation note appends one l
   {
     name: 'evangelism-outreach',
     description:
-      "Plans outreach campaigns, drafts gospel-proclamation content, and supports new church establishment. Never conditions aid or service on participation.",
+      'Plans outreach campaigns, drafts gospel-proclamation content, and supports new church establishment. Never conditions aid or service on participation.',
     systemPrompt: `# Role
 
 You support the NGO's evangelism and church-planting work: outreach campaign plans, gospel-proclamation content drafts (testimonies, evangelistic talk outlines, tract copy), and church-planting support briefs. Load the \`gospel-mission\` skill for the full theological framing behind this work.

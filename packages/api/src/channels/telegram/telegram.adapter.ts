@@ -88,7 +88,9 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
     const openaiApiKey = process.env['OPENAI_API_KEY'];
     if (!openaiApiKey) {
       logger.warn({ chatId: ctx.chat.id }, 'OPENAI_API_KEY not set — cannot transcribe voice');
-      await ctx.reply('Voice transcription requires an OpenAI API key. Contact your administrator.');
+      await ctx.reply(
+        'Voice transcription requires an OpenAI API key. Contact your administrator.',
+      );
       return;
     }
 
@@ -99,11 +101,16 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
       const transcription = await transcribeAudio(audioBuffer, openaiApiKey);
 
       if (!transcription) {
-        await ctx.reply('Could not transcribe your voice message. Please try again or send a text message.');
+        await ctx.reply(
+          'Could not transcribe your voice message. Please try again or send a text message.',
+        );
         return;
       }
 
-      logger.info({ chatId: ctx.chat.id, chars: transcription.length }, 'Voice message transcribed');
+      logger.info(
+        { chatId: ctx.chat.id, chars: transcription.length },
+        'Voice message transcribed',
+      );
 
       await ctx.reply(`_🎤 "${transcription}"_`, { parse_mode: 'Markdown' });
 
@@ -124,7 +131,9 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
     } catch (error: unknown) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       logger.error({ chatId: ctx.chat.id, error: errorMsg }, 'Voice transcription failed');
-      await ctx.reply('Failed to process your voice message. Please try again or send a text message.');
+      await ctx.reply(
+        'Failed to process your voice message. Please try again or send a text message.',
+      );
     }
   });
 
@@ -251,7 +260,9 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
         const chunks = splitMessage(bufferedText, SAFE_SPLIT_LENGTH);
         for (const chunk of chunks) {
           try {
-            await bot.api.sendMessage(recipientId, formatMarkdownV2(chunk), { parse_mode: 'MarkdownV2' });
+            await bot.api.sendMessage(recipientId, formatMarkdownV2(chunk), {
+              parse_mode: 'MarkdownV2',
+            });
           } catch {
             await bot.api.sendMessage(recipientId, chunk);
           }
@@ -269,7 +280,9 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
         const chunks = splitMessage(bufferedText, SAFE_SPLIT_LENGTH);
         for (const chunk of chunks) {
           try {
-            await bot.api.sendMessage(recipientId, formatMarkdownV2(chunk), { parse_mode: 'MarkdownV2' });
+            await bot.api.sendMessage(recipientId, formatMarkdownV2(chunk), {
+              parse_mode: 'MarkdownV2',
+            });
           } catch {
             await bot.api.sendMessage(recipientId, chunk);
           }

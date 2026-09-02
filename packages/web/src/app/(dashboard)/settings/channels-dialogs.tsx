@@ -91,8 +91,7 @@ const messages = {
       line2Post: '.',
       line3Pre: 'Auth state persists at ',
       line3Mid1: ' (default ',
-      line3Mid2:
-        ') — restarts won’t re-prompt for QR. Authorize a user by setting their ',
+      line3Mid2: ') — restarts won’t re-prompt for QR. Authorize a user by setting their ',
       line3Mid3: ' (e.g. ',
       line3Post: ').',
     },
@@ -467,9 +466,7 @@ function TelegramConfigFields({ config = {} }: { config?: Record<string, unknown
               }
             />
             <p className="text-xs text-muted-foreground">
-              {hasWebhookSecret
-                ? t.telegram.webhookSecretSetHelp
-                : t.telegram.webhookSecretHelp}
+              {hasWebhookSecret ? t.telegram.webhookSecretSetHelp : t.telegram.webhookSecretHelp}
             </p>
           </div>
         </>

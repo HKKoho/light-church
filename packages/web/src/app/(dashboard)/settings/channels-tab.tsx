@@ -101,8 +101,7 @@ const messages = {
     },
     deleteDialog: {
       title: '移除頻道',
-      description: (name: string) =>
-        `確定要移除 ${name} 嗎？這將中斷此頻道的連線並移除其設定。`,
+      description: (name: string) => `確定要移除 ${name} 嗎？這將中斷此頻道的連線並移除其設定。`,
       cancel: '取消',
       confirm: '移除',
     },

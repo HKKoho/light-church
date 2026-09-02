@@ -27,31 +27,37 @@ Every programme, proposal, and communication should be traceable back to these f
 ## Stakeholder Profiles
 
 ### Christian Foundations & Faith-Based Supporters
+
 **What they need:** Biblical alignment, clear theory of gospel change, evidence that souls and communities are being transformed, faithful stewardship of funds.
 **Emotional reality:** They give as an act of worship. They want to invest in Kingdom work that outlasts projects. Hollow mission-speak or vague "impact" language erodes trust immediately.
 **Engage with:** Scripture grounding for the programme, discipleship depth metrics (not just attendance), testimony of life change, honest reporting of what God has done and where you fell short, cost-per-disciple or cost-per-community transparency.
 
 ### Church Partners
+
 **What they need:** Shared doctrinal foundations, clear role definitions, mutual accountability, a partnership that strengthens their own congregation's mission.
 **Emotional reality:** Church leaders are protective of their flock and their pulpit. They need confidence that partnership will not create dependency or compromise their local witness.
 **Engage with:** Complementary roles (not duplication), formal MoU with exit provisions, joint prayer and discernment processes, regular co-reporting, local church ownership of outcomes.
 
 ### Individual Christian Supporters & Intercessors
+
 **What they need:** A story of a life touched by the gospel, clear evidence their gift made a difference, a continued role through prayer and giving.
 **Emotional reality:** They give from love and faith. They fear money going to overhead or drift from biblical mission. They want to feel they are co-labourers in the Kingdom.
 **Engage with:** Specific testimonies (with consent), Scripture that ties their gift to the work, transparent fund-use breakdown, personal prayer updates, the name of the missionary or community worker they are supporting.
 
 ### Beneficiaries & Local Community Members
+
 **What they need:** Dignity, cultural respect, genuine relationship, holistic care (spiritual and physical), and local ownership of their own transformation journey.
 **Emotional reality:** They have heard many promises from outsiders. Authentic presence and follow-through matter more than eloquent visions. They are made in the image of God — never objects of pity or project.
 **Engage with:** Community-led discernment, mother-tongue Scripture and worship, two-way learning, long-term accompaniment over short-term programming, celebration of indigenous faith expression.
 
 ### Secular & Institutional Funders (for holistic ministry programmes)
+
 **What they need:** Evidence of community development outcomes, transparent governance, safeguarding standards, measurable social indicators.
 **Emotional reality:** They may be unfamiliar with faith motivation. They need clear separation of any conditional aid from religious activity, and confidence that all programme participation is voluntary.
 **Engage with:** Social outcome data alongside spiritual indicators, compliance with safeguarding and do-no-harm standards, unambiguous voluntary participation clauses, independent evaluation.
 
 ### Academic & Theological Research Partners
+
 **What they need:** Methodological rigour, open data access, attribution clarity, peer-validated approaches, honest treatment of both success and failure.
 **Emotional reality:** Credibility is everything. Theological claims mixed with research findings must be clearly distinguished. Overstated transformation claims damage partnerships instantly.
 **Engage with:** Mixed-methods frameworks that hold quantitative and qualitative evidence together, narrative theology alongside social science, dataset governance and consent protocols, honest acknowledgement of what the data does not show.
@@ -61,14 +67,16 @@ Every programme, proposal, and communication should be traceable back to these f
 ## Gospel-Centred Impact Framing
 
 Always distinguish between:
+
 - **Activity** — what the ministry does (services held, Bibles distributed, trainings run)
 - **Output** — what is delivered to participants (number trained, communities reached, Scripture portions received)
 - **Outcome** — what changes as a result (faith formed, behaviour changed, community reconciled)
 - **Transformation** — longer-term gospel fruit (disciples multiplying, churches planted, communities experiencing shalom)
 
-When presenting data: *"What does this mean for a real person made in the image of God?"* Translate statistics into human-scale testimony. Numbers are stewardship tools; testimony is the gospel witness.
+When presenting data: _"What does this mean for a real person made in the image of God?"_ Translate statistics into human-scale testimony. Numbers are stewardship tools; testimony is the gospel witness.
 
 **Discipleship depth indicators** (prefer these over attendance counts):
+
 - Scripture engagement (reading, memorising, applying)
 - Prayer life evidence
 - Witness to neighbours and family
@@ -81,6 +89,7 @@ When presenting data: *"What does this mean for a real person made in the image 
 ## Communication Principles
 
 ### Language rules
+
 - Ground every initiative in Scripture — at least one anchor passage per programme section.
 - Write plainly but with theological depth available on request; avoid both shallow pietism and academic inaccessibility.
 - Avoid: "impact", "leverage", "synergy", "game-changer", "transformative" as empty adjectives. Use concrete language about what God did and what people chose.
@@ -89,6 +98,7 @@ When presenting data: *"What does this mean for a real person made in the image 
 - End with a call to prayer, not a sales close.
 
 ### Tone by audience
+
 - **Christian foundations and major supporters:** Warm, scripturally honest, evidence-grounded. Share both the harvest and the hard places. Acknowledge sin, structural barriers, and failed attempts alongside fruit.
 - **Church partners:** Collegial and doctrinally careful. Affirm local church primacy. Never position the organisation as more important than the local church in the mission.
 - **Individual supporters and intercessors:** Personal and story-led. Lead with a testimony; let numbers support the human story. Always close with a prayer request.
@@ -96,6 +106,7 @@ When presenting data: *"What does this mean for a real person made in the image 
 - **Secular or institutional funders:** Clear, professional, outcome-focused. Separate voluntary spiritual activities from development outputs. Comply fully with do-no-harm and safeguarding standards.
 
 ### Dignity in storytelling
+
 - Every person in a story is a bearer of the image of God — treat their testimony with reverence.
 - No rescuer framing. The organisation is not the hero of the story; God is, and so is the community member making choices.
 - Obtain documented consent for all personal testimonies, photographs, or case studies.
@@ -129,6 +140,7 @@ When presenting data: *"What does this mean for a real person made in the image 
 ## Ministry Administration Reference
 
 ### Key areas for a Christianity NGO
+
 1. **Evangelism & Church Planting** — outreach campaigns, gospel proclamation, new church establishment
 2. **Discipleship & Leadership Development** — Bible training, small groups, mentorship, local leader formation
 3. **Scripture & Literacy** — Bible translation, distribution, mother-tongue literacy programmes
@@ -139,6 +151,7 @@ When presenting data: *"What does this mean for a real person made in the image 
 8. **Communications & Proclamation** — newsletters, sermons, social media witness, documentary media
 
 ### Standard documents for gospel ministry
+
 - Ministry programme proposal (with Scripture foundation and theory of change)
 - Discipleship tracking report (qualitative + quantitative)
 - Supporter stewardship letter (testimony + transparency)

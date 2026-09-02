@@ -117,15 +117,15 @@ pnpm run install:clawix
 
 The installer is interactive. Answer the prompts like this:
 
-| Prompt | Answer |
-| --- | --- |
-| Deployment mode | `1` (production) |
-| Provider selection | pick one or more (e.g. `1` for Anthropic) + paste your API key |
-| Default model | accept the default, or pick a cheaper one — see cost tip below |
-| Public host or IP | `lightchurch.aibyml.uk` (no `https://`, no port) |
-| Use HTTPS? | `y` |
-| Extra CORS origins | leave blank |
-| Admin email / password / name | your admin login |
+| Prompt                        | Answer                                                         |
+| ----------------------------- | -------------------------------------------------------------- |
+| Deployment mode               | `1` (production)                                               |
+| Provider selection            | pick one or more (e.g. `1` for Anthropic) + paste your API key |
+| Default model                 | accept the default, or pick a cheaper one — see cost tip below |
+| Public host or IP             | `lightchurch.aibyml.uk` (no `https://`, no port)               |
+| Use HTTPS?                    | `y`                                                            |
+| Extra CORS origins            | leave blank                                                    |
+| Admin email / password / name | your admin login                                               |
 
 > **Cost tip:** the installer defaults to `gpt-4o` for OpenAI (or
 > `claude-sonnet-4-5` for Anthropic). For most conversational use, a cheaper
@@ -145,7 +145,7 @@ the installer waits for `http://localhost:3003/health` to go green.
 Do **not** point a Caddy site block at the same port number the app's Docker
 container publishes on the host (e.g. `lightchurch.aibyml.uk:3010 {
 reverse_proxy localhost:3010 }`) — Caddy would try to bind that port itself
-*and* proxy to it, which is a straight `bind: address already in use`
+_and_ proxy to it, which is a straight `bind: address already in use`
 conflict with the container. Two processes can't own one host port.
 
 Instead, use a clean port-less URL: Caddy terminates TLS on 443 for the root
@@ -251,19 +251,24 @@ sudo systemctl enable docker
 ## Troubleshooting
 
 ### API fails to start
+
 ```bash
 docker compose -f docker-compose.prod.yml logs api
 ```
+
 Common causes: missing env var, Postgres not ready yet, bad provider API key.
 
 ### Agents fail to spawn
+
 Confirm the Docker daemon is reachable and the agent image exists:
+
 ```bash
 docker image ls clawix-agent:latest
 docker ps
 ```
 
 ### WebSocket shows "disconnected" in the dashboard
+
 Usually a proxy/Cloudflare issue — confirm Cloudflare DNS is set to **DNS
 only** (grey cloud), not proxied, and that the Caddyfile blocks in Step 5
 match your domain exactly.
@@ -272,10 +277,10 @@ match your domain exactly.
 
 ## Cost recap
 
-| Item | Monthly |
-|---|---|
-| Hetzner CX22 VPS | ~$4 |
-| Domain (amortized, if newly registered) | ~$1 |
-| Caddy, Docker, TLS | $0 |
-| **Infra total** | **~$5/mo** |
-| LLM API usage | variable — dominates the bill; pick a cheap default model |
+| Item                                    | Monthly                                                   |
+| --------------------------------------- | --------------------------------------------------------- |
+| Hetzner CX22 VPS                        | ~$4                                                       |
+| Domain (amortized, if newly registered) | ~$1                                                       |
+| Caddy, Docker, TLS                      | $0                                                        |
+| **Infra total**                         | **~$5/mo**                                                |
+| LLM API usage                           | variable — dominates the bill; pick a cheap default model |
