@@ -41,6 +41,8 @@ const mockHttpAdapterHost = { httpAdapter: { getHttpServer: vi.fn().mockReturnVa
 const mockAgentDefRepo = { findById: vi.fn() };
 const mockAgentRunner = { run: vi.fn() };
 const mockTts = { synthesize: vi.fn() };
+const mockSadTalker = { generateVideo: vi.fn() };
+const mockAvatarController = { readPhotoBuffer: vi.fn() };
 
 describe('TalkingFaceGateway', () => {
   let gateway: TalkingFaceGateway;
@@ -60,6 +62,8 @@ describe('TalkingFaceGateway', () => {
       mockAgentDefRepo as never,
       mockAgentRunner as never,
       mockTts as never,
+      mockSadTalker as never,
+      mockAvatarController as never,
     );
   });
 
@@ -73,10 +77,7 @@ describe('TalkingFaceGateway', () => {
     it('rejects a connection with an invalid token', async () => {
       mockJwtService.verifyAsync.mockRejectedValue(new Error('bad token'));
       const socket = mockSocket();
-      await gateway.handleConnection(
-        socket as never,
-        mockRequest('/ws/talkingface?token=bad'),
-      );
+      await gateway.handleConnection(socket as never, mockRequest('/ws/talkingface?token=bad'));
       expect(socket.close).toHaveBeenCalledWith(4001, 'unauthorized');
     });
 
@@ -101,7 +102,7 @@ describe('TalkingFaceGateway', () => {
         }),
       );
 
-      expect(handleSpeakSpy).toHaveBeenCalledWith('user-1', socket, {
+      expect(handleSpeakSpy).toHaveBeenCalledWith('user-1', undefined, socket, {
         agentDefinitionId: 'agent-1',
         input: 'Hi',
         sessionId: undefined,
@@ -114,16 +115,18 @@ describe('TalkingFaceGateway', () => {
       userId: string,
       socket: ReturnType<typeof mockSocket>,
       payload: { agentDefinitionId: string; input: string; sessionId?: string },
+      userRole = 'volunteer',
     ) =>
       (
         gateway as unknown as {
           handleSpeak: (
             userId: string,
+            userRole: string,
             socket: unknown,
             payload: typeof payload,
           ) => Promise<void>;
         }
-      ).handleSpeak(userId, socket, payload);
+      ).handleSpeak(userId, userRole, socket, payload);
 
     it('synthesizes a single chunk when streaming is disabled', async () => {
       mockAgentDefRepo.findById.mockResolvedValue({ streamingEnabled: false });
@@ -153,26 +156,28 @@ describe('TalkingFaceGateway', () => {
 
     it('streams each completed sentence as its own chunk, then flushes the remainder', async () => {
       mockAgentDefRepo.findById.mockResolvedValue({ streamingEnabled: true });
-      mockAgentRunner.run.mockImplementation(async (opts: { onEvent?: (e: unknown) => Promise<void> }) => {
-        await opts.onEvent?.({
-          type: 'assistant_chunk',
-          content: 'Hello there. How are you',
-          isFinal: false,
-        });
-        await opts.onEvent?.({
-          type: 'assistant_chunk',
-          content: '? I am fine.',
-          isFinal: true,
-        });
-        return {
-          agentRunId: 'run-2',
-          sessionId: 'sess-2',
-          output: 'Hello there. How are you? I am fine.',
-          status: 'completed',
-          tokenUsage: {},
-          streamingUsed: true,
-        };
-      });
+      mockAgentRunner.run.mockImplementation(
+        async (opts: { onEvent?: (e: unknown) => Promise<void> }) => {
+          await opts.onEvent?.({
+            type: 'assistant_chunk',
+            content: 'Hello there. How are you',
+            isFinal: false,
+          });
+          await opts.onEvent?.({
+            type: 'assistant_chunk',
+            content: '? I am fine.',
+            isFinal: true,
+          });
+          return {
+            agentRunId: 'run-2',
+            sessionId: 'sess-2',
+            output: 'Hello there. How are you? I am fine.',
+            status: 'completed',
+            tokenUsage: {},
+            streamingUsed: true,
+          };
+        },
+      );
 
       const socket = mockSocket();
       await call('user-1', socket, { agentDefinitionId: 'agent-1', input: 'Hi' });

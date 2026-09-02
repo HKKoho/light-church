@@ -85,7 +85,9 @@ export default function TalkingFacePage() {
         const active = res.data.find((a) => a.isActive);
         setAgentId(active?.id ?? null);
       })
-      .catch((err) => setError(err instanceof Error ? err.message : 'Failed to load agents'));
+      .catch((err: unknown) =>
+        setError(err instanceof Error ? err.message : 'Failed to load agents'),
+      );
   }, []);
 
   // Fetch avatar list (admin only)
@@ -93,7 +95,9 @@ export default function TalkingFacePage() {
     if (!isAdmin) return;
     void authFetch<AvatarListItem[]>('/api/v1/talkingface/avatar')
       .then(setAvatars)
-      .catch(() => { /* non-fatal */ });
+      .catch(() => {
+        /* non-fatal */
+      });
   }, [isAdmin]);
 
   // --- photo upload ---
@@ -121,14 +125,19 @@ export default function TalkingFacePage() {
     }
   }, []);
 
-  const handleDeleteAvatar = useCallback(async (photoId: string) => {
-    await authFetch(`/api/v1/talkingface/avatar/${photoId}`, { method: 'DELETE' }).catch(() => {});
-    setAvatars((prev) => prev.filter((a) => a.photoId !== photoId));
-    if (selectedPhotoId === photoId) {
-      setSelectedPhotoId(null);
-      setMode('3d');
-    }
-  }, [selectedPhotoId]);
+  const handleDeleteAvatar = useCallback(
+    async (photoId: string) => {
+      await authFetch(`/api/v1/talkingface/avatar/${photoId}`, { method: 'DELETE' }).catch(
+        () => {},
+      );
+      setAvatars((prev) => prev.filter((a) => a.photoId !== photoId));
+      if (selectedPhotoId === photoId) {
+        setSelectedPhotoId(null);
+        setMode('3d');
+      }
+    },
+    [selectedPhotoId],
+  );
 
   // --- WS callbacks ---
   const handleChunk = useCallback(async (chunk: SpeakChunk) => {
@@ -138,7 +147,12 @@ export default function TalkingFacePage() {
     } else {
       // 3D avatar mode: drive TalkingHead.js with audio + word timings
       const audio = await decodeBase64Audio(chunk.audio);
-      stage3DRef.current?.speak({ audio, words: chunk.words, wtimes: chunk.wtimes, wdurations: chunk.wdurations });
+      stage3DRef.current?.speak({
+        audio,
+        words: chunk.words,
+        wtimes: chunk.wtimes,
+        wdurations: chunk.wdurations,
+      });
     }
   }, []);
 
@@ -160,31 +174,39 @@ export default function TalkingFacePage() {
   });
 
   // --- send message ---
-  const sendText = useCallback(async (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed || !agentId || speaking) return;
-    setSpeaking(true);
-    setError('');
-    setInput('');
-    try {
-      await sendSpeak(
-        agentId,
-        trimmed,
-        sessionId,
-        mode === 'photo' && selectedPhotoId ? selectedPhotoId : undefined,
-      );
-    } catch (err) {
-      setError(`Failed to get a reply: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      setSpeaking(false);
-    }
-  }, [agentId, sessionId, speaking, sendSpeak, mode, selectedPhotoId]);
+  const sendText = useCallback(
+    async (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed || !agentId || speaking) return;
+      setSpeaking(true);
+      setError('');
+      setInput('');
+      try {
+        await sendSpeak(
+          agentId,
+          trimmed,
+          sessionId,
+          mode === 'photo' && selectedPhotoId ? selectedPhotoId : undefined,
+        );
+      } catch (err) {
+        setError(`Failed to get a reply: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        setSpeaking(false);
+      }
+    },
+    [agentId, sessionId, speaking, sendSpeak, mode, selectedPhotoId],
+  );
 
-  const handleSend = useCallback(() => { void sendText(input); }, [input, sendText]);
+  const handleSend = useCallback(() => {
+    void sendText(input);
+  }, [input, sendText]);
 
-  const handleSpeechResult = useCallback((text: string, isFinal: boolean) => {
-    setInput(text);
-    if (isFinal) void sendText(text);
-  }, [sendText]);
+  const handleSpeechResult = useCallback(
+    (text: string, isFinal: boolean) => {
+      setInput(text);
+      if (isFinal) void sendText(text);
+    },
+    [sendText],
+  );
 
   const speechInput = useSpeechInput(handleSpeechResult);
 
@@ -326,7 +348,10 @@ export default function TalkingFacePage() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleSend(); }
+            if (e.key === 'Enter' && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
           }}
           placeholder={speechInput.listening ? 'Listening…' : 'Say something…'}
           disabled={!ready || !agentId || speaking}
@@ -338,12 +363,16 @@ export default function TalkingFacePage() {
             size="icon"
             className="size-9 shrink-0 rounded-full"
             disabled={!ready || !agentId || speaking}
-            onClick={() => speechInput.listening ? speechInput.stop() : speechInput.start()}
+            onClick={() => (speechInput.listening ? speechInput.stop() : speechInput.start())}
           >
-            {speechInput.listening ? <MicOff className="size-4 animate-pulse" /> : <Mic className="size-4" />}
+            {speechInput.listening ? (
+              <MicOff className="size-4 animate-pulse" />
+            ) : (
+              <Mic className="size-4" />
+            )}
           </Button>
         )}
-        <Button onClick={() => void handleSend()} disabled={!ready || !agentId || speaking}>
+        <Button onClick={handleSend} disabled={!ready || !agentId || speaking}>
           {speaking ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
           Send
         </Button>

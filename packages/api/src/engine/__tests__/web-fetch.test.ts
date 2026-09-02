@@ -19,9 +19,9 @@ const { mockUndiciFetch } = vi.hoisted(() => ({
 }));
 vi.mock('undici', () => ({
   fetch: mockUndiciFetch,
-  Agent: vi.fn().mockImplementation(() => ({
-    close: vi.fn().mockResolvedValue(undefined),
-  })),
+  Agent: vi.fn().mockImplementation(function () {
+    return { close: vi.fn().mockResolvedValue(undefined) };
+  }),
 }));
 
 import { validateUrl } from '../tools/web/ssrf-protection.js';

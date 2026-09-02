@@ -55,7 +55,10 @@ describe('ContextBuilderService - skill summary integration', () => {
     const promptIndex = systemContent.indexOf('Be helpful.');
     expect(skillIndex).toBeGreaterThan(promptIndex);
     // Loader is called with <workspace>/skills as customDir
-    expect(mockSkillLoader.buildSkillsSummary).toHaveBeenCalledWith('/tmp/workspace-user1/skills');
+    expect(mockSkillLoader.buildSkillsSummary).toHaveBeenCalledWith(
+      '/tmp/workspace-user1/skills',
+      undefined,
+    );
   });
 
   it('omits skill section for sub-agents even when skills are available', async () => {

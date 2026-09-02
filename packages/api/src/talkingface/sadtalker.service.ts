@@ -57,8 +57,16 @@ export class SadTalkerService {
       ]);
 
       const form = new FormData();
-      form.append('image', new Blob([imageBuffer], { type: 'image/jpeg' }), 'avatar.jpg');
-      form.append('audio', new Blob([audioBuffer], { type: 'audio/wav' }), 'audio.wav');
+      form.append(
+        'image',
+        new Blob([new Uint8Array(imageBuffer)], { type: 'image/jpeg' }),
+        'avatar.jpg',
+      );
+      form.append(
+        'audio',
+        new Blob([new Uint8Array(audioBuffer)], { type: 'audio/wav' }),
+        'audio.wav',
+      );
 
       const response = await fetch(`${this.baseUrl}/generate`, {
         method: 'POST',

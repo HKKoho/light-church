@@ -1,21 +1,21 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('openai', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    chat: { completions: { create: vi.fn() } },
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return { chat: { completions: { create: vi.fn() } } };
+  }),
 }));
 
 vi.mock('@anthropic-ai/sdk', () => ({
-  default: vi.fn().mockImplementation(() => ({
-    messages: { create: vi.fn() },
-  })),
+  default: vi.fn().mockImplementation(function () {
+    return { messages: { create: vi.fn() } };
+  }),
 }));
 
 vi.mock('@google/genai', () => ({
-  GoogleGenAI: vi.fn().mockImplementation(() => ({
-    models: { generateContent: vi.fn() },
-  })),
+  GoogleGenAI: vi.fn().mockImplementation(function () {
+    return { models: { generateContent: vi.fn() } };
+  }),
 }));
 
 vi.mock('@clawix/shared', async (importOriginal) => {

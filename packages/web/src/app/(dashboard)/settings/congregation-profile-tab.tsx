@@ -273,8 +273,8 @@ export function CongregationProfileTab() {
     );
   }
 
-  const ageTotal = AGE_BANDS.reduce((sum, band) => sum + form[AGE_FIELD_MAP[band]], 0);
-  const economicTotal = ECONOMIC_TIERS.reduce(
+  const ageTotal = AGE_BANDS.reduce<number>((sum, band) => sum + form[AGE_FIELD_MAP[band]], 0);
+  const economicTotal = ECONOMIC_TIERS.reduce<number>(
     (sum, tier) => sum + form[ECONOMIC_FIELD_MAP[tier]],
     0,
   );

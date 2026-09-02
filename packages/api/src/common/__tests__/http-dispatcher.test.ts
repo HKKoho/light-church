@@ -5,7 +5,7 @@ const AgentMock = vi.fn();
 
 vi.mock('undici', () => ({
   setGlobalDispatcher: (...args: unknown[]) => setGlobalDispatcher(...args),
-  Agent: vi.fn().mockImplementation((opts: unknown) => {
+  Agent: vi.fn().mockImplementation(function (opts: unknown) {
     AgentMock(opts);
     return { __mockAgent: true, opts };
   }),
