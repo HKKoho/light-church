@@ -1,0 +1,53 @@
+Christian Ministry Grant
+========================
+
+Copyright (c) 2026 Victor HUNG / Light Church Project
+
+In addition to the terms of the PolyForm Noncommercial License 1.0.0 that
+governs this entire repository (see LICENSE and NOTICE), the maintainers
+extend the following supplemental grant to Christian organizations.
+
+Grant
+-----
+Any local church, denomination, Christian ministry, missionary society,
+Christian school or seminary, Christian healthcare or social-care organization,
+or other body whose primary purpose is the proclamation of the Christian Gospel,
+Christian worship, Christian discipleship, or Christian charitable service
+("Christian Organization") is hereby granted a royalty-free, worldwide,
+perpetual right to use, copy, modify, and self-host this software — in its
+entirety — for any purpose directly related to that organization's ministry
+activities, including activities that involve the collection of tithes,
+offerings, tuition, or other charitable donations, provided that:
+
+  1. The software (or a service built on it) is not sold, licensed, or
+     otherwise offered as a standalone commercial product or SaaS offering
+     to third parties outside the organization.
+
+  2. This grant notice and the copyright notice above are preserved in all
+     copies or substantial portions of the software.
+
+  3. The organization's primary purpose remains Christian ministry as
+     described above, and this grant lapses automatically if that ceases
+     to be the case.
+
+Scope
+-----
+This grant covers the entire Light Church platform repository — all packages,
+the talking-face feature, NGO components, infrastructure scripts, and
+documentation — as listed in the NOTICE file. It does not extend to any
+third-party dependencies, which retain their own licenses.
+
+No Warranty
+-----------
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+MAINTAINERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN
+AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+This grant is a supplemental permission layered on top of the PolyForm
+Noncommercial License 1.0.0. It is not an OSI-approved open source license.
+If you are uncertain whether your organization qualifies, contact the
+maintainers.
