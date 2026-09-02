@@ -13,11 +13,14 @@ import type { ReasoningEvent } from '../engine/reasoning-loop.types.js';
 import { PiperTtsService } from '../tts/tts.service.js';
 import { estimateWordTimings } from '../tts/word-timing.js';
 import { SentenceChunker } from './sentence-chunker.js';
+import { SadTalkerService } from './sadtalker.service.js';
+import { TalkingFaceAvatarController } from './talkingface-avatar.controller.js';
 import { parseClientMessage, serializeServerMessage } from './talkingface.protocol.js';
 
 const logger = createLogger('talkingface:gateway');
 
 const WS_OPEN = 1;
+const ADMIN_ROLES = new Set(['super_admin', 'admin_staff']);
 
 interface JwtPayload {
   sub: string;
@@ -28,10 +31,12 @@ interface JwtPayload {
 
 /**
  * WebSocket gateway that streams agent replies to the talking-face avatar
- * sentence-by-sentence: each completed sentence is synthesized and pushed
- * to the client as soon as it's ready, instead of waiting for the full
- * reply before starting playback. Uses raw `ws` for Fastify compatibility,
- * same as `channels/web/web.gateway.ts`.
+ * sentence-by-sentence. Supports two rendering modes:
+ *
+ *  - 3D avatar mode (default): sends `speak.chunk` with audio + word timings.
+ *  - Photo-realistic mode (admin only): when the client passes `avatarPhotoId`,
+ *    each sentence is also fed through SadTalker → the chunk additionally
+ *    carries a `video` field (base64 MP4) the frontend plays sequentially.
  */
 @Injectable()
 export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
@@ -52,6 +57,8 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
     private readonly agentDefRepo: AgentDefinitionRepository,
     private readonly agentRunner: AgentRunnerService,
     private readonly tts: PiperTtsService,
+    private readonly sadTalker: SadTalkerService,
+    private readonly avatarController: TalkingFaceAvatarController,
   ) {}
 
   onModuleInit(): void {
@@ -99,6 +106,7 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
     }
 
     const userId = payload.sub;
+    const userRole = payload.role;
 
     socket.on('message', (data: Buffer | ArrayBuffer | Buffer[]) => {
       void (async () => {
@@ -108,7 +116,7 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
           logger.warn({ userId }, 'Ignoring malformed talkingface WS message');
           return;
         }
-        await this.handleSpeak(userId, socket, message.payload);
+        await this.handleSpeak(userId, userRole, socket, message.payload);
       })();
     });
 
@@ -123,9 +131,20 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
 
   private async handleSpeak(
     userId: string,
+    userRole: string,
     socket: WebSocket,
-    payload: { agentDefinitionId: string; input: string; sessionId?: string },
+    payload: {
+      agentDefinitionId: string;
+      input: string;
+      sessionId?: string;
+      avatarPhotoId?: string;
+    },
   ): Promise<void> {
+    // Photo-realistic mode is admin-only — silently drop avatarPhotoId for other roles.
+    const photoId = ADMIN_ROLES.has(userRole) ? payload.avatarPhotoId : undefined;
+    // Load photo buffer once up-front so it's reused for every sentence.
+    const photoBuffer = photoId ? await this.avatarController.readPhotoBuffer(photoId) : null;
+
     try {
       const agentDef = await this.agentDefRepo.findById(payload.agentDefinitionId);
       const chunker = new SentenceChunker();
@@ -134,11 +153,30 @@ export class TalkingFaceGateway implements OnModuleInit, OnModuleDestroy {
       const speakSentence = async (sentence: string): Promise<void> => {
         const { audio, durationMs } = await this.tts.synthesize(sentence);
         const { words, wtimes, wdurations } = estimateWordTimings(sentence, durationMs);
+
+        let video: string | undefined;
+        if (photoBuffer) {
+          try {
+            const result = await this.sadTalker.generateVideo(photoBuffer, audio);
+            video = result.video.toString('base64');
+          } catch (err) {
+            // SadTalker failure falls back to 3D avatar — don't abort the whole run.
+            logger.warn({ err, userId }, 'SadTalker failed for sentence, falling back to 3D avatar');
+          }
+        }
+
         if (socket.readyState !== WS_OPEN) return;
         socket.send(
           serializeServerMessage({
             type: 'speak.chunk',
-            payload: { text: sentence, audio: audio.toString('base64'), words, wtimes, wdurations },
+            payload: {
+              text: sentence,
+              audio: audio.toString('base64'),
+              words,
+              wtimes,
+              wdurations,
+              ...(video !== undefined ? { video } : {}),
+            },
           }),
         );
       };

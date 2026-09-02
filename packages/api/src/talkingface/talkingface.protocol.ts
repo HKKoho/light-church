@@ -8,6 +8,13 @@ const speakStartSchema = z.object({
     agentDefinitionId: z.string().min(1),
     input: z.string().min(1).max(4000),
     sessionId: z.string().min(1).optional(),
+    /**
+     * When provided, the gateway runs each sentence through SadTalker using
+     * the stored portrait photo, and each `speak.chunk` will carry a `video`
+     * field (base64 MP4) in addition to `audio`.
+     * Only admins may pass this field — the gateway ignores it for non-admins.
+     */
+    avatarPhotoId: z.string().uuid().optional(),
   }),
 });
 
@@ -36,6 +43,8 @@ export type ServerMessage =
         readonly words: readonly string[];
         readonly wtimes: readonly number[];
         readonly wdurations: readonly number[];
+        /** Base64 MP4 video — only present when photo-avatar mode is active. */
+        readonly video?: string;
       };
     }
   | { readonly type: 'speak.done'; readonly payload: { readonly sessionId: string | null } }

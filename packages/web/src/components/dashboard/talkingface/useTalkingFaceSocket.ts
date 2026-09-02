@@ -9,6 +9,8 @@ export interface SpeakChunk {
   words: string[];
   wtimes: number[];
   wdurations: number[];
+  /** Base64 MP4 — present only when photo-avatar mode is active (admin only). */
+  video?: string;
 }
 
 /** Server→Client WebSocket protocol (mirrors talkingface.protocol.ts) */
@@ -86,12 +88,17 @@ export function useTalkingFaceSocket({ onChunk, onDone, onError }: UseTalkingFac
   }, []);
 
   const sendSpeak = useCallback(
-    async (agentDefinitionId: string, input: string, sessionId?: string): Promise<void> => {
+    async (
+      agentDefinitionId: string,
+      input: string,
+      sessionId?: string,
+      avatarPhotoId?: string,
+    ): Promise<void> => {
       const ws = await ensureConnected();
       ws.send(
         JSON.stringify({
           type: 'speak.start',
-          payload: { agentDefinitionId, input, sessionId },
+          payload: { agentDefinitionId, input, sessionId, avatarPhotoId },
         }),
       );
     },
