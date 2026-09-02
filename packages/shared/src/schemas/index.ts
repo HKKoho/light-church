@@ -133,3 +133,8 @@ export {
   type UpdateSkillContentInput,
   type SkillReadResult,
 } from './skill.schema.js';
+
+export {
+  talkingFaceSpeakSchema,
+  type TalkingFaceSpeakInput,
+} from './talkingface.schema.js';

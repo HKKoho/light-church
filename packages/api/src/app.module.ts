@@ -32,6 +32,7 @@ import { PacksModule } from './packs/packs.module.js';
 import { WorkspaceModule } from './workspace/index.js';
 import { CongregationProfileModule } from './congregation-profile/congregation-profile.module.js';
 import { ClientModule } from './client/client.module.js';
+import { TalkingFaceModule } from './talkingface/talkingface.module.js';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { ClientModule } from './client/client.module.js';
     WorkspaceModule,
     CongregationProfileModule,
     ClientModule,
+    TalkingFaceModule,
   ],
   providers: [
     {
