@@ -20,20 +20,21 @@ interface PiperSynthesizeResponse {
 
 @Injectable()
 export class PiperTtsService {
-  private readonly baseUrl: string;
-
-  constructor(@Inject(ConfigService) configService: ConfigService) {
-    this.baseUrl = configService.getOrThrow<string>('TTS_PIPER_URL');
-  }
+  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
   async synthesize(text: string): Promise<SynthesizeResult> {
+    const baseUrl = this.configService.get<string>('TTS_PIPER_URL');
+    if (!baseUrl) {
+      throw new ExternalServiceError('piper-tts', 'TTS_PIPER_URL is not configured');
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => {
       controller.abort();
     }, SYNTHESIZE_TIMEOUT_MS);
 
     try {
-      const response = await fetch(`${this.baseUrl}/synthesize`, {
+      const response = await fetch(`${baseUrl}/synthesize`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),

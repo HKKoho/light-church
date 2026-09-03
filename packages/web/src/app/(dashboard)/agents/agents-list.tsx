@@ -25,6 +25,7 @@ import { authFetch } from '@/lib/auth';
 import { useAnimeOnMount, staggerFadeUp, STAGGER } from '@/lib/anime';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { CreateAgentDialog, EditAgentDialog } from './agents-dialogs';
+import { AgentAvatarImage } from './agent-avatar-picker';
 import { useT, type Messages } from '@/lib/i18n';
 
 // ------------------------------------------------------------------ //
@@ -115,6 +116,7 @@ export interface ApiAgent {
   provider: string;
   model: string;
   apiBaseUrl: string | null;
+  avatarPhotoId: string | null;
   skillIds: string[];
   maxTokensPerRun: number;
   containerConfig: Record<string, unknown>;
@@ -267,6 +269,7 @@ export function AgentsList() {
           provider: form.get('provider'),
           model: form.get('model'),
           apiBaseUrl: form.get('apiBaseUrl') || undefined,
+          avatarPhotoId: form.get('avatarPhotoId') || null,
           maxTokensPerRun: Number(form.get('maxTokensPerRun')) || 100000,
           streamingEnabled: form.get('streamingEnabled') === 'true',
           skillIds:
@@ -300,6 +303,7 @@ export function AgentsList() {
           provider: form.get('provider'),
           model: form.get('model'),
           apiBaseUrl: form.get('apiBaseUrl') || undefined,
+          avatarPhotoId: form.get('avatarPhotoId') || null,
           maxTokensPerRun: Number(form.get('maxTokensPerRun')) || 100000,
           streamingEnabled: form.get('streamingEnabled') === 'true',
           skillIds:
@@ -419,7 +423,14 @@ export function AgentsList() {
                 <TableRow key={agent.id}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">
-                      <Bot className="size-4" />
+                      {agent.avatarPhotoId ? (
+                        <AgentAvatarImage
+                          photoId={agent.avatarPhotoId}
+                          className="size-5 shrink-0 rounded-full border object-cover"
+                        />
+                      ) : (
+                        <Bot className="size-4 shrink-0" />
+                      )}
                       {agent.name}
                     </div>
                   </TableCell>

@@ -30,6 +30,8 @@ export const createAgentDefinitionSchema = z.object({
   provider: z.string().min(1),
   model: z.string().min(1),
   apiBaseUrl: z.string().url().nullable().optional(),
+  /** photoId of a previously uploaded image in the talkingface avatar store. */
+  avatarPhotoId: z.string().min(1).nullable().optional(),
   skillIds: z.array(z.string().min(1)).default([]),
   maxTokensPerRun: z.number().int().positive().default(100000),
   containerConfig: containerConfigSchema.default({

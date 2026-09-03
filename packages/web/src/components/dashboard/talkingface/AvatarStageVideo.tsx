@@ -1,6 +1,7 @@
 'use client';
 
 import { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import { useAuthedImageUrl } from '@/hooks/use-authed-image';
 
 export interface VideoSpeakParams {
   /** Base64-encoded MP4 video from SadTalker. */
@@ -37,6 +38,9 @@ export const AvatarStageVideo = forwardRef<AvatarVideoHandle, AvatarStageVideoPr
     const queueRef = useRef<VideoSpeakParams[]>([]);
     const playingRef = useRef(false);
     const currentBlobRef = useRef<string | null>(null);
+    // photoUrl points at an auth-protected API endpoint — resolve it to a
+    // blob URL a plain <img> can actually load (see use-authed-image.ts).
+    const photoObjectUrl = useAuthedImageUrl(photoUrl);
 
     const playNext = useCallback(() => {
       const next = queueRef.current.shift();
@@ -94,9 +98,9 @@ export const AvatarStageVideo = forwardRef<AvatarVideoHandle, AvatarStageVideoPr
         className={`relative overflow-hidden rounded-lg border border-border/60 bg-black/90 ${className ?? 'h-full w-full'}`}
       >
         {/* Static portrait shown when idle */}
-        {photoUrl && (
+        {photoObjectUrl && (
           <img
-            src={photoUrl}
+            src={photoObjectUrl}
             alt="Avatar portrait"
             className="absolute inset-0 h-full w-full object-cover object-top"
           />

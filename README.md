@@ -109,6 +109,12 @@ Nothing in a "drafts" folder or on the Projector page has been sent or published
 
 ---
 
+## Talk face-to-face (experimental)
+
+If your administrator has set it up, the **Talking Face** page gives you a life-like avatar of your assistant that speaks its replies aloud with lip-sync, instead of just showing text — either a 3D animated face, or (for admin staff who've uploaded a photo) a photo-realistic video avatar. It's an optional, experimental way to have the same conversation; everything else — drafts only, no invented facts, a human always finishes the work — still applies. Ask your administrator whether it's enabled for your organisation.
+
+---
+
 ## The ground rules that keep you safe
 
 These rules are built into Light Church. Knowing them helps you trust what it gives you:
@@ -240,6 +246,16 @@ pnpm run dev                         # API on :3001, dashboard on :3000
 | Web dashboard   | Available |
 | Telegram        | Available |
 | WhatsApp, Slack | Planned   |
+
+### Talking face avatar (optional)
+
+At `/talkingface` in the web dashboard, the primary assistant can be rendered as a speaking avatar with lip-synced audio instead of plain text. It is not linked from the sidebar nav yet — reachable only by direct URL — and is off by default in the sense that voice synthesis has no server to call unless one is configured.
+
+- **3D avatar** (default) — client-side, via `@met4citizen/talkinghead`; loads a `.glb` model from a CDN.
+- **Photo-realistic video** — driven by the SadTalker sidecar (`infra/docker/`); the mode toggle only appears for `super_admin` / `admin_staff` users who've uploaded an avatar photo on the page.
+- Both modes need speech audio from a **Piper TTS server**: set `TTS_PIPER_URL` in `.env` to point at one. No Piper service ships in `docker-compose.prod.yml` by default — you must stand one up yourself (a sidecar container exposing a `/synthesize` endpoint). Without it, the page loads but speaking fails with a clear `piper-tts` error; nothing else in the app is affected.
+- Backend: `packages/api/src/talkingface/` (WebSocket gateway at `/ws/talkingface`), `packages/api/src/tts/` (Piper client, `PiperTtsService`).
+- Frontend: `packages/web/src/app/(dashboard)/talkingface/`, components under `packages/web/src/components/dashboard/talkingface/`.
 
 ---
 

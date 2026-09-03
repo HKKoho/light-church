@@ -16,6 +16,7 @@ interface CreateAgentDefinitionData {
   readonly provider?: string;
   readonly model?: string;
   readonly apiBaseUrl?: string | null;
+  readonly avatarPhotoId?: string | null;
   readonly skillIds?: string[];
   readonly maxTokensPerRun?: number;
   readonly containerConfig?: Prisma.InputJsonValue;
@@ -222,6 +223,7 @@ export class AgentDefinitionRepository {
           ...(data.provider !== undefined ? { provider: data.provider } : {}),
           ...(data.model !== undefined ? { model: data.model } : {}),
           ...(data.apiBaseUrl !== undefined ? { apiBaseUrl: data.apiBaseUrl } : {}),
+          ...(data.avatarPhotoId !== undefined ? { avatarPhotoId: data.avatarPhotoId } : {}),
           ...(data.skillIds !== undefined ? { skillIds: data.skillIds } : {}),
           ...(data.maxTokensPerRun !== undefined ? { maxTokensPerRun: data.maxTokensPerRun } : {}),
           ...(data.containerConfig !== undefined ? { containerConfig: data.containerConfig } : {}),
@@ -249,6 +251,7 @@ export class AgentDefinitionRepository {
           ...(data.provider !== undefined ? { provider: data.provider } : {}),
           ...(data.model !== undefined ? { model: data.model } : {}),
           ...(data.apiBaseUrl !== undefined ? { apiBaseUrl: data.apiBaseUrl } : {}),
+          ...(data.avatarPhotoId !== undefined ? { avatarPhotoId: data.avatarPhotoId } : {}),
           ...(data.skillIds !== undefined ? { skillIds: data.skillIds } : {}),
           ...(data.maxTokensPerRun !== undefined ? { maxTokensPerRun: data.maxTokensPerRun } : {}),
           ...(data.containerConfig !== undefined ? { containerConfig: data.containerConfig } : {}),

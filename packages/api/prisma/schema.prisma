@@ -121,6 +121,7 @@ model AgentDefinition {
   provider         String    @default("anthropic")
   model            String    @default("claude-sonnet-4-20250514")
   apiBaseUrl       String? // for custom/self-hosted endpoints
+  avatarPhotoId    String? // references a photoId in the talkingface avatar store (disk-backed, no FK)
   skillIds         String[] // references to Skill.id
   maxTokensPerRun  Int       @default(100000)
   containerConfig  Json      @default("{}")

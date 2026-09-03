@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ImagePlus, Loader2, Mic, MicOff, Send, Trash2, Volume2 } from 'lucide-react';
 import { authFetch, ensureAccessToken } from '@/lib/auth';
+import { useAuthedImageUrl } from '@/hooks/use-authed-image';
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,8 +48,17 @@ async function decodeBase64Audio(base64: string): Promise<AudioBuffer> {
   return ctx.decodeAudioData(bytes.buffer);
 }
 
+const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+
 function avatarPhotoUrl(photoId: string): string {
-  return `/api/v1/talkingface/avatar/${photoId}`;
+  return `${API_BASE}/api/v1/talkingface/avatar/${photoId}`;
+}
+
+/** Renders one avatar-list thumbnail from the auth-protected photo store. */
+function AvatarThumbnail({ photoId, className }: { photoId: string; className?: string }) {
+  const url = useAuthedImageUrl(avatarPhotoUrl(photoId));
+  if (!url) return <div className={className} />;
+  return <img src={url} alt="" className={className} />;
 }
 
 export default function TalkingFacePage() {
@@ -108,7 +118,7 @@ export default function TalkingFacePage() {
       const token = await ensureAccessToken();
       const form = new FormData();
       form.append('file', file);
-      const res = await fetch('/api/v1/talkingface/avatar/upload', {
+      const res = await fetch(`${API_BASE}/api/v1/talkingface/avatar/upload`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token ?? ''}` },
         body: form,
@@ -317,9 +327,8 @@ export default function TalkingFacePage() {
                   }}
                 >
                   <div className="flex items-center gap-3">
-                    <img
-                      src={avatarPhotoUrl(a.photoId)}
-                      alt={a.filename}
+                    <AvatarThumbnail
+                      photoId={a.photoId}
                       className="size-8 rounded-full object-cover"
                     />
                     <span className="truncate max-w-[180px]">{a.filename}</span>

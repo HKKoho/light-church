@@ -39,6 +39,7 @@ import {
   User,
   Users,
   UsersRound,
+  Video,
   Wallet,
   Wrench,
 } from 'lucide-react';
@@ -82,6 +83,7 @@ export interface NavItem {
 
 const platformItems: readonly NavItem[] = [
   { key: 'conversations', icon: MessageSquare, href: '/conversations' },
+  { key: 'talkingFace', icon: Video, href: '/talkingface' },
   { key: 'workspace', icon: FolderOpen, href: '/workspace' },
   { key: 'projector', icon: MonitorPlay, href: '/projector' },
   { key: 'gameStudio', icon: Gamepad2, href: '/game-studio' },
@@ -139,6 +141,7 @@ const messages = {
     groupGovernance: 'Governance',
     nav: {
       conversations: 'Conversations',
+      talkingFace: 'Talking Face',
       workspace: 'Workspace',
       projector: 'Projector',
       gameStudio: 'Game Studio',
@@ -187,6 +190,7 @@ const messages = {
     groupGovernance: '治理',
     nav: {
       conversations: '對話',
+      talkingFace: '會說話的頭像',
       workspace: '工作區',
       projector: '投影台',
       gameStudio: '遊戲工坊',

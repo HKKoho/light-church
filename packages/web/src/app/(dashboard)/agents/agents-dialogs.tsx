@@ -144,6 +144,7 @@ import {
 } from '@/components/ui/dialog';
 import { authFetch } from '@/lib/auth';
 import type { ApiAgent } from './agents-list';
+import { AgentAvatarPicker } from './agent-avatar-picker';
 import { useT, type Messages } from '@/lib/i18n';
 
 // ------------------------------------------------------------------ //
@@ -586,12 +587,16 @@ export function CreateAgentDialog({
   const providers = useProviders();
   const [streamingEnabled, setStreamingEnabled] = useState(false);
   const [systemPrompt, setSystemPrompt] = useState('');
+  const [avatarPhotoId, setAvatarPhotoId] = useState<string | null>(null);
 
   return (
     <Dialog
       open={open}
       onOpenChange={(v) => {
-        if (!v) setSystemPrompt('');
+        if (!v) {
+          setSystemPrompt('');
+          setAvatarPhotoId(null);
+        }
         onOpenChange(v);
       }}
     >
@@ -609,6 +614,12 @@ export function CreateAgentDialog({
           }}
           className="flex flex-col gap-4"
         >
+          <AgentAvatarPicker
+            idPrefix="create"
+            value={avatarPhotoId}
+            onChange={setAvatarPhotoId}
+          />
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="create-name">{t.name}</Label>
             <Input id="create-name" name="name" placeholder={t.namePlaceholder} required />
@@ -750,6 +761,9 @@ export function EditAgentDialog({
   const t = useT(messages);
   const providers = useProviders();
   const [streamingEnabled, setStreamingEnabled] = useState(agent?.streamingEnabled ?? false);
+  const [avatarPhotoId, setAvatarPhotoId] = useState<string | null>(
+    agent?.avatarPhotoId ?? null,
+  );
 
   if (!agent) return null;
 
@@ -769,6 +783,8 @@ export function EditAgentDialog({
           }}
           className="flex flex-col gap-4"
         >
+          <AgentAvatarPicker idPrefix="edit" value={avatarPhotoId} onChange={setAvatarPhotoId} />
+
           <div className="flex flex-col gap-2">
             <Label htmlFor="edit-name">{t.name}</Label>
             <Input id="edit-name" name="name" defaultValue={agent.name} required />
