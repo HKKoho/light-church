@@ -1,11 +1,33 @@
 # Theological Reading Library — RAG Plan
 
 Gives the pastor's agents (primarily `church-sermon-prep`, also usable by
-`church-bible-study`, `pastoral-care`) a searchable library of theological
-PDFs — commentaries, systematic theologies, denominational statements,
-sermon archives — too large to load as skill text, filtered so retrieval
-never surfaces material that contradicts the congregation's own doctrinal
-positions.
+`church-bible-study`, `pastoral-care`) two complementary ways to work with
+theological readings:
+
+- **Option A — curated library (RAG).** An admin-approved, doctrine-tagged
+  collection of PDFs, searchable across the whole corpus. Built for volume
+  and for keeping the congregation's teaching consistent across many
+  sources. Requires review before anything is searchable.
+- **Option B — ad-hoc reading (no RAG, no review).** A pastor uploads a
+  single PDF (or DOCX) to their own agent's workspace and asks the agent to
+  read it; the system converts it to Markdown (OCR'd if scanned) and the
+  agent reads and discusses that one document in the conversation. No
+  embeddings, no admin approval, no shared corpus — it's the pastor reading
+  their own document with AI assistance, the same way they'd read it
+  themselves, just faster.
+
+Both are described below. Option B has no infrastructure dependency on
+Option A (no pgvector needed) and can ship first.
+
+> **Status: Option B is implemented.** `convert_document_to_markdown`
+> (`packages/api/src/engine/tools/document-conversion.ts`), PDF text/OCR
+> extraction (`engine/tools/document-reading/pdf-extraction.service.ts`,
+> using `pdf-parse`'s own page-screenshot renderer + `tesseract.js` — no
+> `poppler-utils`/`pdftoppm` needed, see the pipeline section below), DOCX
+> extraction (`engine/tools/document-reading/docx-extraction.ts`, mammoth +
+> turndown), registration gated by `toolConfig.documentReadingEnabled`
+> (default on) in `agent-runner.service.ts`, and the `read-document`
+> `SKILL.md` are all in place. Option A remains design-only.
 
 ## Why this isn't a bigger skill
 
@@ -31,6 +53,16 @@ easy to conflate but must stay separate:
 2. **Doctrinal filter** — restrict what's retrievable in the first place, by
    curation and metadata, not by asking the LLM to police theology at query
    time from an unfiltered result set.
+
+That's the case for Option A specifically. Option B (below) sidesteps both
+problems by not searching at all — the pastor picks the one document, reads
+it themselves through the agent, and the doctrinal judgment stays exactly
+where it already is: with the pastor, in the moment, on a document they
+chose. No curation step needed because there's no shared corpus to curate.
+
+---
+
+# Option A: Curated theological library (RAG search)
 
 ## Architecture overview
 
@@ -283,7 +315,7 @@ is the one that actually can't be bypassed by a clever user message.
 - Source list with status badges and a "reprocess" action (re-run extraction
   if OCR quality was poor).
 
-## Governance notes
+## Option A governance notes
 
 - **Copyright.** Most theological commentaries and systematic theologies are
   under active copyright. Ingesting a publisher's PDF into a searchable
@@ -305,7 +337,7 @@ is the one that actually can't be bypassed by a clever user message.
   per the existing invariant) — a rejected-then-later-reconsidered source is
   exactly the kind of decision a board might ask to see the history of.
 
-## Tests
+## Option A tests
 
 - `pdf-extraction.service.test.ts` — text-layer PDF fixture, OCR-fallback
   path, `[UNEXTRACTED]` marking.
@@ -321,7 +353,7 @@ is the one that actually can't be bypassed by a clever user message.
   actually protects the doctrinal-filter invariant — treat it as
   load-bearing, not boilerplate).
 
-## Rollout order
+## Option A rollout order
 
 1. `pgvector/pgvector:pg16` image swap + migration (`CREATE EXTENSION
    vector`, `ReadingSource`/`ReadingChunk` tables, ANN index). Deployable and
@@ -340,3 +372,221 @@ Each step is independently useful — an admin can be curating and approving
 sources in step 2 well before any agent can search them in step 3, which
 gives the doctrinal review process a running start instead of a backlog
 dumped on launch day.
+
+---
+
+# Option B: Ad-hoc single-document reading (no RAG, no review)
+
+Lets a pastor upload one PDF (or DOCX) into their own agent's workspace and
+say "read this and tell me...", with no admin curation step and no vector
+search. This reuses the workspace agents already have, plus one new
+conversion step, and otherwise rides entirely on existing engine machinery
+— context window, session history, `MemoryConsolidationService` — for the
+"wait for subsequent prompts about the text" part. No new session/context
+mechanism is needed for that; it's what sessions already do.
+
+## Why this is a genuinely separate path from Option A
+
+Workspaces already accept PDF uploads — `WorkspaceService.uploadFile`
+(`packages/api/src/workspace/workspace.service.ts:592`) writes any file to
+disk with no format restriction, and files are visible to the agent's
+container the normal way. But PDFs are classified as a `BINARY_TYPES` entry
+(`workspace.service.ts:96`), so `readFileContent` deliberately returns
+`content: null` for them (`workspace.service.ts:305-306`) — there is
+currently **no path** by which an agent (or the dashboard file viewer) can
+read what's inside an uploaded PDF. That's the specific gap this closes.
+
+It's deliberately not routed through Option A's `ReadingSource` table:
+there's no reason a pastor's personal, private reading of one document
+should wait on an admin review queue, get a doctrine tag, or become
+searchable by every other agent in the church. Option B's "review" is the
+pastor reading the document themselves, in real time, which is a stronger
+guarantee of doctrinal fit than any tag ever could be — it just doesn't
+scale to a hundred-document library, which is exactly what Option A is for.
+
+## Flow
+
+```
+Pastor uploads sermon-prep.pdf to their agent's workspace
+  (existing: WorkspaceService.uploadFile → stored on disk, mounted at /workspace)
+
+Pastor, in chat: "Read sermon-prep.pdf and summarize its argument about grace."
+
+ReasoningLoop → tool_call: convert_document_to_markdown({ path: "/workspace/sermon-prep.pdf" })
+  (host-side tool, like search_theological_reading)
+    1. Resolve the real disk path via the same workspace path-resolution
+       WorkspaceService already uses (resolveWorkspacePaths /
+       ScopedFs) — never trust the container-side path directly.
+    2. Detect format: .pdf → PdfExtractionService (shared with Option A's
+       ingestion module — same text-layer extraction + OCR fallback);
+       .docx → DocxExtractionService (new, small — see below).
+    3. Assemble Markdown: "## Page N" headings, paragraphs preserved,
+       `[UNEXTRACTED]` markers on any page/section OCR couldn't recover.
+    4. Write sermon-prep.pdf.md as a sibling file in the same workspace
+       directory (so it shows up in the normal file list, and survives
+       for next time — step 1 is skipped on a later request if the .md
+       sibling is newer than the source file).
+    5. Return a SHORT result: { markdownPath, pageCount, ocrPagesUsed } —
+       not the full text.
+
+ReasoningLoop → tool_call: read_file({ path: "/workspace/sermon-prep.pdf.md" })
+  (existing tool, engine/tools/file-io.ts — nothing new needed here)
+    → full Markdown content returned, becomes part of the session's
+      message history from this point on.
+
+Agent answers using the now-loaded content. Follow-up questions in the same
+session ("what does it say about fasting?") need no re-conversion — the
+text is already in the conversation. If the session grows past 65,536
+tokens, MemoryConsolidationService compacts it the same way it would for
+any other long conversation — this feature adds no new compaction logic.
+```
+
+Returning a short pointer from the conversion tool and letting the agent
+call the ordinary `read_file` tool — rather than having
+`convert_document_to_markdown` return the full text directly — keeps the
+new tool's surface small and means one document can be re-read, re-listed,
+or referenced by path without inventing a second content-delivery
+mechanism. It also means a very long document can be split into multiple
+per-chapter `.md` files (e.g. `sermon-prep/01-intro.md`,
+`sermon-prep/02-grace.md`) if extraction detects natural chapter/heading
+breaks, so the agent can `list_directory` and read only the section it
+needs instead of one giant file — reusing tools that already exist rather
+than inventing pagination for `read_file`.
+
+## Conversion pipeline
+
+### PDF: text layer + OCR fallback
+
+Reuses `PdfExtractionService` from Option A's ingestion module
+(`packages/api/src/theology-library/pdf-extraction.service.ts`) — same
+per-page text-layer extraction via `pdf-parse`. The OCR fallback for
+scanned/image-only pages (which the user has specifically asked for) needs
+an actual OCR engine, which today's codebase has none of:
+
+| Option | Notes |
+|---|---|
+| **Tesseract.js** (recommended default) | Pure JS/WASM, runs in the API process with no external service or GPU — same "no new sidecar" shape as everything else in this plan except SadTalker/Piper. Good enough accuracy for clean scans of printed text; struggles with poor scans, unusual fonts, or non-Latin scripts beyond what its trained language packs cover. |
+| External OCR API (e.g. a cloud vision/OCR service) | Higher accuracy, handles harder scans, but adds a network dependency and a per-page cost — a bigger decision (data leaves the self-hosted boundary) that deserves its own sign-off given `docs/SECURITY.md`'s self-hosted posture, not something to default into silently. |
+
+Default to Tesseract.js; note the external-API option in `docs/PROVIDERS.md`
+as a future upgrade path if scan quality turns out to be the bottleneck in
+practice, not something to build speculatively now.
+
+### DOCX: structured conversion, no OCR needed
+
+`DocxExtractionService` — a thin wrapper around `mammoth` (converts `.docx`
+directly to Markdown/HTML from its native XML, since it's already
+structured text, not a scanned image). New dependency, small and
+well-established; no OCR path needed for this format.
+
+### Both formats
+
+- Reject or truncate documents past a size ceiling (page count and/or
+  extracted-character count) with a clear tool error rather than silently
+  producing a Markdown file too large for any session to hold — the exact
+  ceiling should be picked against `MemoryConsolidationService`'s
+  65,536-token trigger, not chosen arbitrarily.
+- `.md` output is plain workspace content — it inherits whatever access
+  control already governs that pastor's workspace folder
+  (`WorkspaceService.assertPathAllowed`); no new permission model needed.
+
+## New tool: `convert_document_to_markdown`
+
+`packages/api/src/engine/tools/document-conversion.ts`, host-side (like
+`createSearchTheologyTool`), bound to `WorkspaceService`/`ScopedFs` for path
+resolution and to the two extraction services:
+
+```ts
+export function createConvertDocumentTool(
+  workspaceService: WorkspaceService,
+  pdfExtraction: PdfExtractionService,
+  docxExtraction: DocxExtractionService,
+): Tool {
+  return {
+    name: 'convert_document_to_markdown',
+    description:
+      'Convert an uploaded PDF or DOCX in the workspace to a readable Markdown file ' +
+      '(OCR is used automatically for scanned pages). Returns the path to the ' +
+      'Markdown file — read it with read_file to see the content. Skips ' +
+      'reconversion if an up-to-date .md sibling already exists.',
+    parameters: {
+      type: 'object',
+      properties: {
+        path: { type: 'string', description: 'Workspace path to the PDF or DOCX file.' },
+      },
+      required: ['path'],
+    },
+    async execute(params) {
+      // resolve + validate path within the caller's workspace, extension-dispatch
+      // to pdfExtraction or docxExtraction, write sibling .md, return short result
+    },
+  };
+}
+```
+
+Gated by `toolConfig.documentReadingEnabled` — default **on**, unlike
+Option A's `theologyLibraryEnabled`, because this tool only ever touches
+files the pastor themselves put in their own workspace; there's no shared
+corpus or doctrinal exposure to gate against.
+
+## Skill wrapper
+
+`skills/builtin/read-document/SKILL.md`:
+
+```markdown
+---
+name: read-document
+description: "Use when the user uploads or references a PDF or DOCX file in their workspace and asks you to read, summarize, explain, or answer questions about it. Call convert_document_to_markdown, then read_file on the resulting path, then respond. Skip conversion if a current .md sibling is already present."
+pack: church
+---
+
+# Reading an uploaded document
+
+1. Convert: `convert_document_to_markdown({ path })`.
+2. Read: `read_file({ path: <markdownPath from step 1> })`.
+3. Discuss the content normally. If OCR left `[UNEXTRACTED]` sections,
+   tell the user which pages/parts couldn't be read rather than silently
+   skipping them.
+4. This is the user's own document, not the approved theological library —
+   don't present it with the institutional authority of a vetted source;
+   it carries whatever authority the user already grants the document
+   themselves.
+```
+
+## Relationship to Option A
+
+Once a pastor has read a document this way and thinks it belongs in the
+shared library, offer a "Submit to theological library" action (dashboard,
+not agent-initiated) that copies the original PDF into Option A's upload
+flow (`POST /api/v1/theology-library/sources`) so it enters the normal
+doctrinal review queue from there. This is the one deliberate bridge
+between the two options — everything else stays separate on purpose.
+
+## Option B tests
+
+- `docx-extraction.service.test.ts` — mocked `mammoth` output, Markdown
+  shape.
+- `document-conversion.tool.test.ts` — path validation (rejects paths
+  outside the caller's workspace scope), skip-if-fresh-sibling-exists
+  behavior, size-ceiling rejection, `[UNEXTRACTED]` marking passed through
+  from the extraction services.
+- Extend `pdf-extraction.service.test.ts` (shared with Option A) rather
+  than duplicating it.
+
+## Option B rollout order
+
+1. `DocxExtractionService` + reuse of `PdfExtractionService` (can be built
+   before or independently of Option A's ingestion module — extract the PDF
+   text-extraction logic into a shared service either way so neither option
+   ends up owning it exclusively).
+2. Tesseract.js OCR fallback wired into `PdfExtractionService`.
+3. `convert_document_to_markdown` tool + conditional registration via
+   `toolConfig.documentReadingEnabled` (default on) + `read-document`
+   `SKILL.md`.
+4. "Submit to theological library" bridge action (only meaningful once
+   Option A's upload endpoint exists).
+
+Steps 1–3 have no dependency on pgvector, `ReadingSource`/`ReadingChunk`, or
+any Option A infrastructure — this option can ship completely independently
+and first, if the immediate need is "let the pastor read their own PDF"
+rather than "build the whole library."

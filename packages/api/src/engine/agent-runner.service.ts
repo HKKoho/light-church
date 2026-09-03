@@ -65,6 +65,8 @@ import { BudgetTracker } from './budget-tracker.js';
 import { ToolRegistry } from './tool-registry.js';
 import { registerBuiltinTools, registerMemoryTools, registerCronTools } from './tools/index.js';
 import { createSpawnTool } from './tools/spawn.js';
+import { createConvertDocumentTool } from './tools/document-conversion.js';
+import { PdfExtractionService } from './tools/document-reading/pdf-extraction.service.js';
 import { CronGuardService } from './cron-guard.service.js';
 import { ContextBuilderService } from './context-builder.service.js';
 import { WorkspaceSeederService } from './workspace-seeder.service.js';
@@ -124,6 +126,7 @@ export class AgentRunnerService {
     private readonly browserSessionManager: BrowserSessionManager,
     private readonly browserProviderRegistry: BrowserProviderRegistry,
     private readonly browserQuotaCache: BrowserQuotaCache,
+    private readonly pdfExtractionService: PdfExtractionService,
   ) {}
 
   /** Lazy accessor to break circular dependency with TaskExecutorService. */
@@ -392,6 +395,19 @@ export class AgentRunnerService {
       registerBuiltinTools(registry, containerId, this.containerRunner);
       registerWebTools(registry, this.searchProviderRegistry);
       registerMemoryTools(registry, this.prisma, this.memoryItemRepo, userId);
+
+      // Ad-hoc "read this document" tool (docs/RAGplan.md, Option B) — default
+      // on unless the agent explicitly opts out, since it only ever touches
+      // files the user already put in their own workspace.
+      const documentReadingEnabled =
+        (agentDef.toolConfig as { documentReadingEnabled?: boolean } | null)
+          ?.documentReadingEnabled !== false;
+      if (documentReadingEnabled && workspacePaths !== undefined) {
+        registry.register(
+          createConvertDocumentTool(workspacePaths.localPath, this.pdfExtractionService),
+        );
+      }
+
       if (!isSubAgent && session) {
         registry.register(
           createSpawnTool(

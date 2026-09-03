@@ -44,9 +44,12 @@ RUN cp -r /app/packages/shared/dist /app/deploy/node_modules/@clawix/shared/dist
 # ─────────────────────────────────────────────────────────────────────────────
 FROM node:22-slim AS runner
 
-# Install Docker CLI (official, matches daemon API ≥1.44) and openssl for Prisma
+# Install Docker CLI (official, matches daemon API ≥1.44), openssl for Prisma,
+# and fontconfig (glyph rendering for @napi-rs/canvas, used by pdf-parse's
+# page-screenshot renderer in the OCR fallback path — see
+# engine/tools/document-reading/pdf-extraction.service.ts)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates curl gnupg openssl \
+    ca-certificates curl gnupg openssl fontconfig \
     && install -m 0755 -d /etc/apt/keyrings \
     && curl -fsSL https://download.docker.com/linux/debian/gpg \
        | gpg --dearmor -o /etc/apt/keyrings/docker.gpg \

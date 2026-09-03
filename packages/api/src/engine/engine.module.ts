@@ -24,6 +24,7 @@ import { BootstrapFileService } from './bootstrap-file.service.js';
 import { WorkspaceSeederService } from './workspace-seeder.service.js';
 import { StaleRunReaperService } from './stale-run-reaper.service.js';
 import { CompressorService } from './compressor.js';
+import { PdfExtractionService } from './tools/document-reading/pdf-extraction.service.js';
 import { SearchProviderRegistry } from './tools/web/search-provider.js';
 import { BraveSearchProvider } from './tools/web/providers/brave.js';
 import { DuckDuckGoProvider } from './tools/web/providers/duckduckgo.js';
@@ -63,6 +64,7 @@ import { AgentRunSourceAdapter } from './tools/browser/agent-run-source.adapter.
     CronSchedulerService,
     StaleRunReaperService,
     CompressorService,
+    PdfExtractionService,
     {
       provide: SkillLoaderService,
       useFactory: () => {
