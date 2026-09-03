@@ -39,7 +39,7 @@ const messages = {
   en: {
     tagProfile: 'Tag serving-party profile',
     description:
-      "Optional, coarse demographic tags for ministry reporting — no real identity involved. Leave any field unset if unknown.",
+      'Optional, coarse demographic tags for ministry reporting — no real identity involved. Leave any field unset if unknown.',
     ageBand: 'Age band',
     economicTier: 'Economic background',
     ethnicGroup: 'Ethnic group',

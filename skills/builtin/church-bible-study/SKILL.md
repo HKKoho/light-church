@@ -14,9 +14,11 @@ This skill supports Bible study facilitators in guiding groups into deep, transf
 ## Three Study Modes
 
 ### Mode 1: Book Study (Verse-by-verse / Section-by-section)
+
 For groups wanting to journey through a complete biblical book.
 
 **Multi-Week Series Output:**
+
 ```
 SERIES: [Book Name] — [Series Title]
 DURATION: [X weeks]
@@ -40,11 +42,13 @@ SESSION MAP:
 ```
 
 ### Mode 2: Topical Study
+
 For groups studying a theological theme across multiple biblical texts.
 
 Topics handled: Prayer · Forgiveness · Suffering · Hope · Identity · Justice · Grace · Money · Relationships · Fear · Purpose · Spiritual Disciplines · The Holy Spirit · Eschatology · Mission
 
 **Output includes:**
+
 - 4–8 session structure following the biblical narrative arc of the theme
 - Key texts per session (not proof-texting — full passage context)
 - How the theme develops from OT → NT
@@ -52,11 +56,13 @@ Topics handled: Prayer · Forgiveness · Suffering · Hope · Identity · Justic
 - Recommended resources for deeper study
 
 ### Mode 3: Character Study
+
 For groups studying a biblical figure's faith journey.
 
 Characters covered: Abraham · Moses · Esther · Ruth · David · Elijah · Mary · Peter · Paul · Mary Magdalene · Joseph · Daniel · Nehemiah + more
 
 **Output structure:**
+
 - Character introduction and historical setting
 - Session-by-session narrative moments
 - Character flaws and failures (not hagiography)
@@ -73,6 +79,7 @@ For the whole congregation (not just facilitators) to read Scripture together ou
 **When to use:** a facilitator or church admin wants a plan the congregation can follow between sessions of a current series, during a season (Advent, Lent, a fast), or as a standalone read-through.
 
 **Output:**
+
 ```
 READING PLAN: [Title]
 LENGTH: [X days/weeks]
@@ -93,6 +100,7 @@ WEEKLY COMMUNITY TOUCHPOINT
 ```
 
 **Guidance:**
+
 - Keep daily entries short enough to read in under 5 minutes — the goal is consistency, not depth (depth belongs in the group session).
 - The SHARE PROMPT and WEEKLY COMMUNITY TOUCHPOINT exist specifically so solitary daily reading resurfaces in community — a plan with no communal touchpoint is just a devotional, not a discipleship-and-community tool.
 - When the plan runs during an outreach season, bias reflection questions toward things easy to explain to a friend, so participants have something natural to invite others into.
@@ -160,13 +168,16 @@ BETWEEN SESSIONS
 When a facilitator needs detailed exegetical notes on a passage:
 
 ### Structural Analysis
+
 - Paragraph/strophe breaks
 - Narrative arc or argument flow
 - Key transitions and connectives
 - Climactic verse identification
 
 ### Word Studies
+
 For 2–4 key terms:
+
 ```
 WORD: [English term]
 ORIGINAL: [Greek/Hebrew]
@@ -177,6 +188,7 @@ SIGNIFICANCE: [Why this word choice matters for interpretation]
 ```
 
 ### Cross-Reference Map
+
 ```
 PASSAGE: [Reference]
 DIRECT QUOTES: [OT passages directly quoted]
@@ -187,7 +199,9 @@ CHRISTOLOGICAL CONNECTION: [How this passage points to or is fulfilled in Christ
 ```
 
 ### Difficult Texts Protocol
+
 For passages that raise theological, ethical, or cultural questions:
+
 1. **Acknowledge the difficulty** — do not smooth it over
 2. **Present the major interpretive positions** (2–3 main views)
 3. **Note which traditions tend toward which interpretation**
@@ -203,11 +217,13 @@ Examples: divine violence (Joshua), imprecatory Psalms, women and church leaders
 For facilitators managing group health:
 
 ### Starting a New Group
+
 - Session 1 covenant guide: confidentiality, respect, participation norms
 - Introductory icebreakers that build trust
 - How to establish a safe space for honest questions
 
 ### Managing Difficult Group Members
+
 - The talker who dominates
 - The silent member who disengages
 - The challenger who debates everything
@@ -217,6 +233,7 @@ For facilitators managing group health:
 (Guidance is pastoral and practical — not clinical management frameworks)
 
 ### Group Milestones
+
 - Celebrate biblical literacy growth
 - End-of-series reflection activity
 - Testimony sharing structure
@@ -227,6 +244,7 @@ For facilitators managing group health:
 ## Recommended Commentary Library
 
 When a facilitator asks for deeper resources, provide:
+
 - **Accessible** (for general group members): The Bible Speaks Today series, IVP Bible Guides, Life Application Commentary
 - **Intermediate** (for facilitators): NIV Application Commentary, Pillar NT Commentary
 - **Academic** (for pastor-level preparation): Word Biblical Commentary, New International Greek Testament Commentary

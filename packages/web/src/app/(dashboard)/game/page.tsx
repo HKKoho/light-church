@@ -70,26 +70,24 @@ function GamePageContent() {
         <div className="flex flex-col items-center gap-3">
           <p className="text-sm font-medium">How many players?</p>
           <div className="flex gap-2">
-            {Array.from({ length: DEF.maxPlayers - DEF.minPlayers + 1 }, (_, i) => i + DEF.minPlayers).map(
-              (n) => (
-                <Button
-                  key={n}
-                  variant="outline"
-                  onClick={() => {
-                    setPlayerCount(n);
-                    clearGame(DEF.id);
-                    // initialise with chosen count
-                    Object.assign(
-                      state,
-                      createInitialState(DEF, DEFAULT_PLAYERS.slice(0, n)),
-                    );
-                    window.location.reload();
-                  }}
-                >
-                  {n}
-                </Button>
-              ),
-            )}
+            {Array.from(
+              { length: DEF.maxPlayers - DEF.minPlayers + 1 },
+              (_, i) => i + DEF.minPlayers,
+            ).map((n) => (
+              <Button
+                key={n}
+                variant="outline"
+                onClick={() => {
+                  setPlayerCount(n);
+                  clearGame(DEF.id);
+                  // initialise with chosen count
+                  Object.assign(state, createInitialState(DEF, DEFAULT_PLAYERS.slice(0, n)));
+                  window.location.reload();
+                }}
+              >
+                {n}
+              </Button>
+            ))}
           </div>
         </div>
       </div>

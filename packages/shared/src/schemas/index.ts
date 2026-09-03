@@ -14,10 +14,7 @@ export {
   type UpdateUserInput,
 } from './user.schema.js';
 
-export {
-  createClientAccountSchema,
-  type CreateClientAccountInput,
-} from './client.schema.js';
+export { createClientAccountSchema, type CreateClientAccountInput } from './client.schema.js';
 
 export {
   createAgentDefinitionSchema,
@@ -133,3 +130,5 @@ export {
   type UpdateSkillContentInput,
   type SkillReadResult,
 } from './skill.schema.js';
+
+export { talkingFaceSpeakSchema, type TalkingFaceSpeakInput } from './talkingface.schema.js';

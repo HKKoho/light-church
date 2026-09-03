@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@/test-utils';
 import userEvent from '@testing-library/user-event';
 import { UploadZone } from '../upload-zone';
 
@@ -112,7 +112,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR();
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);
@@ -134,7 +136,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR();
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);
@@ -155,7 +159,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 201 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} onUploadComplete={onUploadComplete} />);
@@ -182,7 +188,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 409 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);
@@ -202,7 +210,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 500 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);
@@ -222,7 +232,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 201 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);
@@ -243,7 +255,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 201 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} onUploadComplete={onUploadComplete} />);
@@ -267,7 +281,9 @@ describe('UploadZone', () => {
     const mockXHR = createMockXHR({ status: 201 });
     vi.stubGlobal(
       'XMLHttpRequest',
-      vi.fn(() => mockXHR),
+      vi.fn(function () {
+        return mockXHR;
+      }),
     );
 
     render(<UploadZone {...defaultProps} />);

@@ -15,7 +15,7 @@
  *   with an approved (hitl.readyForBuild === true) package.
  */
 
-import type { StoryboardPackage } from '../storyboard/storyboard-agent'
+import type { StoryboardPackage } from '../storyboard/storyboard-agent';
 
 // ── TYPES ────────────────────────────────────────────────────
 
@@ -36,79 +36,75 @@ export type GameAction =
   | 'clear_coins'
   | 'set_hud'
   | 'reset'
-  | 'get_state'
+  | 'get_state';
 
 export interface GameControllerParams {
-  action: GameAction
+  action: GameAction;
   params?: {
     // load_storyboard / advance_panel
-    package?: StoryboardPackage
+    package?: StoryboardPackage;
     // start_game
-    message?: string
+    message?: string;
     // set_world
-    gravity?: number
-    friction?: number
-    width?: number
-    height?: number
+    gravity?: number;
+    friction?: number;
+    width?: number;
+    height?: number;
     // spawn_player
-    id?: string
-    x?: number
-    y?: number
-    color?: string
-    size?: number
-    label?: string
+    id?: string;
+    x?: number;
+    y?: number;
+    color?: string;
+    size?: number;
+    label?: string;
     // move_player
-    vx?: number
-    vy?: number
+    vx?: number;
+    vy?: number;
     // spawn_coins
-    count?: number
-    value?: number
+    count?: number;
+    value?: number;
     // set_hud
-    title?: string
-    score?: number
-  }
+    title?: string;
+    score?: number;
+  };
 }
 
-export type GameControllerResult =
-  | { ok: true;  data: unknown }
-  | { ok: false; error: string }
+export type GameControllerResult = { ok: true; data: unknown } | { ok: false; error: string };
 
 // ── SKILL RUNNER ─────────────────────────────────────────────
 
-const AGENT_WS_URL = 'ws://localhost:9091'
+const AGENT_WS_URL = 'ws://localhost:9091';
 
 export async function run(params: GameControllerParams): Promise<GameControllerResult> {
-  const { action, params: p = {} } = params
+  const { action, params: p = {} } = params;
 
   return new Promise((resolve, reject) => {
-    const ws = new (require('ws'))( AGENT_WS_URL )
+    const ws = new (require('ws'))(AGENT_WS_URL);
 
     const timer = setTimeout(() => {
-      ws.terminate()
-      reject(new Error(
-        'Game server timeout — is server/game-server.ts running on port 9091?'
-      ))
-    }, 5000)
+      ws.terminate();
+      reject(new Error('Game server timeout — is server/game-server.ts running on port 9091?'));
+    }, 5000);
 
     ws.on('open', () => {
-      ws.send(JSON.stringify({ action, params: p }))
-    })
+      ws.send(JSON.stringify({ action, params: p }));
+    });
 
     ws.on('message', (data: Buffer) => {
-      clearTimeout(timer)
-      ws.close()
+      clearTimeout(timer);
+      ws.close();
       try {
-        resolve(JSON.parse(data.toString()))
+        resolve(JSON.parse(data.toString()));
       } catch {
-        resolve({ ok: true, data: data.toString() })
+        resolve({ ok: true, data: data.toString() });
       }
-    })
+    });
 
     ws.on('error', (err: Error) => {
-      clearTimeout(timer)
-      reject(err)
-    })
-  })
+      clearTimeout(timer);
+      reject(err);
+    });
+  });
 }
 
 // ── CLAWIX YAML REGISTRATION BLOCK ──────────────────────────

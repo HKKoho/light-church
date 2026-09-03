@@ -49,7 +49,9 @@ describe('WorkspaceService', () => {
       createReadStream: vi.fn(),
     };
 
-    MockedScopedFs.mockImplementation(() => mockScopedFs as unknown as ScopedFs);
+    MockedScopedFs.mockImplementation(function () {
+      return mockScopedFs as unknown as ScopedFs;
+    });
 
     mockUserAgentRepo = {
       findByUserId: vi.fn().mockResolvedValue({

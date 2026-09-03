@@ -22,18 +22,18 @@ The assistant is **not** a replacement for staff judgment. It is a drafting, str
 
 These mirror Anthropic's published AI-Assistant principles and must be honored by every agent and skill in this proposal.
 
-| # | Principle | How it is enforced in Clawix |
-|---|-----------|------------------------------|
-| 1 | **Scoped file access** | Each agent has an explicit `working_dir`. No agent may read or write outside its declared scope. The NGO workspace is the only mounted folder. |
-| 2 | **Tool whitelisting** | `allowed-tools` is declared per agent. New tools require human approval via `request_access`. |
-| 3 | **No autonomous money movement** | No agent may execute a transfer, payment, supporter refund, or trade. Agents may *prepare* a payment instruction; a named human signs off out-of-band. |
-| 4 | **Outbound comms are draft-only** | Email, SMS, social posts, supporter portal submissions are drafted into files. Sending requires a human click. |
-| 5 | **Beneficiary PII handling** | Names, contact details, photos, case notes are tagged `pii:true` and never written to agent memory. Agents read them in-session, then forget. |
-| 6 | **Web access** | Limited to a domain allowlist (supporter portals, OECD-DAC, ReliefWeb, government registries). Suspicious links are surfaced to a human, never auto-opened. |
-| 7 | **Audit log** | Every agent action appends one line to `.clawix/audit.log` (timestamp, agent, tool, target, outcome). The log is append-only and human-readable. |
-| 8 | **Refusals carry through** | If a skill or agent declines a task (e.g., "draft a misleading supporter narrative"), no other agent in the system may complete it on its behalf. |
-| 9 | **Skills are read-only knowledge, not authority** | Skills cannot grant new tool access. They only encode *how* to do work the agent is already permitted to do. |
-| 10 | **Human-in-the-loop on irreversible actions** | Submitting a proposal, publishing a report, signing an MOU, sharing data with a third party — all require explicit human confirmation. |
+| #   | Principle                                         | How it is enforced in Clawix                                                                                                                                |
+| --- | ------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | **Scoped file access**                            | Each agent has an explicit `working_dir`. No agent may read or write outside its declared scope. The NGO workspace is the only mounted folder.              |
+| 2   | **Tool whitelisting**                             | `allowed-tools` is declared per agent. New tools require human approval via `request_access`.                                                               |
+| 3   | **No autonomous money movement**                  | No agent may execute a transfer, payment, supporter refund, or trade. Agents may _prepare_ a payment instruction; a named human signs off out-of-band.      |
+| 4   | **Outbound comms are draft-only**                 | Email, SMS, social posts, supporter portal submissions are drafted into files. Sending requires a human click.                                              |
+| 5   | **Beneficiary PII handling**                      | Names, contact details, photos, case notes are tagged `pii:true` and never written to agent memory. Agents read them in-session, then forget.               |
+| 6   | **Web access**                                    | Limited to a domain allowlist (supporter portals, OECD-DAC, ReliefWeb, government registries). Suspicious links are surfaced to a human, never auto-opened. |
+| 7   | **Audit log**                                     | Every agent action appends one line to `.clawix/audit.log` (timestamp, agent, tool, target, outcome). The log is append-only and human-readable.            |
+| 8   | **Refusals carry through**                        | If a skill or agent declines a task (e.g., "draft a misleading supporter narrative"), no other agent in the system may complete it on its behalf.           |
+| 9   | **Skills are read-only knowledge, not authority** | Skills cannot grant new tool access. They only encode _how_ to do work the agent is already permitted to do.                                                |
+| 10  | **Human-in-the-loop on irreversible actions**     | Submitting a proposal, publishing a report, signing an MOU, sharing data with a third party — all require explicit human confirmation.                      |
 
 ---
 
@@ -43,19 +43,19 @@ These mirror Anthropic's published AI-Assistant principles and must be honored b
 
 Five specialized agents, each narrowly scoped. Specialization is a security feature — it shrinks the blast radius of any single agent.
 
-| Agent | Primary responsibility | Tools | Reads skills |
-|-------|------------------------|-------|--------------|
-| `program-coordinator` | Maintain workplan, partner register, activity tracker; flag deviations | Read, Write, Edit, Grep | safeguarding, ngo-comms |
-| `donor-engagement` | Draft proposals, narrative + financial reports, supporter research | Read, Write, Edit, WebSearch (allowlisted) | donor-proposal, grant-research, impact-report |
-| `monitoring-evaluation` | Indicator design, data-collection form drafting, dashboard refresh | Read, Write, Edit, Bash (read-only on data) | mne, data-protection |
-| `communications` | Newsletters, social posts, op-eds, advocacy briefs | Read, Write, Edit | ngo-comms |
-| `field-operations` | Logistics list, risk register, safeguarding incident triage | Read, Write, Edit | safeguarding, data-protection |
+| Agent                   | Primary responsibility                                                 | Tools                                       | Reads skills                                  |
+| ----------------------- | ---------------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------- |
+| `program-coordinator`   | Maintain workplan, partner register, activity tracker; flag deviations | Read, Write, Edit, Grep                     | safeguarding, ngo-comms                       |
+| `donor-engagement`      | Draft proposals, narrative + financial reports, supporter research     | Read, Write, Edit, WebSearch (allowlisted)  | donor-proposal, grant-research, impact-report |
+| `monitoring-evaluation` | Indicator design, data-collection form drafting, dashboard refresh     | Read, Write, Edit, Bash (read-only on data) | mne, data-protection                          |
+| `communications`        | Newsletters, social posts, op-eds, advocacy briefs                     | Read, Write, Edit                           | ngo-comms                                     |
+| `field-operations`      | Logistics list, risk register, safeguarding incident triage            | Read, Write, Edit                           | safeguarding, data-protection                 |
 
 Agents talk to each other through **shared files**, not direct delegation. The Program Coordinator drops a brief into `briefs/`; the Supporter Engagement agent picks it up. This keeps each agent's authority narrow and the audit trail clean.
 
 ### 3.2 The skill library
 
-Skills are reference packages — encoded best practice the relevant agent reads *before* drafting.
+Skills are reference packages — encoded best practice the relevant agent reads _before_ drafting.
 
 1. **donor-proposal** — log-frame structure, Theory of Change, OECD-DAC alignment, common supporter templates (FCDO, USAID, ECHO, GAC, SDC, BMZ, private foundations).
 2. **mne** — SMART indicator design, baseline/midline/endline structure, qualitative coding, OECD-DAC evaluation criteria.
@@ -108,16 +108,16 @@ Each agent file is a self-contained Clawix agent definition (YAML frontmatter + 
 
 ## 5. Measurable impact
 
-| Metric | Baseline assumption | Target after 90 days | Method |
-|--------|---------------------|----------------------|--------|
-| Hours per supporter proposal (drafting only) | 35 hrs | ≤ 17 hrs | Self-reported, comparing 3 proposals before/after |
-| Narrative reports submitted on time | 70% | ≥ 95% | Supporter portal submission logs |
-| M&E indicators with documented baseline | 60% | ≥ 90% | M&E plan audit |
-| Beneficiary records with consent flag | unknown / informal | 100% | Data-protection skill enforces flag |
-| Safeguarding incidents triaged within 24 hrs | varies | 100% | Field-ops audit log |
-| Communications backlog (drafts pending) | rolling 2–3 weeks | ≤ 5 days | Comms folder review |
-| Audit-log integrity | n/a | 100% append-only, no gaps | Log review |
-| Security incidents (PII leak, unauthorized payment, off-policy publishing) | n/a | 0 | Audit log review |
+| Metric                                                                     | Baseline assumption | Target after 90 days      | Method                                            |
+| -------------------------------------------------------------------------- | ------------------- | ------------------------- | ------------------------------------------------- |
+| Hours per supporter proposal (drafting only)                               | 35 hrs              | ≤ 17 hrs                  | Self-reported, comparing 3 proposals before/after |
+| Narrative reports submitted on time                                        | 70%                 | ≥ 95%                     | Supporter portal submission logs                  |
+| M&E indicators with documented baseline                                    | 60%                 | ≥ 90%                     | M&E plan audit                                    |
+| Beneficiary records with consent flag                                      | unknown / informal  | 100%                      | Data-protection skill enforces flag               |
+| Safeguarding incidents triaged within 24 hrs                               | varies              | 100%                      | Field-ops audit log                               |
+| Communications backlog (drafts pending)                                    | rolling 2–3 weeks   | ≤ 5 days                  | Comms folder review                               |
+| Audit-log integrity                                                        | n/a                 | 100% append-only, no gaps | Log review                                        |
+| Security incidents (PII leak, unauthorized payment, off-policy publishing) | n/a                 | 0                         | Audit log review                                  |
 
 A 30-day pulse check is run by the Program Coordinator agent itself: it reads the audit log, summarizes which agents acted on which artifacts, and emits a markdown report into `reports/30-day-review.md`.
 

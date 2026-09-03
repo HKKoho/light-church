@@ -13,7 +13,7 @@
 >
 > This page is written for the people who **use** Light Church every day — ministry coordinators, stewardship and grants staff, discipleship/impact teams, communications teams and field or mission-trip coordinators. **You do not need to be technical.** If you can send a message in a chat app, you can use Light Church.
 >
-> If you are the person who *installs or maintains* Light Church on a server, skip to [**For administrators**](#for-administrators-technical-setup) at the bottom.
+> If you are the person who _installs or maintains_ Light Church on a server, skip to [**For administrators**](#for-administrators-technical-setup) at the bottom.
 
 ---
 
@@ -25,7 +25,7 @@ You talk to them in plain language, the same way you'd brief a colleague. They d
 
 Light Church is a ministry configuration of **Clawix**, a self-hosted multi-agent AI platform. Its working assumptions come from a simple theological frame: the Great Commission (Matthew 28:19–20), the Great Commandment (Matthew 22:37–39), and faithful stewardship of what's been entrusted to your organisation. Four promises sit underneath everything it does:
 
-- 🧑‍⚖️ **A human is always in charge.** Light Church only ever produces *drafts*. It never sends an email, posts to social media, publishes a game for children, or submits anything to a supporter on its own. A person always presses "send" — or "approve".
+- 🧑‍⚖️ **A human is always in charge.** Light Church only ever produces _drafts_. It never sends an email, posts to social media, publishes a game for children, or submits anything to a supporter on its own. A person always presses "send" — or "approve".
 - 🔒 **Your data stays yours.** Light Church runs on your organisation's own server. Beneficiary and congregant names and personal details are deliberately kept out of its memory.
 - ✅ **It won't make things up.** If a figure or fact is missing, the assistants mark it clearly (e.g. `[FILL: 2024 baptisms count]`) rather than inventing a number.
 - 🙏 **Prayerful discernment, not autopilot.** Every response carries the reminder that these are drafts from a capable assistant, not spiritual authority — your team's judgment and discernment always finish the work.
@@ -36,14 +36,14 @@ Light Church is a ministry configuration of **Clawix**, a self-hosted multi-agen
 
 At the front desk is the **Ministry Coordinator** (shown in-app as the primary assistant). This is who you talk to first. You describe what you need in everyday words, and it quietly hands the job to the right specialist — one at a time — then brings the result back to you. You rarely need to talk to the specialists directly.
 
-| The specialist | Shown in the app as | Ask them for… |
-| --- | --- | --- |
-| **Ministry Coordinator** | *Ministries* | Workplans, partner/church registers, activity trackers, weekly status notes |
-| **Stewardship** | *Stewardship* | Proposals, supporter reports, log-frames, and research into Christian foundations and faith-based grants |
-| **Kingdom Impact** | *Kingdom Impact* | Indicators that go beyond outputs — salvations, baptisms, discipleship depth — plus data-collection forms and dashboard summaries |
-| **Proclamation** | *Proclamation* | Newsletters, social posts, op-eds, advocacy and witness content |
-| **Mission Field** | *Mission Field / Safeguarding* | Logistics lists, trip risk registers, and writing up safeguarding incident records *after* a person has handled the situation |
-| **Game Studio** | *Projector* | Short, Scripture-rooted narrative games for VBS, youth ministry and family devotion — built storyboard-first, with a human approving the story before anything gets built |
+| The specialist           | Shown in the app as            | Ask them for…                                                                                                                                                             |
+| ------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Ministry Coordinator** | _Ministries_                   | Workplans, partner/church registers, activity trackers, weekly status notes                                                                                               |
+| **Stewardship**          | _Stewardship_                  | Proposals, supporter reports, log-frames, and research into Christian foundations and faith-based grants                                                                  |
+| **Kingdom Impact**       | _Kingdom Impact_               | Indicators that go beyond outputs — salvations, baptisms, discipleship depth — plus data-collection forms and dashboard summaries                                         |
+| **Proclamation**         | _Proclamation_                 | Newsletters, social posts, op-eds, advocacy and witness content                                                                                                           |
+| **Mission Field**        | _Mission Field / Safeguarding_ | Logistics lists, trip risk registers, and writing up safeguarding incident records _after_ a person has handled the situation                                             |
+| **Game Studio**          | _Projector_                    | Short, Scripture-rooted narrative games for VBS, youth ministry and family devotion — built storyboard-first, with a human approving the story before anything gets built |
 
 Each specialist has been given a set of **best-practice guides** ("skills") to read before it drafts — for example, how funders like FCDO, USAID and Christian foundations expect proposals to be structured, the theological/audience framing to use with different stakeholders, or the data-protection rules for handling sensitive information. So you're not just getting generic text; you're getting drafts that follow the standards your ministry and sector expect.
 
@@ -82,20 +82,20 @@ In the web dashboard, open **Conversations** and choose the primary assistant. O
 
 Describe what you need the way you'd ask a colleague. You don't need special commands or keywords. For example:
 
-> *"Find Christian foundations that fund water and sanitation work in West Africa."*
+> _"Find Christian foundations that fund water and sanitation work in West Africa."_
 > → The Stewardship agent researches funders and saves a shortlist for you to review.
 
-> *"Design Kingdom Impact indicators for our discipleship program."*
+> _"Design Kingdom Impact indicators for our discipleship program."_
 > → You get a ready-to-edit set of indicators that go beyond attendance counts, following M&E best practice.
 
-> *"Draft this month's newsletter using our recent outreach updates."*
+> _"Draft this month's newsletter using our recent outreach updates."_
 > → A first draft of the newsletter from Proclamation, written in accessible, dignity-preserving language.
 
-> *"Build a short game about the Good Samaritan for our VBS kids."*
+> _"Build a short game about the Good Samaritan for our VBS kids."_
 > → Game Studio drafts a storyboard first and asks you to approve it — it never builds before a human signs off on the story.
 
-> *"/prayer Please pray for the Nunez family as they finalize their adoption."*
-> → Saved instantly to Prayer Requests → *new*, ready for your prayer team.
+> _"/prayer Please pray for the Nunez family as they finalize their adoption."_
+> → Saved instantly to Prayer Requests → _new_, ready for your prayer team.
 
 ---
 
@@ -115,7 +115,7 @@ These rules are built into Light Church. Knowing them helps you trust what it gi
 
 1. **Drafts only — a human always sends.** Emails, supporter submissions, and social posts are prepared for you, never sent automatically.
 2. **Beneficiary and congregant privacy is protected.** Personal details of the people you serve are kept out of the assistants' memory. When incidents are written up, real names are replaced with pseudonyms; the key linking them is kept in an access-controlled folder.
-3. **Safeguarding comes first.** Mission Field will **not** handle a safeguarding disclosure or make first-contact decisions. A trained person deals with the situation; the assistant only helps *document* it afterwards, and mandatory-reporting flags can't be quietly removed.
+3. **Safeguarding comes first.** Mission Field will **not** handle a safeguarding disclosure or make first-contact decisions. A trained person deals with the situation; the assistant only helps _document_ it afterwards, and mandatory-reporting flags can't be quietly removed.
 4. **No invented facts or figures.** Missing data is flagged for you to fill in, not guessed.
 5. **Games are storyboard-gated.** Game Studio always designs the story first and waits for a human to approve it — theologically and for age-appropriateness — before building anything. Built games run with no network access and use no combat, fear or shame mechanics.
 6. **One specialist at a time.** The Ministry Coordinator routes each request to a single specialist — there's no uncontrolled chain of agents acting on their own.
@@ -123,13 +123,13 @@ These rules are built into Light Church. Knowing them helps you trust what it gi
 
 ---
 
-## What Light Church will *not* do
+## What Light Church will _not_ do
 
 So there are no surprises, Light Church deliberately **does not**:
 
 - Send emails, submit proposals, or publish posts on its own.
 - Store or remember beneficiaries' or congregants' personal information.
-- Make safeguarding or protection *decisions* — that's always a person's job.
+- Make safeguarding or protection _decisions_ — that's always a person's job.
 - Invent statistics, quotes, or results to fill a gap.
 - Publish a game or interactive tool for children without a human approving the story first.
 - Act on a story without consent — beneficiary and testimony stories are only used when the source is marked as shareable.
@@ -152,6 +152,7 @@ So there are no surprises, Light Church deliberately **does not**:
 - **Want a new kind of assistant or skill?** Those can be added — pass the request to your administrator.
 
 ---
+
 ---
 
 ## For administrators (technical setup)
@@ -161,6 +162,7 @@ So there are no surprises, Light Church deliberately **does not**:
 Light Church is a ministry configuration built on **Clawix**, a **self-hosted multi-agent AI orchestration platform**: every agent runs in its own isolated Docker container, with full audit logging, role-based access, token budgets, and encrypted secrets. It's a pnpm monorepo (`packages/api` — NestJS + Fastify; `packages/web` — Next.js dashboard; `packages/shared`). The underlying repository, package name, and Docker services are still named `clawix` — that's the platform layer; "Light Church" is the branding and configuration applied on top of it for this deployment.
 
 **Full guides:**
+
 - **Server / cloud deployment (DigitalOcean, domains, SSL):** see [`DO_deploy.md`](DO_deploy.md)
 - **Railway deployment (managed web/API + VPS agent containers):** see [`Railway_install.md`](Railway_install.md)
 - **Codebase architecture & developer commands:** see [`CLAUDE.md`](CLAUDE.md) and [`docs/`](docs/)
@@ -176,7 +178,7 @@ cd clawixngo
 pnpm run install:clawix
 ```
 
-There is also a one-step bootstrapper that clones *and* installs: `./setup-clawix.sh` (interactive) or `./setup-clawix.sh --auto --provider anthropic --api-key sk-ant-xxx` (unattended). Use it for **first-time installs only** — never for updates.
+There is also a one-step bootstrapper that clones _and_ installs: `./setup-clawix.sh` (interactive) or `./setup-clawix.sh --auto --provider anthropic --api-key sk-ant-xxx` (unattended). Use it for **first-time installs only** — never for updates.
 
 ### Update / restart
 
@@ -223,21 +225,21 @@ pnpm run dev                         # API on :3001, dashboard on :3000
 
 ### Supported AI providers
 
-| Provider | Status |
-| --- | --- |
-| Anthropic (Claude) | Available |
-| OpenAI (GPT) | Available |
-| Z.AI Coding (GLM) | Available |
+| Provider                                         | Status    |
+| ------------------------------------------------ | --------- |
+| Anthropic (Claude)                               | Available |
+| OpenAI (GPT)                                     | Available |
+| Z.AI Coding (GLM)                                | Available |
 | Any OpenAI-compatible endpoint (Ollama, vLLM, …) | Available |
-| Azure, DeepSeek, Gemini, Kimi, OpenRouter | Planned |
+| Azure, DeepSeek, Gemini, Kimi, OpenRouter        | Planned   |
 
 ### Channels
 
-| Channel | Status |
-| --- | --- |
-| Web dashboard | Available |
-| Telegram | Available |
-| WhatsApp, Slack | Planned |
+| Channel         | Status    |
+| --------------- | --------- |
+| Web dashboard   | Available |
+| Telegram        | Available |
+| WhatsApp, Slack | Planned   |
 
 ---
 
@@ -249,31 +251,31 @@ A complete multi-agent setup for small-to-mid-size mission organizations and NGO
 
 Installed as the `ngo` Ministry Pack (**Settings → Ministry Packs**, or `scripts/seed-ngo-agents.mjs`) — each with `role: worker`, `isOfficial: true`. Definitions live in `packages/api/src/packs/definitions/ngo-agents.data.ts`, the single source shared by the CLI script and the pack-installer API.
 
-| Agent (internal name) | Shown in-app as | Responsibility | Tools | Reads skills |
-|---|---|---|---|---|
-| `program-coordinator` | Ministries | Workplan, partner/church register, activity tracker, weekly status notes | Read, Write, Edit, Grep, Glob | safeguarding, ngo-comms |
-| `donor-engagement` | Stewardship | Proposals, narrative reports, log-frames, supporter research | Read, Write, Edit, Grep, Glob, WebSearch (domain-allowlisted) | donor-proposal, grant-research, impact-report, data-protection, gospel-mission |
-| `monitoring-evaluation` | Kingdom Impact | Indicators, data-collection forms, period validation, dashboard summaries | Read, Write, Edit, Grep, Glob, Bash (read-only allowlist) | mne, data-protection |
-| `communications` | Proclamation | Newsletters, social posts, op-eds, advocacy briefs | Read, Write, Edit, Grep, Glob | ngo-comms, data-protection, gospel-mission |
-| `field-operations` | Mission Field / Safeguarding | Logistics lists, risk register, safeguarding incident records (post-triage only) | Read, Write, Edit, Grep, Glob | safeguarding, data-protection |
-| `game-studio` | Projector (Game Builder) | Short, Scripture-rooted narrative games for VBS/youth ministry, storyboard-first, human-approved before build | Read, Write, Edit, spawn `coder` sub-agent (build phase only) | game-builder, gospel-mission |
-| `pastoral-care` | Pastoral Care | AI-disclosed pastoral/spiritual support conversations — listening, prayer, Scripture; escalates crisis disclosures to a human | Read, Write (`pastoral-care/records/`, `pastoral-care/flagged/`) | pastoral-care |
-| `finance-assistant` | Finance | Ledger entries, budget-vs-actual reports, reconciliation prep, bookkeeping exports — drafts only | Read, Write, Edit | finance-steward |
-| `evangelism-outreach` | Outreach | Outreach campaign plans, gospel-proclamation content, church-planting briefs; never conditions aid on participation | Read, Write, Edit | gospel-mission |
-| `scripture-literacy` | Scripture & Literacy | Bible translation status, Scripture distribution records, mother-tongue literacy programmes | Read, Write, Edit | — |
+| Agent (internal name)   | Shown in-app as              | Responsibility                                                                                                                | Tools                                                            | Reads skills                                                                   |
+| ----------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `program-coordinator`   | Ministries                   | Workplan, partner/church register, activity tracker, weekly status notes                                                      | Read, Write, Edit, Grep, Glob                                    | safeguarding, ngo-comms                                                        |
+| `donor-engagement`      | Stewardship                  | Proposals, narrative reports, log-frames, supporter research                                                                  | Read, Write, Edit, Grep, Glob, WebSearch (domain-allowlisted)    | donor-proposal, grant-research, impact-report, data-protection, gospel-mission |
+| `monitoring-evaluation` | Kingdom Impact               | Indicators, data-collection forms, period validation, dashboard summaries                                                     | Read, Write, Edit, Grep, Glob, Bash (read-only allowlist)        | mne, data-protection                                                           |
+| `communications`        | Proclamation                 | Newsletters, social posts, op-eds, advocacy briefs                                                                            | Read, Write, Edit, Grep, Glob                                    | ngo-comms, data-protection, gospel-mission                                     |
+| `field-operations`      | Mission Field / Safeguarding | Logistics lists, risk register, safeguarding incident records (post-triage only)                                              | Read, Write, Edit, Grep, Glob                                    | safeguarding, data-protection                                                  |
+| `game-studio`           | Projector (Game Builder)     | Short, Scripture-rooted narrative games for VBS/youth ministry, storyboard-first, human-approved before build                 | Read, Write, Edit, spawn `coder` sub-agent (build phase only)    | game-builder, gospel-mission                                                   |
+| `pastoral-care`         | Pastoral Care                | AI-disclosed pastoral/spiritual support conversations — listening, prayer, Scripture; escalates crisis disclosures to a human | Read, Write (`pastoral-care/records/`, `pastoral-care/flagged/`) | pastoral-care                                                                  |
+| `finance-assistant`     | Finance                      | Ledger entries, budget-vs-actual reports, reconciliation prep, bookkeeping exports — drafts only                              | Read, Write, Edit                                                | finance-steward                                                                |
+| `evangelism-outreach`   | Outreach                     | Outreach campaign plans, gospel-proclamation content, church-planting briefs; never conditions aid on participation           | Read, Write, Edit                                                | gospel-mission                                                                 |
+| `scripture-literacy`    | Scripture & Literacy         | Bible translation status, Scripture distribution records, mother-tongue literacy programmes                                   | Read, Write, Edit                                                | —                                                                              |
 
 ### The Church Ministries pack — 7 specialist agents
 
 Installed as the `church` Ministry Pack (`scripts/seed-church-agents.mjs`). Definitions live in `packages/api/src/packs/definitions/church-agents.data.ts`.
 
-| Agent (internal name) | Responsibility | Reads skills |
-|---|---|---|
-| `church-sermon-prep` | Passage exegesis, outline construction, illustrations, application points, closing prayers | `church-sermon-prep` |
-| `church-sunday-school` | Age-banded lessons (nursery–senior high): teaching, crafts, memory verses, parent take-home notes | `church-sunday-school` |
-| `church-bible-study` | Small-group study guides, multi-week series, inductive discussion questions | `church-bible-study` |
-| `church-worship-planner` | Song selection, liturgical flow, seasonal and special-service planning | `church-worship-planner` |
-| `church-prayer-journal` | Prayer meeting guides, intercession lists, fasting guides, contemplative prayer | `church-prayer-journal` |
-| `church-communications` | Congregation-facing newsletters, welcome emails, event invitations, testimonies | `church-communications` |
+| Agent (internal name)      | Responsibility                                                                                        | Reads skills                 |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `church-sermon-prep`       | Passage exegesis, outline construction, illustrations, application points, closing prayers            | `church-sermon-prep`         |
+| `church-sunday-school`     | Age-banded lessons (nursery–senior high): teaching, crafts, memory verses, parent take-home notes     | `church-sunday-school`       |
+| `church-bible-study`       | Small-group study guides, multi-week series, inductive discussion questions                           | `church-bible-study`         |
+| `church-worship-planner`   | Song selection, liturgical flow, seasonal and special-service planning                                | `church-worship-planner`     |
+| `church-prayer-journal`    | Prayer meeting guides, intercession lists, fasting guides, contemplative prayer                       | `church-prayer-journal`      |
+| `church-communications`    | Congregation-facing newsletters, welcome emails, event invitations, testimonies                       | `church-communications`      |
 | `church-admin-coordinator` | Full back-office: events, bulletins, volunteer rotas, facility booking, membership, minutes, calendar | the 9 `church-admin*` skills |
 
 ### The primary orchestrator
@@ -312,24 +314,24 @@ Game Studio's output goes to `workspace/games/<slug>/` and `workspace/projector/
 
 Read-only reference packages — encoded best practice the relevant agent reads before drafting. They grant no new tool access.
 
-| Skill | Location | Agent(s) | Content |
-|---|---|---|---|
-| `donor-proposal/SKILL.md` | `reference/…/skills/` | Stewardship | Drafting order (Theory of Change → log-frame → activities → budget → risk → sustainability); indicator alignment for FCDO, USAID, ECHO, GAC, SDC, BMZ, private foundations; common rejection reasons |
-| `mne/SKILL.md` | `reference/…/skills/` | Kingdom Impact | SMART indicator YAML template; baseline/midline/endline structure; OECD-DAC evaluation criteria; data-validation rules; anonymization recipe |
-| `safeguarding/SKILL.md` | `reference/…/skills/` | Mission Field, Ministries | PSEA principles, child safeguarding, incident triage decision tree, mandatory reporting triggers, record structure with pseudonym convention |
-| `data-protection/SKILL.md` | `reference/…/skills/` | Kingdom Impact, Stewardship, Proclamation, Mission Field | GDPR + ICRC/IASC guidance; `pii: true` convention; consent capture; anonymization steps |
-| `impact-report/SKILL.md` | `reference/…/skills/` | Stewardship | Narrative report structure by supporter type; financial reporting touchpoints; beneficiary story consent rules; variance reporting standard |
-| `grant-research/SKILL.md` | `reference/…/skills/` | Stewardship | Supporter scanning checklist; eligibility filters; deadline tracking; fit-scoring rubric (1–5) |
-| `ngo-comms/SKILL.md` | `reference/…/skills/` | Proclamation, Ministries | Accessible language standards; do-no-harm storytelling; dignity-preserving imagery; advocacy framing; status-note classification |
-| `game-builder/SKILL.md` | `skills/builtin/` | Game Studio | Enforces STORYBOARD → APPROVE → BUILD → DELIVER; games render in a sandboxed, network-free iframe; permitted genres (puzzle, platformer, narrative, collector — no combat/arena); content rules (no fear/shame mechanics, theologically sound, age-appropriate, antagonists drawn with dignity) |
-| `gospel-mission/SKILL.md` | `skills/builtin/` | Game Studio (tone cross-check); available platform-wide | Theological foundation (Great Commission, Great Commandment, stewardship); stakeholder messaging profiles for Christian foundations, church partners, individual supporters/intercessors, beneficiaries, and secular/institutional funders |
-| `projector-creator/SKILL.md` | `skills/builtin/` | Any agent building a Projector tool | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the Projector page (Game Studio is one specialization of this) |
+| Skill                        | Location              | Agent(s)                                                 | Content                                                                                                                                                                                                                                                                                         |
+| ---------------------------- | --------------------- | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `donor-proposal/SKILL.md`    | `reference/…/skills/` | Stewardship                                              | Drafting order (Theory of Change → log-frame → activities → budget → risk → sustainability); indicator alignment for FCDO, USAID, ECHO, GAC, SDC, BMZ, private foundations; common rejection reasons                                                                                            |
+| `mne/SKILL.md`               | `reference/…/skills/` | Kingdom Impact                                           | SMART indicator YAML template; baseline/midline/endline structure; OECD-DAC evaluation criteria; data-validation rules; anonymization recipe                                                                                                                                                    |
+| `safeguarding/SKILL.md`      | `reference/…/skills/` | Mission Field, Ministries                                | PSEA principles, child safeguarding, incident triage decision tree, mandatory reporting triggers, record structure with pseudonym convention                                                                                                                                                    |
+| `data-protection/SKILL.md`   | `reference/…/skills/` | Kingdom Impact, Stewardship, Proclamation, Mission Field | GDPR + ICRC/IASC guidance; `pii: true` convention; consent capture; anonymization steps                                                                                                                                                                                                         |
+| `impact-report/SKILL.md`     | `reference/…/skills/` | Stewardship                                              | Narrative report structure by supporter type; financial reporting touchpoints; beneficiary story consent rules; variance reporting standard                                                                                                                                                     |
+| `grant-research/SKILL.md`    | `reference/…/skills/` | Stewardship                                              | Supporter scanning checklist; eligibility filters; deadline tracking; fit-scoring rubric (1–5)                                                                                                                                                                                                  |
+| `ngo-comms/SKILL.md`         | `reference/…/skills/` | Proclamation, Ministries                                 | Accessible language standards; do-no-harm storytelling; dignity-preserving imagery; advocacy framing; status-note classification                                                                                                                                                                |
+| `game-builder/SKILL.md`      | `skills/builtin/`     | Game Studio                                              | Enforces STORYBOARD → APPROVE → BUILD → DELIVER; games render in a sandboxed, network-free iframe; permitted genres (puzzle, platformer, narrative, collector — no combat/arena); content rules (no fear/shame mechanics, theologically sound, age-appropriate, antagonists drawn with dignity) |
+| `gospel-mission/SKILL.md`    | `skills/builtin/`     | Game Studio (tone cross-check); available platform-wide  | Theological foundation (Great Commission, Great Commandment, stewardship); stakeholder messaging profiles for Christian foundations, church partners, individual supporters/intercessors, beneficiaries, and secular/institutional funders                                                      |
+| `projector-creator/SKILL.md` | `skills/builtin/`     | Any agent building a Projector tool                      | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the Projector page (Game Studio is one specialization of this)                                                                                                                                     |
 
 ### Architecture docs
 
-| File | Purpose |
-|---|---|
-| `reference/Clawix SKILL and Agent/README.md` | Architecture diagram, folder layout rationale, deployment runbook, operating rules for staff, what the configuration does not do (still uses generic "NGO" framing) |
+| File                                           | Purpose                                                                                                                                                                                             |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `reference/Clawix SKILL and Agent/README.md`   | Architecture diagram, folder layout rationale, deployment runbook, operating rules for staff, what the configuration does not do (still uses generic "NGO" framing)                                 |
 | `reference/Clawix SKILL and Agent/PROPOSAL.md` | Strategic case; 10 non-negotiable security principles; full agent + skill roster; MCP connectors (KoboToolbox, PowerBI, Google Drive, Mailchimp — all gated); 90-day impact targets; phased rollout |
 
 ### What's next
@@ -342,15 +344,15 @@ Phases 2A–2C are shipped: the original NGO feature backlog, the Church Ministr
 
 Light Church follows a **zero-trust architecture** for agent execution:
 
-| Threat | Mitigation |
-| --- | --- |
-| Cross-user data access | Workspaces only mounted into the owner's container |
-| Sub-agent privilege escalation | Sub-agents get read-only curated context, never the full workspace |
-| Memory poisoning | Agent context regenerated from the database each run |
-| Disk exhaustion | Per-user quota enforcement (default 500 MB) |
-| Path traversal | All paths validated to stay under `data/org/` |
-| Secret leakage | API keys encrypted at rest (AES-256-GCM) |
-| Untrusted code execution | All agent code runs inside sandboxed containers, never on the host |
+| Threat                                | Mitigation                                                                                                                                   |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cross-user data access                | Workspaces only mounted into the owner's container                                                                                           |
+| Sub-agent privilege escalation        | Sub-agents get read-only curated context, never the full workspace                                                                           |
+| Memory poisoning                      | Agent context regenerated from the database each run                                                                                         |
+| Disk exhaustion                       | Per-user quota enforcement (default 500 MB)                                                                                                  |
+| Path traversal                        | All paths validated to stay under `data/org/`                                                                                                |
+| Secret leakage                        | API keys encrypted at rest (AES-256-GCM)                                                                                                     |
+| Untrusted code execution              | All agent code runs inside sandboxed containers, never on the host                                                                           |
 | Unreviewed content reaching a browser | Game Studio / Projector output renders in a sandboxed iframe with no network access, and never builds before a human approves the storyboard |
 
 ---

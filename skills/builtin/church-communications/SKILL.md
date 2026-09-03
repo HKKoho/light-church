@@ -9,7 +9,7 @@ pack: church
 
 The church's communication is its public face and its community heartbeat. This skill crafts communications that are warm, inclusive, theologically honest, and genuinely engaging — so the right people hear the right message at the right moment.
 
-*"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone."* — Colossians 4:6
+_"Let your conversation be always full of grace, seasoned with salt, so that you may know how to answer everyone."_ — Colossians 4:6
 
 ---
 
@@ -28,6 +28,7 @@ The church's communication is its public face and its community heartbeat. This 
 ### Platform-Specific Templates
 
 **Instagram / Facebook Post — Event Announcement**
+
 ```
 [Attention-grabbing first line — question or bold statement]
 
@@ -41,6 +42,7 @@ The church's communication is its public face and its community heartbeat. This 
 ```
 
 **Instagram Story — Quote Graphic Script**
+
 ```
 [Short Scripture verse or powerful quote — max 12 words for readability]
 Typeface: Bold, high contrast
@@ -49,6 +51,7 @@ CTA: "Save this ↑" or "Share with someone who needs this"
 ```
 
 **Twitter/X — Sermon Quote Drop**
+
 ```
 "[Memorable sermon quote — under 240 chars, no filler]"
 
@@ -59,6 +62,7 @@ CTA: "Save this ↑" or "Share with someone who needs this"
 ```
 
 **YouTube / Podcast Description**
+
 ```
 [Episode/Sermon Title] | [Church Name]
 
@@ -81,6 +85,7 @@ Subscribe for weekly messages of hope and truth.
 ### New Member Welcome Sequence (3-email series)
 
 **Email 1 — Day 1: Warm Welcome**
+
 ```
 Subject: You're home 🏠
 
@@ -104,6 +109,7 @@ With warmth,
 ```
 
 **Email 2 — Day 7: Connection Invitation**
+
 ```
 Subject: One simple way to go deeper
 
@@ -111,7 +117,7 @@ Hi [First Name],
 
 It's been a week since you first visited, and we've been thinking about you!
 
-The best thing we've found for people who want to go deeper is [small group / Alpha course / 
+The best thing we've found for people who want to go deeper is [small group / Alpha course /
 newcomers' event]. It's [brief description — low commitment, no pressure].
 
 Next one is [Date] at [Time] at [Location].
@@ -123,6 +129,7 @@ See you soon,
 ```
 
 **Email 3 — Day 30: Month-in Check-in**
+
 ```
 Subject: A month in — how are you finding it?
 
@@ -133,7 +140,7 @@ in a long time. Either way, we wanted to check in.
 
 How are you finding things? Is there anything we can do to help you feel more at home?
 
-[If not yet connected:] There's still space in our [small group / newcomers' gathering] — 
+[If not yet connected:] There's still space in our [small group / newcomers' gathering] —
 we'd love to introduce you to a few people.
 
 [If already connected:] It's been brilliant having you around.
@@ -148,6 +155,7 @@ No pressure — just wanted you to know we're still glad you're here.
 ## Announcement Scripts (For Sunday Service)
 
 ### Standard Announcement Script Template
+
 ```
 ANNOUNCEMENT SCRIPT: [Event/Initiative]
 ─────────────────────────────────────────
@@ -165,7 +173,7 @@ WHEN/WHERE: [Date, time, location]
 
 CLOSING LINE: [Brief, warm, not salesy]
 
-[Optional: Personal testimony prompt — "If you've been to [event] before, tell someone 
+[Optional: Personal testimony prompt — "If you've been to [event] before, tell someone
 what it meant to you this week."]
 ```
 
@@ -174,9 +182,11 @@ what it meant to you this week."]
 ## Testimony Features
 
 ### Written Testimony Guide
+
 Help congregation members share their faith story effectively:
 
 **Structure:**
+
 1. **Before** — life before faith (or during a difficult season) — honest, relatable
 2. **The moment** — what happened, what changed, when you encountered God
 3. **After** — what's different now — specific, not overly triumphalistic
@@ -185,6 +195,7 @@ Help congregation members share their faith story effectively:
 **Length:** 300–500 words for written; 2–3 minutes spoken
 
 **Testimony Coaching Notes for the member:**
+
 - You don't need a dramatic story — ordinary faithfulness is powerful
 - Don't feel pressure to have "all the answers" now
 - Speak about your experience, not others'
@@ -195,6 +206,7 @@ Help congregation members share their faith story effectively:
 ## Community Outreach Copy
 
 ### Neighbourhood Event Invitation
+
 ```
 [Event Name]
 [Date] | [Time] | [Location]
@@ -213,6 +225,7 @@ Organised by [Church Name] | [Contact] | [Website]
 ```
 
 ### Alpha / Christianity Explored Invitation
+
 ```
 Subject: Questions about life? This is for you.
 
@@ -220,17 +233,17 @@ What's the point of it all?
 Is there more to life than this?
 What happens when we die?
 
-These are big questions. At [Church Name], we think they deserve honest, 
+These are big questions. At [Church Name], we think they deserve honest,
 pressure-free conversation.
 
-[Alpha / Christianity Explored] is a [X]-week series where you can explore the 
+[Alpha / Christianity Explored] is a [X]-week series where you can explore the
 Christian faith with complete freedom to doubt, disagree, and ask anything.
 
 Starting: [Date]
 Day/Time: [Details]
 Venue: [Location + online option if applicable]
 
-No experience required. No commitment implied. Just honest conversation, 
+No experience required. No commitment implied. Just honest conversation,
 good food, and real community.
 
 [Registration link / contact]

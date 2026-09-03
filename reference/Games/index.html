@@ -1,270 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clawix Game</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #0a0a10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    color: #e2e0d8;
-  }
-  #hud-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 800px;
-    padding: 10px 0 8px;
-    font-size: 13px;
-    color: #888780;
-  }
-  #hud-title  { font-weight: 500; font-size: 15px; color: #c2c0b6; }
-  #hud-score  { font-variant-numeric: tabular-nums; color: #EF9F27; font-weight: 500; }
-  #hud-panel  { font-size: 11px; color: #534AB7; letter-spacing: 0.04em; }
-  #canvas     { display: block; border-radius: 10px; border: 1px solid #2c2c2a; transition: background 1s; }
-  #premise    { width: 800px; padding: 8px 0 0; font-size: 11px; color: #444441; font-style: italic; text-align: center; min-height: 18px; }
-  #hud-message{ width: 800px; padding: 4px 0 0; font-size: 12px; color: #5F5E5A; text-align: center; min-height: 18px; }
-  #ws-status  { margin-top: 10px; font-size: 11px; color: #444; display: flex; align-items: center; gap: 6px; }
-  .dot { width: 7px; height: 7px; border-radius: 50%; background: #444; transition: background 0.3s; }
-  .dot.connected { background: #1D9E75; }
-  .dot.error     { background: #E24B4A; }
-  /* Lighting mood overlays */
-  #mood-overlay { position: absolute; pointer-events: none; border-radius: 10px; transition: opacity 1s; }
-</style>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Clawix Game</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        background: #0a0a10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+        color: #e2e0d8;
+      }
+      #hud-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 800px;
+        padding: 10px 0 8px;
+        font-size: 13px;
+        color: #888780;
+      }
+      #hud-title {
+        font-weight: 500;
+        font-size: 15px;
+        color: #c2c0b6;
+      }
+      #hud-score {
+        font-variant-numeric: tabular-nums;
+        color: #ef9f27;
+        font-weight: 500;
+      }
+      #hud-panel {
+        font-size: 11px;
+        color: #534ab7;
+        letter-spacing: 0.04em;
+      }
+      #canvas {
+        display: block;
+        border-radius: 10px;
+        border: 1px solid #2c2c2a;
+        transition: background 1s;
+      }
+      #premise {
+        width: 800px;
+        padding: 8px 0 0;
+        font-size: 11px;
+        color: #444441;
+        font-style: italic;
+        text-align: center;
+        min-height: 18px;
+      }
+      #hud-message {
+        width: 800px;
+        padding: 4px 0 0;
+        font-size: 12px;
+        color: #5f5e5a;
+        text-align: center;
+        min-height: 18px;
+      }
+      #ws-status {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #444;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #444;
+        transition: background 0.3s;
+      }
+      .dot.connected {
+        background: #1d9e75;
+      }
+      .dot.error {
+        background: #e24b4a;
+      }
+      /* Lighting mood overlays */
+      #mood-overlay {
+        position: absolute;
+        pointer-events: none;
+        border-radius: 10px;
+        transition: opacity 1s;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="hud-bar">
+      <span id="hud-title">Clawix Game</span>
+      <span id="hud-panel"></span>
+      <span id="hud-score">Score: 0</span>
+    </div>
 
-<div id="hud-bar">
-  <span id="hud-title">Clawix Game</span>
-  <span id="hud-panel"></span>
-  <span id="hud-score">Score: 0</span>
-</div>
+    <div style="position: relative; display: inline-block">
+      <canvas id="canvas" width="800" height="500"></canvas>
+      <canvas
+        id="mood-overlay"
+        width="800"
+        height="500"
+        style="position: absolute; top: 0; left: 0; opacity: 0"
+      ></canvas>
+    </div>
 
-<div style="position:relative;display:inline-block">
-  <canvas id="canvas" width="800" height="500"></canvas>
-  <canvas id="mood-overlay" width="800" height="500" style="position:absolute;top:0;left:0;opacity:0"></canvas>
-</div>
+    <div id="premise"></div>
+    <div id="hud-message">Waiting for storyboard…</div>
 
-<div id="premise"></div>
-<div id="hud-message">Waiting for storyboard…</div>
+    <div id="ws-status">
+      <div class="dot" id="dot"></div>
+      <span id="ws-label">Connecting to ws://localhost:9090…</span>
+    </div>
 
-<div id="ws-status">
-  <div class="dot" id="dot"></div>
-  <span id="ws-label">Connecting to ws://localhost:9090…</span>
-</div>
+    <script>
+      const canvas = document.getElementById('canvas');
+      const overlay = document.getElementById('mood-overlay');
+      const ctx = canvas.getContext('2d');
+      const octx = overlay.getContext('2d');
+      const dot = document.getElementById('dot');
+      const wsLabel = document.getElementById('ws-label');
+      const hudTitle = document.getElementById('hud-title');
+      const hudScore = document.getElementById('hud-score');
+      const hudPanel = document.getElementById('hud-panel');
+      const hudMessage = document.getElementById('hud-message');
+      const premiseEl = document.getElementById('premise');
 
-<script>
-const canvas      = document.getElementById('canvas')
-const overlay     = document.getElementById('mood-overlay')
-const ctx         = canvas.getContext('2d')
-const octx        = overlay.getContext('2d')
-const dot         = document.getElementById('dot')
-const wsLabel     = document.getElementById('ws-label')
-const hudTitle    = document.getElementById('hud-title')
-const hudScore    = document.getElementById('hud-score')
-const hudPanel    = document.getElementById('hud-panel')
-const hudMessage  = document.getElementById('hud-message')
-const premiseEl   = document.getElementById('premise')
+      let state = null;
+      let particles = [];
 
-let state = null
-let particles = []
+      // ── MOOD OVERLAY ──────────────────────────────────────────────
 
-// ── MOOD OVERLAY ──────────────────────────────────────────────
+      const moodSettings = {
+        bright: { overlayColor: null, gridAlpha: 0.08 },
+        dim: { overlayColor: 'rgba(0,0,0,0.2)', gridAlpha: 0.04 },
+        dark: { overlayColor: 'rgba(0,0,0,0.5)', gridAlpha: 0.025 },
+        golden: { overlayColor: 'rgba(180,100,0,0.12)', gridAlpha: 0.06 },
+        cold: { overlayColor: 'rgba(30,60,120,0.18)', gridAlpha: 0.04 },
+      };
 
-const moodSettings = {
-  bright: { overlayColor: null,              gridAlpha: 0.08 },
-  dim:    { overlayColor: 'rgba(0,0,0,0.2)', gridAlpha: 0.04 },
-  dark:   { overlayColor: 'rgba(0,0,0,0.5)', gridAlpha: 0.025 },
-  golden: { overlayColor: 'rgba(180,100,0,0.12)', gridAlpha: 0.06 },
-  cold:   { overlayColor: 'rgba(30,60,120,0.18)',  gridAlpha: 0.04 },
-}
+      function applyMoodOverlay(mood) {
+        const s = moodSettings[mood] || moodSettings.dim;
+        octx.clearRect(0, 0, overlay.width, overlay.height);
+        if (s.overlayColor) {
+          octx.fillStyle = s.overlayColor;
+          octx.fillRect(0, 0, overlay.width, overlay.height);
+          overlay.style.opacity = '1';
+        } else {
+          overlay.style.opacity = '0';
+        }
+        return s.gridAlpha;
+      }
 
-function applyMoodOverlay(mood) {
-  const s = moodSettings[mood] || moodSettings.dim
-  octx.clearRect(0, 0, overlay.width, overlay.height)
-  if (s.overlayColor) {
-    octx.fillStyle = s.overlayColor
-    octx.fillRect(0, 0, overlay.width, overlay.height)
-    overlay.style.opacity = '1'
-  } else {
-    overlay.style.opacity = '0'
-  }
-  return s.gridAlpha
-}
+      // ── AMBIENT PARTICLES ─────────────────────────────────────────
 
-// ── AMBIENT PARTICLES ─────────────────────────────────────────
+      function spawnParticles(W, H) {
+        particles = Array.from({ length: 30 }, () => ({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: 1 + Math.random() * 2,
+          vy: -0.2 - Math.random() * 0.3,
+          alpha: 0.1 + Math.random() * 0.3,
+        }));
+      }
 
-function spawnParticles(W, H) {
-  particles = Array.from({ length: 30 }, () => ({
-    x: Math.random() * W,
-    y: Math.random() * H,
-    r: 1 + Math.random() * 2,
-    vy: -0.2 - Math.random() * 0.3,
-    alpha: 0.1 + Math.random() * 0.3,
-  }))
-}
+      function updateParticles(W, H) {
+        for (const p of particles) {
+          p.y += p.vy;
+          if (p.y < -4) {
+            p.y = H + 4;
+            p.x = Math.random() * W;
+          }
+        }
+      }
 
-function updateParticles(W, H) {
-  for (const p of particles) {
-    p.y += p.vy
-    if (p.y < -4) { p.y = H + 4; p.x = Math.random() * W }
-  }
-}
+      // ── RENDERER ──────────────────────────────────────────────────
 
-// ── RENDERER ──────────────────────────────────────────────────
+      function render(s) {
+        const W = s.width,
+          H = s.height;
+        const theme = s.theme || {
+          backgroundColor: '#0f0f14',
+          lightingMood: 'dark',
+          gridVisible: true,
+          ambientParticles: false,
+        };
 
-function render(s) {
-  const W = s.width, H = s.height
-  const theme = s.theme || { backgroundColor: '#0f0f14', lightingMood: 'dark', gridVisible: true, ambientParticles: false }
+        if (canvas.width !== W || canvas.height !== H) {
+          canvas.width = overlay.width = W;
+          canvas.height = overlay.height = H;
+          if (theme.ambientParticles) spawnParticles(W, H);
+        }
 
-  if (canvas.width !== W || canvas.height !== H) {
-    canvas.width = overlay.width = W
-    canvas.height = overlay.height = H
-    if (theme.ambientParticles) spawnParticles(W, H)
-  }
+        canvas.style.background = theme.backgroundColor;
 
-  canvas.style.background = theme.backgroundColor
+        ctx.clearRect(0, 0, W, H);
+        const gridAlpha = applyMoodOverlay(theme.lightingMood);
 
-  ctx.clearRect(0, 0, W, H)
-  const gridAlpha = applyMoodOverlay(theme.lightingMood)
+        // Grid
+        if (theme.gridVisible) {
+          ctx.strokeStyle = `rgba(255,255,255,${gridAlpha})`;
+          ctx.lineWidth = 0.5;
+          for (let x = 0; x < W; x += 40) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, H);
+            ctx.stroke();
+          }
+          for (let y = 0; y < H; y += 40) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(W, y);
+            ctx.stroke();
+          }
+        }
 
-  // Grid
-  if (theme.gridVisible) {
-    ctx.strokeStyle = `rgba(255,255,255,${gridAlpha})`
-    ctx.lineWidth = 0.5
-    for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke() }
-    for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke() }
-  }
+        // Ambient particles
+        if (theme.ambientParticles && particles.length) {
+          updateParticles(W, H);
+          for (const p of particles) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(200,180,255,${p.alpha})`;
+            ctx.fill();
+          }
+        }
 
-  // Ambient particles
-  if (theme.ambientParticles && particles.length) {
-    updateParticles(W, H)
-    for (const p of particles) {
-      ctx.beginPath()
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-      ctx.fillStyle = `rgba(200,180,255,${p.alpha})`
-      ctx.fill()
-    }
-  }
+        // Coins
+        for (const coin of s.coins) {
+          if (coin.collected) continue;
+          ctx.beginPath();
+          ctx.arc(coin.pos.x, coin.pos.y, 10, 0, Math.PI * 2);
+          ctx.fillStyle = '#EF9F27';
+          ctx.fill();
+          ctx.strokeStyle = '#BA7517';
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = '#412402';
+          ctx.font = 'bold 8px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(coin.value, coin.pos.x, coin.pos.y);
+        }
 
-  // Coins
-  for (const coin of s.coins) {
-    if (coin.collected) continue
-    ctx.beginPath()
-    ctx.arc(coin.pos.x, coin.pos.y, 10, 0, Math.PI * 2)
-    ctx.fillStyle = '#EF9F27'
-    ctx.fill()
-    ctx.strokeStyle = '#BA7517'; ctx.lineWidth = 1.5; ctx.stroke()
-    ctx.fillStyle = '#412402'; ctx.font = 'bold 8px sans-serif'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillText(coin.value, coin.pos.x, coin.pos.y)
-  }
+        // Players
+        for (const p of Object.values(s.players)) {
+          if (!p.alive) continue;
+          // Shadow
+          ctx.beginPath();
+          ctx.ellipse(p.pos.x, p.pos.y + p.size - 4, p.size * 0.7, 5, 0, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(0,0,0,0.4)';
+          ctx.fill();
+          // Body
+          ctx.beginPath();
+          ctx.arc(p.pos.x, p.pos.y, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.fill();
+          ctx.strokeStyle = lighten(p.color, 40);
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Velocity trail
+          const spd = Math.sqrt(p.vel.x ** 2 + p.vel.y ** 2);
+          if (spd > 0.5) {
+            ctx.beginPath();
+            ctx.moveTo(p.pos.x, p.pos.y);
+            ctx.lineTo(p.pos.x + p.vel.x * 3, p.pos.y + p.vel.y * 3);
+            ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+          }
+          // Label
+          ctx.fillStyle = '#fff';
+          ctx.font = '11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+          ctx.fillText(p.label, p.pos.x, p.pos.y - p.size - 4);
+        }
 
-  // Players
-  for (const p of Object.values(s.players)) {
-    if (!p.alive) continue
-    // Shadow
-    ctx.beginPath()
-    ctx.ellipse(p.pos.x, p.pos.y + p.size - 4, p.size * 0.7, 5, 0, 0, Math.PI * 2)
-    ctx.fillStyle = 'rgba(0,0,0,0.4)'; ctx.fill()
-    // Body
-    ctx.beginPath()
-    ctx.arc(p.pos.x, p.pos.y, p.size, 0, Math.PI * 2)
-    ctx.fillStyle = p.color; ctx.fill()
-    ctx.strokeStyle = lighten(p.color, 40); ctx.lineWidth = 2; ctx.stroke()
-    // Velocity trail
-    const spd = Math.sqrt(p.vel.x**2 + p.vel.y**2)
-    if (spd > 0.5) {
-      ctx.beginPath(); ctx.moveTo(p.pos.x, p.pos.y)
-      ctx.lineTo(p.pos.x + p.vel.x * 3, p.pos.y + p.vel.y * 3)
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)'; ctx.lineWidth = 2; ctx.stroke()
-    }
-    // Label
-    ctx.fillStyle = '#fff'; ctx.font = '11px sans-serif'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'bottom'
-    ctx.fillText(p.label, p.pos.x, p.pos.y - p.size - 4)
-  }
+        // Tick
+        ctx.fillStyle = 'rgba(255,255,255,0.08)';
+        ctx.font = '10px monospace';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText(`tick ${s.tick}`, W - 8, H - 6);
 
-  // Tick
-  ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.font = '10px monospace'
-  ctx.textAlign = 'right'; ctx.textBaseline = 'bottom'
-  ctx.fillText(`tick ${s.tick}`, W - 8, H - 6)
+        // Storyboard gate overlay
+        if (!s.storyboardLoaded) {
+          ctx.fillStyle = 'rgba(10,10,20,0.75)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = '#534AB7';
+          ctx.font = '500 15px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Produce and approve a storyboard to begin', W / 2, H / 2 - 14);
+          ctx.fillStyle = '#3C3489';
+          ctx.font = '12px sans-serif';
+          ctx.fillText(
+            'storyboard_director → produce_storyboard → approve_storyboard → load_storyboard',
+            W / 2,
+            H / 2 + 12,
+          );
+        } else if (!s.running) {
+          ctx.fillStyle = 'rgba(10,10,20,0.55)';
+          ctx.fillRect(0, 0, W, H);
+          ctx.fillStyle = '#888780';
+          ctx.font = '14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('Storyboard loaded — call start_game to begin', W / 2, H / 2);
+        }
+      }
 
-  // Storyboard gate overlay
-  if (!s.storyboardLoaded) {
-    ctx.fillStyle = 'rgba(10,10,20,0.75)'
-    ctx.fillRect(0, 0, W, H)
-    ctx.fillStyle = '#534AB7'; ctx.font = '500 15px sans-serif'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillText('Produce and approve a storyboard to begin', W / 2, H / 2 - 14)
-    ctx.fillStyle = '#3C3489'; ctx.font = '12px sans-serif'
-    ctx.fillText('storyboard_director → produce_storyboard → approve_storyboard → load_storyboard', W / 2, H / 2 + 12)
-  } else if (!s.running) {
-    ctx.fillStyle = 'rgba(10,10,20,0.55)'
-    ctx.fillRect(0, 0, W, H)
-    ctx.fillStyle = '#888780'; ctx.font = '14px sans-serif'
-    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-    ctx.fillText('Storyboard loaded — call start_game to begin', W / 2, H / 2)
-  }
-}
+      function lighten(hex, amt) {
+        const n = parseInt(hex.replace('#', ''), 16);
+        return `rgb(${Math.min(255, (n >> 16) + amt)},${Math.min(255, ((n >> 8) & 0xff) + amt)},${Math.min(255, (n & 0xff) + amt)})`;
+      }
 
-function lighten(hex, amt) {
-  const n = parseInt(hex.replace('#',''), 16)
-  return `rgb(${Math.min(255,(n>>16)+amt)},${Math.min(255,((n>>8)&0xff)+amt)},${Math.min(255,(n&0xff)+amt)})`
-}
+      // ── WEBSOCKET ─────────────────────────────────────────────────
 
-// ── WEBSOCKET ─────────────────────────────────────────────────
+      function connect() {
+        const ws = new WebSocket('ws://localhost:9090');
 
-function connect() {
-  const ws = new WebSocket('ws://localhost:9090')
+        ws.onopen = () => {
+          dot.className = 'dot connected';
+          wsLabel.textContent = 'Connected — game server live';
+        };
 
-  ws.onopen = () => {
-    dot.className = 'dot connected'
-    wsLabel.textContent = 'Connected — game server live'
-  }
+        ws.onmessage = (evt) => {
+          const msg = JSON.parse(evt.data);
+          if (msg.type === 'state') {
+            state = msg.payload;
+            hudTitle.textContent = state.hud.title;
+            hudScore.textContent = `Score: ${state.hud.score}`;
+            hudMessage.textContent = state.hud.message;
+            hudPanel.textContent = state.currentPanelId ? `Panel ${state.currentPanelId}` : '';
+            premiseEl.textContent = state.premise ? `"${state.premise.slice(0, 120)}…"` : '';
+            render(state);
+          }
+        };
 
-  ws.onmessage = (evt) => {
-    const msg = JSON.parse(evt.data)
-    if (msg.type === 'state') {
-      state = msg.payload
-      hudTitle.textContent   = state.hud.title
-      hudScore.textContent   = `Score: ${state.hud.score}`
-      hudMessage.textContent = state.hud.message
-      hudPanel.textContent   = state.currentPanelId ? `Panel ${state.currentPanelId}` : ''
-      premiseEl.textContent  = state.premise ? `"${state.premise.slice(0, 120)}…"` : ''
-      render(state)
-    }
-  }
+        ws.onclose = () => {
+          dot.className = 'dot error';
+          wsLabel.textContent = 'Disconnected — retrying in 2s…';
+          setTimeout(connect, 2000);
+        };
 
-  ws.onclose = () => {
-    dot.className = 'dot error'
-    wsLabel.textContent = 'Disconnected — retrying in 2s…'
-    setTimeout(connect, 2000)
-  }
+        ws.onerror = () => {
+          dot.className = 'dot error';
+          wsLabel.textContent = 'Cannot reach ws://localhost:9090';
+        };
+      }
 
-  ws.onerror = () => {
-    dot.className = 'dot error'
-    wsLabel.textContent = 'Cannot reach ws://localhost:9090'
-  }
-}
+      connect();
 
-connect()
-
-// Initial paint
-render({
-  running: false, tick: 0, width: 800, height: 500,
-  players: {}, coins: [],
-  hud: { title: 'Clawix Game', message: '', score: 0 },
-  theme: { backgroundColor: '#0f0f14', lightingMood: 'dark', gridVisible: true, ambientParticles: false },
-  storyboardLoaded: false, currentPanelId: null, premise: '',
-})
-</script>
-</body>
+      // Initial paint
+      render({
+        running: false,
+        tick: 0,
+        width: 800,
+        height: 500,
+        players: {},
+        coins: [],
+        hud: { title: 'Clawix Game', message: '', score: 0 },
+        theme: {
+          backgroundColor: '#0f0f14',
+          lightingMood: 'dark',
+          gridVisible: true,
+          ambientParticles: false,
+        },
+        storyboardLoaded: false,
+        currentPanelId: null,
+        premise: '',
+      });
+    </script>
+  </body>
 </html>

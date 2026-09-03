@@ -1,406 +1,635 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruth in the Field of Boaz</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; }
-
-  .header { background: linear-gradient(135deg, #1a1208, #120e06); padding: 16px 24px; border-bottom: 1px solid #2a1e0a; }
-  .header h1 { font-size: 20px; color: #fff; }
-  .header h1 span { color: #d4831a; }
-  .header .subtitle { color: #7a5a2a; font-size: 12px; margin-top: 2px; }
-
-  .stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; position: relative; }
-  .game-wrap { position: relative; width: 800px; height: 500px; border-radius: 10px; overflow: hidden; box-shadow: 0 0 0 1px #2a1e0a; }
-
-  canvas { position: absolute; top: 0; left: 0; display: block; }
-  #game-canvas { background: #120a0a; z-index: 1; }
-  #mood-overlay { z-index: 2; pointer-events: none; opacity: 0; transition: opacity 1.2s; }
-
-  .hud { position: absolute; top: 12px; left: 12px; z-index: 5; display: flex; gap: 10px; font-size: 13px; color: #e8c87a; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
-  .hud .pill { background: rgba(18,10,4,0.75); border: 1px solid #3a2a0a; border-radius: 999px; padding: 4px 12px; }
-
-  .caption { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); z-index: 5; max-width: 82%; text-align: center; background: rgba(12,8,2,0.82); border: 1px solid #3a2a0a; border-radius: 8px; padding: 10px 18px; font-size: 13px; color: #d4ae6a; font-style: italic; opacity: 0; transition: opacity 0.7s; }
-  .caption.visible { opacity: 1; }
-
-  .overlay-screen { position: absolute; inset: 0; z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; background: rgba(8,4,2,0.93); gap: 16px; }
-  .overlay-screen.hidden { display: none; }
-  .overlay-screen h2 { font-size: 26px; color: #e8c87a; font-weight: 300; letter-spacing: 0.04em; }
-  .overlay-screen .premise { max-width: 520px; color: #9a7a4a; font-size: 14px; line-height: 1.65; }
-  .overlay-screen .verse { max-width: 480px; color: #d4831a; font-style: italic; font-size: 14px; border-left: 2px solid rgba(212,131,26,0.4); padding-left: 14px; text-align: left; }
-
-  .btn { padding: 12px 32px; border: none; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em; }
-  .btn-primary { background: #c47a18; color: #fff8e8; }
-  .btn-primary:hover { background: #e0921e; }
-  .btn-secondary { background: #2a1e0a; color: #c4986a; border: 1px solid #3a2a14; }
-  .btn-secondary:hover { background: #3a2a14; color: #e8c87a; }
-
-  .keys-hint { position: absolute; bottom: 14px; right: 14px; z-index: 5; font-size: 10px; color: #4a3a1a; }
-</style>
-</head>
-<body>
-
-<div class="header">
-  <h1><span>Ruth in the Field of Boaz</span></h1>
-  <div class="subtitle">collector · youth group · Ruth 1–2</div>
-</div>
-
-<div class="stage">
-  <div class="game-wrap" id="gameWrap">
-    <canvas id="game-canvas" width="800" height="500"></canvas>
-    <canvas id="mood-overlay" width="800" height="500"></canvas>
-
-    <div class="hud" id="hud">
-      <span class="pill" id="hudPanel">Scene 1</span>
-      <span class="pill" id="hudScore">Gleaned: 0</span>
-    </div>
-
-    <div class="caption" id="caption"></div>
-    <div class="keys-hint" id="keysHint">Arrow keys or WASD to move</div>
-
-    <div class="overlay-screen" id="startScreen">
-      <h2>Ruth in the Field of Boaz</h2>
-      <p class="premise">Faithfulness finds you a place when the world has moved on. Move through four scenes as Ruth — from the vow on the road to the meal at the threshing floor. Gather every sheaf that remains.</p>
-      <p class="verse">"Where you go, I will go. Where you die, I will die." — Ruth 1:16–17</p>
-      <button class="btn btn-primary" onclick="startGame()">Begin</button>
-    </div>
-
-    <div class="overlay-screen hidden" id="endScreen">
-      <h2 id="endTitle">The harvest is in.</h2>
-      <p class="premise" id="endLine"></p>
-      <button class="btn btn-secondary" onclick="restartGame()">Play again</button>
-    </div>
-  </div>
-</div>
-
-<script>
-  // Ruth in the Field of Boaz — JavaScript
-  // All scene data driven by the approved storyboard.
-
-  const PANELS = [
-    {
-      id: 'SB-001', backgroundColor: '#120a0a', lightingMood: 'dim', ambientParticles: false,
-      caption: '"Where you go, I will go. Where you die, I will die." (Ruth 1:16–17)',
-      grainCount: 2,
-    },
-    {
-      id: 'SB-002', backgroundColor: '#0f0a06', lightingMood: 'dark', ambientParticles: false,
-      caption: '"Is this Naomi?" The town barely recognised her.',
-      grainCount: 2,
-    },
-    {
-      id: 'SB-003', backgroundColor: '#1a0f04', lightingMood: 'golden', ambientParticles: true,
-      caption: '"Do not go to glean in another field, but keep close to my young women." (Ruth 2:8)',
-      grainCount: 2,
-    },
-    {
-      id: 'SB-004', backgroundColor: '#14100a', lightingMood: 'golden', ambientParticles: true,
-      caption: '"She ate until she was satisfied, and she had some left over." (Ruth 2:14)',
-      grainCount: 2,
-    },
-  ];
-
-  const GRAVITY   = 0;
-  const FRICTION  = 0.95;
-  const COIN_VALUE = 25;
-
-  let panelIndex = 0;
-  let score = 0;
-  let running = false;
-  let particles = [];
-  let grain = [];
-  let panelGrainCollected = 0;
-  let transitioning = false;
-
-  const player = { x: 400, y: 250, vx: 0, vy: 0, size: 13, color: '#F5E6C8' };
-
-  // ── Mood overlay ───────────────────────────────────────────
-
-  const moodSettings = {
-    dim:    { overlayColor: 'rgba(0,0,0,0.25)',          gridAlpha: 0.04, gridR: 200, gridG: 150, gridB: 60  },
-    dark:   { overlayColor: 'rgba(0,0,0,0.50)',          gridAlpha: 0.02, gridR: 140, gridG: 90,  gridB: 30  },
-    golden: { overlayColor: 'rgba(160,80,0,0.14)',       gridAlpha: 0.07, gridR: 255, gridG: 200, gridB: 80  },
-    bright: { overlayColor: null,                        gridAlpha: 0.09, gridR: 255, gridG: 230, gridB: 150 },
-    cold:   { overlayColor: 'rgba(30,60,120,0.18)',      gridAlpha: 0.04, gridR: 180, gridG: 200, gridB: 255 },
-  };
-
-  function applyMoodOverlay(octx, overlayCanvas, mood) {
-    const s = moodSettings[mood] || moodSettings.dim;
-    octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-    if (s.overlayColor) {
-      octx.fillStyle = s.overlayColor;
-      octx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-      overlayCanvas.style.opacity = '1';
-    } else {
-      overlayCanvas.style.opacity = '0';
-    }
-    return s;
-  }
-
-  // ── Ambient particles (warm golden dust) ──────────────────
-
-  function spawnParticles(w, h) {
-    particles = Array.from({ length: 35 }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      r: 0.8 + Math.random() * 1.8,
-      vy: -0.12 - Math.random() * 0.18,
-      vx: (Math.random() - 0.5) * 0.1,
-      alpha: 0.12 + Math.random() * 0.3,
-    }));
-  }
-
-  function updateParticles(w, h) {
-    for (const p of particles) {
-      p.y += p.vy;
-      p.x += p.vx;
-      if (p.y < -4) { p.y = h + 4; p.x = Math.random() * w; }
-      if (p.x < 0 || p.x > w) p.x = Math.random() * w;
-    }
-  }
-
-  function drawParticles(ctx) {
-    for (const p of particles) {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255,210,90,${p.alpha})`;
-      ctx.fill();
-    }
-  }
-
-  // ── Grain sheaves ─────────────────────────────────────────
-
-  function spawnGrain(count, w, h) {
-    grain = Array.from({ length: count }, () => ({
-      x: 80 + Math.random() * (w - 160),
-      y: 80 + Math.random() * (h - 160),
-      collected: false,
-      pulse: Math.random() * Math.PI * 2,
-    }));
-    panelGrainCollected = 0;
-  }
-
-  function updateGrain() {
-    for (const g of grain) {
-      if (g.collected) continue;
-      g.pulse += 0.045;
-      const dx = player.x - g.x, dy = player.y - g.y;
-      if (Math.sqrt(dx * dx + dy * dy) < player.size + 16) {
-        g.collected = true;
-        panelGrainCollected++;
-        score += COIN_VALUE;
-        document.getElementById('hudScore').textContent = 'Gleaned: ' + score;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ruth in the Field of Boaz</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-    }
-  }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0f0f1a;
+        color: #e0e0e0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
 
-  function drawGrain(ctx) {
-    for (const g of grain) {
-      if (g.collected) continue;
-      const glow = 0.5 + 0.5 * Math.sin(g.pulse);
+      .header {
+        background: linear-gradient(135deg, #1a1208, #120e06);
+        padding: 16px 24px;
+        border-bottom: 1px solid #2a1e0a;
+      }
+      .header h1 {
+        font-size: 20px;
+        color: #fff;
+      }
+      .header h1 span {
+        color: #d4831a;
+      }
+      .header .subtitle {
+        color: #7a5a2a;
+        font-size: 12px;
+        margin-top: 2px;
+      }
 
-      // Outer radial glow
-      const grad = ctx.createRadialGradient(g.x, g.y, 3, g.x, g.y, 20);
-      grad.addColorStop(0,   `rgba(255,210,60,${0.85 + glow * 0.1})`);
-      grad.addColorStop(0.45,`rgba(210,140,20,${0.5 + glow * 0.2})`);
-      grad.addColorStop(1,   'rgba(160,80,0,0)');
-      ctx.beginPath();
-      ctx.arc(g.x, g.y, 20, 0, Math.PI * 2);
-      ctx.fillStyle = grad;
-      ctx.fill();
+      .stage {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        position: relative;
+      }
+      .game-wrap {
+        position: relative;
+        width: 800px;
+        height: 500px;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 0 0 1px #2a1e0a;
+      }
 
-      // Sheaf body — three vertical strokes
-      ctx.strokeStyle = `rgba(255,220,80,${0.8 + glow * 0.2})`;
-      ctx.lineWidth = 2;
-      for (let i = -1; i <= 1; i++) {
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: block;
+      }
+      #game-canvas {
+        background: #120a0a;
+        z-index: 1;
+      }
+      #mood-overlay {
+        z-index: 2;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 1.2s;
+      }
+
+      .hud {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        z-index: 5;
+        display: flex;
+        gap: 10px;
+        font-size: 13px;
+        color: #e8c87a;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+      }
+      .hud .pill {
+        background: rgba(18, 10, 4, 0.75);
+        border: 1px solid #3a2a0a;
+        border-radius: 999px;
+        padding: 4px 12px;
+      }
+
+      .caption {
+        position: absolute;
+        bottom: 14px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        max-width: 82%;
+        text-align: center;
+        background: rgba(12, 8, 2, 0.82);
+        border: 1px solid #3a2a0a;
+        border-radius: 8px;
+        padding: 10px 18px;
+        font-size: 13px;
+        color: #d4ae6a;
+        font-style: italic;
+        opacity: 0;
+        transition: opacity 0.7s;
+      }
+      .caption.visible {
+        opacity: 1;
+      }
+
+      .overlay-screen {
+        position: absolute;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px;
+        background: rgba(8, 4, 2, 0.93);
+        gap: 16px;
+      }
+      .overlay-screen.hidden {
+        display: none;
+      }
+      .overlay-screen h2 {
+        font-size: 26px;
+        color: #e8c87a;
+        font-weight: 300;
+        letter-spacing: 0.04em;
+      }
+      .overlay-screen .premise {
+        max-width: 520px;
+        color: #9a7a4a;
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .overlay-screen .verse {
+        max-width: 480px;
+        color: #d4831a;
+        font-style: italic;
+        font-size: 14px;
+        border-left: 2px solid rgba(212, 131, 26, 0.4);
+        padding-left: 14px;
+        text-align: left;
+      }
+
+      .btn {
+        padding: 12px 32px;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        letter-spacing: 0.03em;
+      }
+      .btn-primary {
+        background: #c47a18;
+        color: #fff8e8;
+      }
+      .btn-primary:hover {
+        background: #e0921e;
+      }
+      .btn-secondary {
+        background: #2a1e0a;
+        color: #c4986a;
+        border: 1px solid #3a2a14;
+      }
+      .btn-secondary:hover {
+        background: #3a2a14;
+        color: #e8c87a;
+      }
+
+      .keys-hint {
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        z-index: 5;
+        font-size: 10px;
+        color: #4a3a1a;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1><span>Ruth in the Field of Boaz</span></h1>
+      <div class="subtitle">collector · youth group · Ruth 1–2</div>
+    </div>
+
+    <div class="stage">
+      <div class="game-wrap" id="gameWrap">
+        <canvas id="game-canvas" width="800" height="500"></canvas>
+        <canvas id="mood-overlay" width="800" height="500"></canvas>
+
+        <div class="hud" id="hud">
+          <span class="pill" id="hudPanel">Scene 1</span>
+          <span class="pill" id="hudScore">Gleaned: 0</span>
+        </div>
+
+        <div class="caption" id="caption"></div>
+        <div class="keys-hint" id="keysHint">Arrow keys or WASD to move</div>
+
+        <div class="overlay-screen" id="startScreen">
+          <h2>Ruth in the Field of Boaz</h2>
+          <p class="premise">
+            Faithfulness finds you a place when the world has moved on. Move through four scenes as
+            Ruth — from the vow on the road to the meal at the threshing floor. Gather every sheaf
+            that remains.
+          </p>
+          <p class="verse">"Where you go, I will go. Where you die, I will die." — Ruth 1:16–17</p>
+          <button class="btn btn-primary" onclick="startGame()">Begin</button>
+        </div>
+
+        <div class="overlay-screen hidden" id="endScreen">
+          <h2 id="endTitle">The harvest is in.</h2>
+          <p class="premise" id="endLine"></p>
+          <button class="btn btn-secondary" onclick="restartGame()">Play again</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Ruth in the Field of Boaz — JavaScript
+      // All scene data driven by the approved storyboard.
+
+      const PANELS = [
+        {
+          id: 'SB-001',
+          backgroundColor: '#120a0a',
+          lightingMood: 'dim',
+          ambientParticles: false,
+          caption: '"Where you go, I will go. Where you die, I will die." (Ruth 1:16–17)',
+          grainCount: 2,
+        },
+        {
+          id: 'SB-002',
+          backgroundColor: '#0f0a06',
+          lightingMood: 'dark',
+          ambientParticles: false,
+          caption: '"Is this Naomi?" The town barely recognised her.',
+          grainCount: 2,
+        },
+        {
+          id: 'SB-003',
+          backgroundColor: '#1a0f04',
+          lightingMood: 'golden',
+          ambientParticles: true,
+          caption:
+            '"Do not go to glean in another field, but keep close to my young women." (Ruth 2:8)',
+          grainCount: 2,
+        },
+        {
+          id: 'SB-004',
+          backgroundColor: '#14100a',
+          lightingMood: 'golden',
+          ambientParticles: true,
+          caption: '"She ate until she was satisfied, and she had some left over." (Ruth 2:14)',
+          grainCount: 2,
+        },
+      ];
+
+      const GRAVITY = 0;
+      const FRICTION = 0.95;
+      const COIN_VALUE = 25;
+
+      let panelIndex = 0;
+      let score = 0;
+      let running = false;
+      let particles = [];
+      let grain = [];
+      let panelGrainCollected = 0;
+      let transitioning = false;
+
+      const player = { x: 400, y: 250, vx: 0, vy: 0, size: 13, color: '#F5E6C8' };
+
+      // ── Mood overlay ───────────────────────────────────────────
+
+      const moodSettings = {
+        dim: {
+          overlayColor: 'rgba(0,0,0,0.25)',
+          gridAlpha: 0.04,
+          gridR: 200,
+          gridG: 150,
+          gridB: 60,
+        },
+        dark: {
+          overlayColor: 'rgba(0,0,0,0.50)',
+          gridAlpha: 0.02,
+          gridR: 140,
+          gridG: 90,
+          gridB: 30,
+        },
+        golden: {
+          overlayColor: 'rgba(160,80,0,0.14)',
+          gridAlpha: 0.07,
+          gridR: 255,
+          gridG: 200,
+          gridB: 80,
+        },
+        bright: { overlayColor: null, gridAlpha: 0.09, gridR: 255, gridG: 230, gridB: 150 },
+        cold: {
+          overlayColor: 'rgba(30,60,120,0.18)',
+          gridAlpha: 0.04,
+          gridR: 180,
+          gridG: 200,
+          gridB: 255,
+        },
+      };
+
+      function applyMoodOverlay(octx, overlayCanvas, mood) {
+        const s = moodSettings[mood] || moodSettings.dim;
+        octx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+        if (s.overlayColor) {
+          octx.fillStyle = s.overlayColor;
+          octx.fillRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+          overlayCanvas.style.opacity = '1';
+        } else {
+          overlayCanvas.style.opacity = '0';
+        }
+        return s;
+      }
+
+      // ── Ambient particles (warm golden dust) ──────────────────
+
+      function spawnParticles(w, h) {
+        particles = Array.from({ length: 35 }, () => ({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 0.8 + Math.random() * 1.8,
+          vy: -0.12 - Math.random() * 0.18,
+          vx: (Math.random() - 0.5) * 0.1,
+          alpha: 0.12 + Math.random() * 0.3,
+        }));
+      }
+
+      function updateParticles(w, h) {
+        for (const p of particles) {
+          p.y += p.vy;
+          p.x += p.vx;
+          if (p.y < -4) {
+            p.y = h + 4;
+            p.x = Math.random() * w;
+          }
+          if (p.x < 0 || p.x > w) p.x = Math.random() * w;
+        }
+      }
+
+      function drawParticles(ctx) {
+        for (const p of particles) {
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255,210,90,${p.alpha})`;
+          ctx.fill();
+        }
+      }
+
+      // ── Grain sheaves ─────────────────────────────────────────
+
+      function spawnGrain(count, w, h) {
+        grain = Array.from({ length: count }, () => ({
+          x: 80 + Math.random() * (w - 160),
+          y: 80 + Math.random() * (h - 160),
+          collected: false,
+          pulse: Math.random() * Math.PI * 2,
+        }));
+        panelGrainCollected = 0;
+      }
+
+      function updateGrain() {
+        for (const g of grain) {
+          if (g.collected) continue;
+          g.pulse += 0.045;
+          const dx = player.x - g.x,
+            dy = player.y - g.y;
+          if (Math.sqrt(dx * dx + dy * dy) < player.size + 16) {
+            g.collected = true;
+            panelGrainCollected++;
+            score += COIN_VALUE;
+            document.getElementById('hudScore').textContent = 'Gleaned: ' + score;
+          }
+        }
+      }
+
+      function drawGrain(ctx) {
+        for (const g of grain) {
+          if (g.collected) continue;
+          const glow = 0.5 + 0.5 * Math.sin(g.pulse);
+
+          // Outer radial glow
+          const grad = ctx.createRadialGradient(g.x, g.y, 3, g.x, g.y, 20);
+          grad.addColorStop(0, `rgba(255,210,60,${0.85 + glow * 0.1})`);
+          grad.addColorStop(0.45, `rgba(210,140,20,${0.5 + glow * 0.2})`);
+          grad.addColorStop(1, 'rgba(160,80,0,0)');
+          ctx.beginPath();
+          ctx.arc(g.x, g.y, 20, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+
+          // Sheaf body — three vertical strokes
+          ctx.strokeStyle = `rgba(255,220,80,${0.8 + glow * 0.2})`;
+          ctx.lineWidth = 2;
+          for (let i = -1; i <= 1; i++) {
+            ctx.beginPath();
+            ctx.moveTo(g.x + i * 3, g.y + 7);
+            ctx.lineTo(g.x + i * 4, g.y - 8);
+            ctx.stroke();
+          }
+          // Binding line
+          ctx.beginPath();
+          ctx.moveTo(g.x - 5, g.y + 1);
+          ctx.lineTo(g.x + 5, g.y + 1);
+          ctx.strokeStyle = `rgba(200,150,40,${0.7})`;
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        }
+      }
+
+      // ── Ruth (player) ─────────────────────────────────────────
+
+      function drawRuth(ctx) {
+        const { x, y, size } = player;
+        const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+
+        // Soft warmth halo
+        const halo = ctx.createRadialGradient(x, y, 0, x, y, size + 10);
+        halo.addColorStop(0, 'rgba(245,220,170,0.22)');
+        halo.addColorStop(1, 'rgba(245,220,170,0)');
         ctx.beginPath();
-        ctx.moveTo(g.x + i * 3, g.y + 7);
-        ctx.lineTo(g.x + i * 4, g.y - 8);
-        ctx.stroke();
+        ctx.arc(x, y, size + 10, 0, Math.PI * 2);
+        ctx.fillStyle = halo;
+        ctx.fill();
+
+        // Cloak (slightly elongated ellipse, warm cream)
+        ctx.beginPath();
+        ctx.ellipse(x, y + 2, size - 2, size + 1, 0, 0, Math.PI * 2);
+        ctx.fillStyle = '#D4B87A';
+        ctx.fill();
+
+        // Face / body circle
+        ctx.beginPath();
+        ctx.arc(x, y - 1, size - 3, 0, Math.PI * 2);
+        ctx.fillStyle = '#F0E0C0';
+        ctx.fill();
+
+        // Direction dot — shows movement direction subtly
+        if (speed > 0.3) {
+          const angle = Math.atan2(player.vy, player.vx);
+          ctx.beginPath();
+          ctx.arc(
+            x + Math.cos(angle) * (size + 2),
+            y + Math.sin(angle) * (size + 2),
+            2,
+            0,
+            Math.PI * 2,
+          );
+          ctx.fillStyle = 'rgba(200,160,60,0.5)';
+          ctx.fill();
+        }
       }
-      // Binding line
-      ctx.beginPath();
-      ctx.moveTo(g.x - 5, g.y + 1);
-      ctx.lineTo(g.x + 5, g.y + 1);
-      ctx.strokeStyle = `rgba(200,150,40,${0.7})`;
-      ctx.lineWidth = 1.5;
-      ctx.stroke();
-    }
-  }
 
-  // ── Ruth (player) ─────────────────────────────────────────
+      // ── Input ─────────────────────────────────────────────────
 
-  function drawRuth(ctx) {
-    const { x, y, size } = player;
-    const speed = Math.sqrt(player.vx * player.vx + player.vy * player.vy);
+      const keys = {};
+      window.addEventListener('keydown', (e) => {
+        keys[e.key] = true;
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+      });
+      window.addEventListener('keyup', (e) => {
+        keys[e.key] = false;
+      });
 
-    // Soft warmth halo
-    const halo = ctx.createRadialGradient(x, y, 0, x, y, size + 10);
-    halo.addColorStop(0,   'rgba(245,220,170,0.22)');
-    halo.addColorStop(1,   'rgba(245,220,170,0)');
-    ctx.beginPath();
-    ctx.arc(x, y, size + 10, 0, Math.PI * 2);
-    ctx.fillStyle = halo;
-    ctx.fill();
+      function updatePlayer(w, h) {
+        const SPEED = 0.55;
+        if (keys['ArrowLeft'] || keys['a'] || keys['A']) player.vx -= SPEED;
+        if (keys['ArrowRight'] || keys['d'] || keys['D']) player.vx += SPEED;
+        if (keys['ArrowUp'] || keys['w'] || keys['W']) player.vy -= SPEED;
+        if (keys['ArrowDown'] || keys['s'] || keys['S']) player.vy += SPEED;
 
-    // Cloak (slightly elongated ellipse, warm cream)
-    ctx.beginPath();
-    ctx.ellipse(x, y + 2, size - 2, size + 1, 0, 0, Math.PI * 2);
-    ctx.fillStyle = '#D4B87A';
-    ctx.fill();
+        player.vx *= FRICTION;
+        player.vy *= FRICTION;
+        player.x += player.vx;
+        player.y += player.vy;
 
-    // Face / body circle
-    ctx.beginPath();
-    ctx.arc(x, y - 1, size - 3, 0, Math.PI * 2);
-    ctx.fillStyle = '#F0E0C0';
-    ctx.fill();
+        if (player.x - player.size < 0) {
+          player.x = player.size;
+          player.vx *= -0.5;
+        }
+        if (player.x + player.size > w) {
+          player.x = w - player.size;
+          player.vx *= -0.5;
+        }
+        if (player.y - player.size < 0) {
+          player.y = player.size;
+          player.vy *= -0.5;
+        }
+        if (player.y + player.size > h) {
+          player.y = h - player.size;
+          player.vy *= -0.5;
+        }
+      }
 
-    // Direction dot — shows movement direction subtly
-    if (speed > 0.3) {
-      const angle = Math.atan2(player.vy, player.vx);
-      ctx.beginPath();
-      ctx.arc(x + Math.cos(angle) * (size + 2), y + Math.sin(angle) * (size + 2), 2, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(200,160,60,0.5)';
-      ctx.fill();
-    }
-  }
+      // ── Panel / scene management ──────────────────────────────
 
-  // ── Input ─────────────────────────────────────────────────
+      function showPanel(i) {
+        panelIndex = i;
+        transitioning = false;
+        const panel = PANELS[i];
 
-  const keys = {};
-  window.addEventListener('keydown', (e) => {
-    keys[e.key] = true;
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) e.preventDefault();
-  });
-  window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+        document.getElementById('gameWrap').style.background = panel.backgroundColor;
+        document.getElementById('hudPanel').textContent = `Scene ${i + 1} of ${PANELS.length}`;
 
-  function updatePlayer(w, h) {
-    const SPEED = 0.55;
-    if (keys['ArrowLeft']  || keys['a'] || keys['A']) player.vx -= SPEED;
-    if (keys['ArrowRight'] || keys['d'] || keys['D']) player.vx += SPEED;
-    if (keys['ArrowUp']    || keys['w'] || keys['W']) player.vy -= SPEED;
-    if (keys['ArrowDown']  || keys['s'] || keys['S']) player.vy += SPEED;
+        const captionEl = document.getElementById('caption');
+        captionEl.textContent = panel.caption;
+        captionEl.classList.add('visible');
+        setTimeout(() => captionEl.classList.remove('visible'), 5500);
 
-    player.vx *= FRICTION;
-    player.vy *= FRICTION;
-    player.x  += player.vx;
-    player.y  += player.vy;
+        if (panel.ambientParticles) spawnParticles(800, 500);
+        else particles = [];
 
-    if (player.x - player.size < 0)  { player.x = player.size;     player.vx *= -0.5; }
-    if (player.x + player.size > w)  { player.x = w - player.size; player.vx *= -0.5; }
-    if (player.y - player.size < 0)  { player.y = player.size;     player.vy *= -0.5; }
-    if (player.y + player.size > h)  { player.y = h - player.size; player.vy *= -0.5; }
-  }
+        spawnGrain(panel.grainCount, 800, 500);
 
-  // ── Panel / scene management ──────────────────────────────
+        // Notify the console iframe
+        window.parent.postMessage({ type: 'game:panel', panelIndex: i }, '*');
+      }
 
-  function showPanel(i) {
-    panelIndex = i;
-    transitioning = false;
-    const panel = PANELS[i];
+      function advancePanel() {
+        if (transitioning) return;
+        transitioning = true;
+        if (panelIndex < PANELS.length - 1) {
+          setTimeout(() => showPanel(panelIndex + 1), 400);
+        } else {
+          setTimeout(endGame, 400);
+        }
+      }
 
-    document.getElementById('gameWrap').style.background = panel.backgroundColor;
-    document.getElementById('hudPanel').textContent = `Scene ${i + 1} of ${PANELS.length}`;
+      // ── Game loop ─────────────────────────────────────────────
 
-    const captionEl = document.getElementById('caption');
-    captionEl.textContent = panel.caption;
-    captionEl.classList.add('visible');
-    setTimeout(() => captionEl.classList.remove('visible'), 5500);
+      function gameTick() {
+        if (!running) return;
 
-    if (panel.ambientParticles) spawnParticles(800, 500);
-    else particles = [];
+        const canvas = document.getElementById('game-canvas');
+        const overlay = document.getElementById('mood-overlay');
+        const ctx = canvas.getContext('2d');
+        const octx = overlay.getContext('2d');
+        const w = canvas.width,
+          h = canvas.height;
 
-    spawnGrain(panel.grainCount, 800, 500);
+        updatePlayer(w, h);
+        updateGrain();
 
-    // Notify the console iframe
-    window.parent.postMessage({ type: 'game:panel', panelIndex: i }, '*');
-  }
+        if (!transitioning && grain.length > 0 && grain.every((g) => g.collected)) {
+          advancePanel();
+        }
 
-  function advancePanel() {
-    if (transitioning) return;
-    transitioning = true;
-    if (panelIndex < PANELS.length - 1) {
-      setTimeout(() => showPanel(panelIndex + 1), 400);
-    } else {
-      setTimeout(endGame, 400);
-    }
-  }
+        ctx.clearRect(0, 0, w, h);
+        const mood = applyMoodOverlay(octx, overlay, PANELS[panelIndex].lightingMood);
 
-  // ── Game loop ─────────────────────────────────────────────
+        // Warm field grid
+        ctx.lineWidth = 0.5;
+        ctx.strokeStyle = `rgba(${mood.gridR},${mood.gridG},${mood.gridB},${mood.gridAlpha})`;
+        for (let x = 0; x < w; x += 40) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, h);
+          ctx.stroke();
+        }
+        for (let y = 0; y < h; y += 40) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(w, y);
+          ctx.stroke();
+        }
 
-  function gameTick() {
-    if (!running) return;
+        if (particles.length) {
+          updateParticles(w, h);
+          drawParticles(ctx);
+        }
 
-    const canvas  = document.getElementById('game-canvas');
-    const overlay = document.getElementById('mood-overlay');
-    const ctx  = canvas.getContext('2d');
-    const octx = overlay.getContext('2d');
-    const w = canvas.width, h = canvas.height;
+        drawGrain(ctx);
+        drawRuth(ctx);
 
-    updatePlayer(w, h);
-    updateGrain();
+        requestAnimationFrame(gameTick);
+      }
 
-    if (!transitioning && grain.length > 0 && grain.every(g => g.collected)) {
-      advancePanel();
-    }
+      // ── Lifecycle ─────────────────────────────────────────────
 
-    ctx.clearRect(0, 0, w, h);
-    const mood = applyMoodOverlay(octx, overlay, PANELS[panelIndex].lightingMood);
+      function startGame() {
+        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('keysHint').style.opacity = '0.5';
+        running = true;
+        window.parent.postMessage({ type: 'game:start' }, '*');
+        showPanel(0);
+        requestAnimationFrame(gameTick);
+      }
 
-    // Warm field grid
-    ctx.lineWidth = 0.5;
-    ctx.strokeStyle = `rgba(${mood.gridR},${mood.gridG},${mood.gridB},${mood.gridAlpha})`;
-    for (let x = 0; x < w; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
-    for (let y = 0; y < h; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+      function restartGame() {
+        document.getElementById('endScreen').classList.add('hidden');
+        panelIndex = 0;
+        score = 0;
+        transitioning = false;
+        player.x = 400;
+        player.y = 250;
+        player.vx = 0;
+        player.vy = 0;
+        document.getElementById('hudScore').textContent = 'Gleaned: 0';
+        running = true;
+        window.parent.postMessage({ type: 'game:start' }, '*');
+        showPanel(0);
+        requestAnimationFrame(gameTick);
+      }
 
-    if (particles.length) { updateParticles(w, h); drawParticles(ctx); }
+      function endGame() {
+        running = false;
+        window.parent.postMessage({ type: 'game:end' }, '*');
+        document.getElementById('endTitle').textContent = 'The harvest is in.';
+        document.getElementById('endLine').textContent =
+          'You belong somewhere you did not expect to belong.';
+        document.getElementById('endScreen').classList.remove('hidden');
+      }
 
-    drawGrain(ctx);
-    drawRuth(ctx);
-
-    requestAnimationFrame(gameTick);
-  }
-
-  // ── Lifecycle ─────────────────────────────────────────────
-
-  function startGame() {
-    document.getElementById('startScreen').classList.add('hidden');
-    document.getElementById('keysHint').style.opacity = '0.5';
-    running = true;
-    window.parent.postMessage({ type: 'game:start' }, '*');
-    showPanel(0);
-    requestAnimationFrame(gameTick);
-  }
-
-  function restartGame() {
-    document.getElementById('endScreen').classList.add('hidden');
-    panelIndex = 0;
-    score = 0;
-    transitioning = false;
-    player.x = 400; player.y = 250; player.vx = 0; player.vy = 0;
-    document.getElementById('hudScore').textContent = 'Gleaned: 0';
-    running = true;
-    window.parent.postMessage({ type: 'game:start' }, '*');
-    showPanel(0);
-    requestAnimationFrame(gameTick);
-  }
-
-  function endGame() {
-    running = false;
-    window.parent.postMessage({ type: 'game:end' }, '*');
-    document.getElementById('endTitle').textContent = 'The harvest is in.';
-    document.getElementById('endLine').textContent =
-      'You belong somewhere you did not expect to belong.';
-    document.getElementById('endScreen').classList.remove('hidden');
-  }
-
-  // Workspace save helper (projector postMessage bridge)
-  function saveToWorkspace(filename, textContent) {
-    window.parent.postMessage({ type: 'projector:save', filename, content: textContent, encoding: 'text' }, '*');
-  }
-</script>
-</body>
+      // Workspace save helper (projector postMessage bridge)
+      function saveToWorkspace(filename, textContent) {
+        window.parent.postMessage(
+          { type: 'projector:save', filename, content: textContent, encoding: 'text' },
+          '*',
+        );
+      }
+    </script>
+  </body>
 </html>

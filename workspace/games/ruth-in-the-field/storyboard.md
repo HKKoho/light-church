@@ -14,30 +14,31 @@ This is a collector game about Ruth's faithfulness and costly belonging (Ruth 1�
 
 ## 2. Persona
 
-| Field | Description |
-|---|---|
-| `whyTheyPlay` | To feel what it means to stay when leaving would have been easier |
-| `whatTheyNeedFromGame` | The weight of a choice that costs something real |
-| `whatBreaksImmersion` | Violence, mockery of Naomi's grief, countdown pressure, a forced "correct" theological answer |
-| `background` | Youth group (ages 13–17), familiar with the story's surface but not its emotional depth |
-| `location` | Ancient Near East — Moabite road and Bethlehem barley fields |
+| Field                  | Description                                                                                   |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| `whyTheyPlay`          | To feel what it means to stay when leaving would have been easier                             |
+| `whatTheyNeedFromGame` | The weight of a choice that costs something real                                              |
+| `whatBreaksImmersion`  | Violence, mockery of Naomi's grief, countdown pressure, a forced "correct" theological answer |
+| `background`           | Youth group (ages 13–17), familiar with the story's surface but not its emotional depth       |
+| `location`             | Ancient Near East — Moabite road and Bethlehem barley fields                                  |
 
 ## 3. Emotional arc
 
-| Stage | Player emotion | Scene type |
-|---|---|---|
-| opening | warmth-and-dread | exterior |
-| inciting | grief | dialogue |
-| rising | determination | exterior |
-| dark_night | exposure | action |
-| turn | recognition | dialogue |
-| climax | quiet-effort | action |
-| resolution | belonging | interior |
-| carry_forward | still-joy | cutscene |
+| Stage         | Player emotion   | Scene type |
+| ------------- | ---------------- | ---------- |
+| opening       | warmth-and-dread | exterior   |
+| inciting      | grief            | dialogue   |
+| rising        | determination    | exterior   |
+| dark_night    | exposure         | action     |
+| turn          | recognition      | dialogue   |
+| climax        | quiet-effort     | action     |
+| resolution    | belonging        | interior   |
+| carry_forward | still-joy        | cutscene   |
 
 ## 4. Acts
 
 **Act 1 — The World Before** (SB-001, SB-002)
+
 - emotionalPurpose: Establish the cost of Ruth's choice before any reward appears
 - openingScene: "The Vow on the Road"
 - closingScene: "Arriving in Bethlehem"
@@ -45,6 +46,7 @@ This is a collector game about Ruth's faithfulness and costly belonging (Ruth 1�
 - playerAgency: Forward movement — there is no turning back
 
 **Act 2 — The World Changed** (SB-003, SB-004)
+
 - emotionalPurpose: Let the player feel what being seen with kindness does after being unseen
 - openingScene: "The Field of Boaz"
 - closingScene: "The Evening Meal"

@@ -16,48 +16,39 @@
  *   get_downstream_brief — returns the relevant section for a named sub-agent
  */
 
-import {
-  StoryboardDirector,
-  StoryboardPackage,
-  GameBrief,
-} from './storyboard-agent'
+import { StoryboardDirector, StoryboardPackage, GameBrief } from './storyboard-agent';
 
 // ── SKILL TYPES ──────────────────────────────────────────────
 
 export interface StoryboardSkillParams {
-  action:
-    | 'produce_storyboard'
-    | 'approve_storyboard'
-    | 'assert_approved'
-    | 'get_downstream_brief'
-  brief?: GameBrief
-  package?: StoryboardPackage
-  reviewerNotes?: string
-  agentName?: 'worldBuilder' | 'narrativeEngine' | 'gameBalance'
+  action: 'produce_storyboard' | 'approve_storyboard' | 'assert_approved' | 'get_downstream_brief';
+  brief?: GameBrief;
+  package?: StoryboardPackage;
+  reviewerNotes?: string;
+  agentName?: 'worldBuilder' | 'narrativeEngine' | 'gameBalance';
 }
 
 export type StoryboardSkillResult =
-  | { ok: true;  data: StoryboardPackage | object | string }
-  | { ok: false; error: string }
+  | { ok: true; data: StoryboardPackage | object | string }
+  | { ok: false; error: string };
 
 // ── SKILL RUNNER ─────────────────────────────────────────────
 
-const director = new StoryboardDirector()
+const director = new StoryboardDirector();
 
 /** In-process store — in production, persist to Redis or Postgres */
-let _latestPackage: StoryboardPackage | null = null
+let _latestPackage: StoryboardPackage | null = null;
 
 export async function run(params: StoryboardSkillParams): Promise<StoryboardSkillResult> {
   switch (params.action) {
-
     // ── produce_storyboard ───────────────────────────────────
     case 'produce_storyboard': {
       if (!params.brief) {
-        return { ok: false, error: 'Missing required param: brief' }
+        return { ok: false, error: 'Missing required param: brief' };
       }
       try {
-        const pkg = await director.produce(params.brief)
-        _latestPackage = pkg
+        const pkg = await director.produce(params.brief);
+        _latestPackage = pkg;
         return {
           ok: true,
           data: {
@@ -67,86 +58,85 @@ export async function run(params: StoryboardSkillParams): Promise<StoryboardSkil
               '⚑ HITL gate is CLOSED. A human must call approve_storyboard ' +
               'with reviewerNotes before any game can be built.',
           },
-        }
+        };
       } catch (e) {
-        return { ok: false, error: String(e) }
+        return { ok: false, error: String(e) };
       }
     }
 
     // ── approve_storyboard ───────────────────────────────────
     case 'approve_storyboard': {
-      const pkg = params.package ?? _latestPackage
+      const pkg = params.package ?? _latestPackage;
       if (!pkg) {
-        return { ok: false, error: 'No storyboard package found. Call produce_storyboard first.' }
+        return { ok: false, error: 'No storyboard package found. Call produce_storyboard first.' };
       }
       if (!params.reviewerNotes?.trim()) {
-        return { ok: false, error: 'reviewerNotes is required for HITL approval.' }
+        return { ok: false, error: 'reviewerNotes is required for HITL approval.' };
       }
-      const approved = director.approve(pkg, params.reviewerNotes)
-      _latestPackage = approved
+      const approved = director.approve(pkg, params.reviewerNotes);
+      _latestPackage = approved;
       return {
         ok: true,
         data: {
           package: approved,
           hitlStatus: approved.hitl,
-          nextStep:
-            '✓ HITL gate is OPEN. GAME-MASTER may now call game_controller actions.',
+          nextStep: '✓ HITL gate is OPEN. GAME-MASTER may now call game_controller actions.',
         },
-      }
+      };
     }
 
     // ── assert_approved ──────────────────────────────────────
     case 'assert_approved': {
-      const pkg = params.package ?? _latestPackage
+      const pkg = params.package ?? _latestPackage;
       if (!pkg) {
         return {
           ok: false,
           error: 'No storyboard found. Run produce_storyboard → approve_storyboard first.',
-        }
+        };
       }
       try {
-        director.assertApproved(pkg)
-        const { downstreamBriefs } = pkg
+        director.assertApproved(pkg);
+        const { downstreamBriefs } = pkg;
         return {
           ok: true,
           data: {
             approved: true,
-            worldBuilderBrief:    downstreamBriefs.worldBuilder,
+            worldBuilderBrief: downstreamBriefs.worldBuilder,
             narrativeEngineBrief: downstreamBriefs.narrativeEngine,
-            gameBalanceBrief:     downstreamBriefs.gameBalance,
-            panels:               pkg.panels.length,
-            premise:              pkg.premise,
+            gameBalanceBrief: downstreamBriefs.gameBalance,
+            panels: pkg.panels.length,
+            premise: pkg.premise,
           },
-        }
+        };
       } catch (e) {
-        return { ok: false, error: String(e) }
+        return { ok: false, error: String(e) };
       }
     }
 
     // ── get_downstream_brief ─────────────────────────────────
     case 'get_downstream_brief': {
-      const pkg = params.package ?? _latestPackage
+      const pkg = params.package ?? _latestPackage;
       if (!pkg) {
-        return { ok: false, error: 'No storyboard found.' }
+        return { ok: false, error: 'No storyboard found.' };
       }
       if (!params.agentName) {
-        return { ok: false, error: 'agentName is required.' }
+        return { ok: false, error: 'agentName is required.' };
       }
-      const brief = pkg.downstreamBriefs[params.agentName]
+      const brief = pkg.downstreamBriefs[params.agentName];
       if (!brief) {
         return {
           ok: false,
           error: `Unknown agentName: ${params.agentName}. Use worldBuilder | narrativeEngine | gameBalance`,
-        }
+        };
       }
-      return { ok: true, data: brief }
+      return { ok: true, data: brief };
     }
 
     default:
       return {
         ok: false,
         error: `Unknown action: ${(params as { action: string }).action}`,
-      }
+      };
   }
 }
 

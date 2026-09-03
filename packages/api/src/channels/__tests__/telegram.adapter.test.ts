@@ -8,17 +8,19 @@ const sendChatActionMock = vi.fn().mockResolvedValue({});
 
 vi.mock('grammy', () => {
   return {
-    Bot: vi.fn().mockImplementation(() => ({
-      on: vi.fn(),
-      command: vi.fn(),
-      start: vi.fn().mockResolvedValue(undefined),
-      stop: vi.fn().mockResolvedValue(undefined),
-      api: {
-        sendMessage: sendMessageMock,
-        sendChatAction: sendChatActionMock,
-        setWebhook: vi.fn().mockResolvedValue({}),
-      },
-    })),
+    Bot: vi.fn().mockImplementation(function () {
+      return {
+        on: vi.fn(),
+        command: vi.fn(),
+        start: vi.fn().mockResolvedValue(undefined),
+        stop: vi.fn().mockResolvedValue(undefined),
+        api: {
+          sendMessage: sendMessageMock,
+          sendChatAction: sendChatActionMock,
+          setWebhook: vi.fn().mockResolvedValue({}),
+        },
+      };
+    }),
   };
 });
 

@@ -11,13 +11,7 @@ export const AGE_BANDS = [
 ] as const;
 export type AgeBand = (typeof AGE_BANDS)[number];
 
-export const ECONOMIC_TIERS = [
-  'poor',
-  'belowAverage',
-  'average',
-  'aboveAverage',
-  'rich',
-] as const;
+export const ECONOMIC_TIERS = ['poor', 'belowAverage', 'average', 'aboveAverage', 'rich'] as const;
 export type EconomicTier = (typeof ECONOMIC_TIERS)[number];
 
 export const MBTI_TYPES = [

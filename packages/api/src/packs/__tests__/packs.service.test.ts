@@ -96,7 +96,9 @@ describe('PacksService', () => {
     it('creates only missing agents, skipping ones that already exist', async () => {
       const ngo = (await import('../definitions/ngo-agents.data.js')).NGO_AGENTS;
       prisma.agentDefinition.findFirst.mockImplementation(({ where }: any) =>
-        where.name === 'pastoral-care' ? Promise.resolve({ id: 'existing' }) : Promise.resolve(null),
+        where.name === 'pastoral-care'
+          ? Promise.resolve({ id: 'existing' })
+          : Promise.resolve(null),
       );
       prisma.agentDefinition.findMany.mockResolvedValue(
         ngo.map((a) => ({ name: a.name, isActive: true })),

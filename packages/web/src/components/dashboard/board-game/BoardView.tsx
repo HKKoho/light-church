@@ -38,13 +38,16 @@ export function BoardView({ def, players }: Props) {
     <div className="overflow-auto rounded-lg border border-border bg-background p-2">
       <div
         className="grid gap-1"
-        style={{ gridTemplateColumns: `repeat(${COLS}, minmax(60px, 1fr))`, gridTemplateRows: `repeat(${rows}, 60px)` }}
+        style={{
+          gridTemplateColumns: `repeat(${COLS}, minmax(60px, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, 60px)`,
+        }}
       >
         {path.map((spaceId, pathIndex) => {
           const space = spaces.find((s) => s.id === spaceId);
           const pos = layout[pathIndex];
           if (!space || !pos) return null;
-          const typeClass = SPACE_TYPE_CLASSES[space.type] ?? SPACE_TYPE_CLASSES['safe']!
+          const typeClass = SPACE_TYPE_CLASSES[space.type] ?? SPACE_TYPE_CLASSES['safe']!;
           const playersHere = players.filter((p) => p.position === pathIndex);
 
           return (

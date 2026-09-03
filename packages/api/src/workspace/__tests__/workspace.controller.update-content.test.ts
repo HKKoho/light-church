@@ -54,6 +54,8 @@ describe('WorkspaceController.updateFileContent', () => {
       '/config.ts',
       'const x = 1;',
       '2026-01-01T00:00:00.000Z',
+      false,
+      'admin',
       undefined,
     );
     expect(result).toEqual(response);
@@ -76,6 +78,8 @@ describe('WorkspaceController.updateFileContent', () => {
       'forced',
       '2026-01-01T00:00:00.000Z',
       true,
+      'admin',
+      undefined,
     );
   });
 

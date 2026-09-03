@@ -41,6 +41,7 @@ node scripts/setup-ngo.mjs          # Seed 28-folder workspace structure + skill
 ```
 
 **Fresh clone setup order:**
+
 1. `cp .env.example .env` and fill in keys
 2. `pnpm install`
 3. `pnpm --filter @clawix/shared run build`

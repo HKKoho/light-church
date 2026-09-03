@@ -44,6 +44,8 @@ describe('App E2E', () => {
 
   beforeAll(async () => {
     process.env['JWT_SECRET'] = 'test-jwt-secret-for-e2e';
+    process.env['TTS_PIPER_URL'] = 'http://localhost:5000';
+    process.env['SADTALKER_URL'] = 'http://localhost:7860';
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule],
       controllers: [TestController],

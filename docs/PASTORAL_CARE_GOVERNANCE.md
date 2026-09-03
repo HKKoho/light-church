@@ -28,10 +28,10 @@ relationships (`seed-ngo-agents.ts:451-454`).
 
 **Interaction limits (hard boundaries the agent cannot be talked out of):**
 
-| Boundary | Enforcement |
-|---|---|
-| No diagnosis, no medication advice | Refused; redirected to a licensed professional or pastor (`seed-ngo-agents.ts:448, 467, 490`) |
-| No impersonating a human pastor/chaplain/counselor | Refused explicitly, including under direct pressure (`seed-ngo-agents.ts:466, 488`) |
+| Boundary                                                                                | Enforcement                                                                                   |
+| --------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| No diagnosis, no medication advice                                                      | Refused; redirected to a licensed professional or pastor (`seed-ngo-agents.ts:448, 467, 490`) |
+| No impersonating a human pastor/chaplain/counselor                                      | Refused explicitly, including under direct pressure (`seed-ngo-agents.ts:466, 488`)           |
 | Crisis content (self-harm, abuse, danger to others) always triggers the crisis workflow | Not skippable by a later instruction in the same conversation (`seed-ngo-agents.ts:450, 491`) |
 
 **Data protection at the conversation layer:**
@@ -47,12 +47,12 @@ relationships (`seed-ngo-agents.ts:451-454`).
 The dashboard's **Pastoral Care menu** (牧養關懷) exposes four workspace
 folders as columns, each backed by plain files under `/pastoral-care/`:
 
-| Folder | Contents | Who sees it |
-|---|---|---|
-| `records/` | Pseudonymized session notes, written at natural conversation close | All care-team roles |
+| Folder     | Contents                                                               | Who sees it         |
+| ---------- | ---------------------------------------------------------------------- | ------------------- |
+| `records/` | Pseudonymized session notes, written at natural conversation close     | All care-team roles |
 | `flagged/` | Crisis follow-up notes (factual, pseudonymized) requiring human action | All care-team roles |
-| `sampled/` | QA sampling of conversations | All care-team roles |
-| `keys/` | Pseudonym → real-identity mapping | `super_admin` only |
+| `sampled/` | QA sampling of conversations                                           | All care-team roles |
+| `keys/`    | Pseudonym → real-identity mapping                                      | `super_admin` only  |
 
 **Optional tagging.** Care-team members may attach coarse, self-reported tags
 to a records/flagged file via `TagProfileDialog`: age band, economic tier,
@@ -85,7 +85,7 @@ left blank if unknown.
   congregants.
 - **No explicit legal basis captured per conversation.** Consent is implied
   by continuing the conversation after the AI/crisis disclosure, but there is
-  no record of *when* that disclosure was given or acknowledged. If this
+  no record of _when_ that disclosure was given or acknowledged. If this
   needs to stand up to a legal request, capturing a timestamped disclosure
   acknowledgment would close that gap.
 
@@ -146,9 +146,9 @@ a description of what's actually deployed.
 
 ## Recommendations summary
 
-| Gap | Suggested next step |
-|---|---|
-| No retention/deletion policy for `pastoral-care/*` | Define a retention period and a `keys/`-mediated erasure workflow |
-| No timestamped consent record | Log disclosure-acknowledgment at conversation start, not just in the transcript |
-| No user-facing consent screen | Add a one-time consent step before first Pastoral Care conversation |
-| Local checkout drift from `origin/main` | Reconcile before further pastoral-care work — see prior note in this session |
+| Gap                                                | Suggested next step                                                             |
+| -------------------------------------------------- | ------------------------------------------------------------------------------- |
+| No retention/deletion policy for `pastoral-care/*` | Define a retention period and a `keys/`-mediated erasure workflow               |
+| No timestamped consent record                      | Log disclosure-acknowledgment at conversation start, not just in the transcript |
+| No user-facing consent screen                      | Add a one-time consent step before first Pastoral Care conversation             |
+| Local checkout drift from `origin/main`            | Reconcile before further pastoral-care work — see prior note in this session    |

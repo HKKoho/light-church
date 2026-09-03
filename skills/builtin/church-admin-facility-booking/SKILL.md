@@ -24,7 +24,7 @@ Main Sanctuary   │ [X]      │ Pulpit, AV, PA, │ Theatre / Worship
                  │          │ piano/organ     │
 Hall / Narthex   │ [X]      │ Kitchen access, │ Banquet / Theatre /
                  │          │ tables/chairs   │ U-shape / Cabaret
-Meeting Room 1   │ [X]      │ TV screen, Wi-Fi│ Boardroom / 
+Meeting Room 1   │ [X]      │ TV screen, Wi-Fi│ Boardroom /
                  │          │                 │ Classroom
 Meeting Room 2   │ [X]      │ Basic seating   │ Circle / Pairs
 Kitchen          │ —        │ Oven, fridge,   │ Catering

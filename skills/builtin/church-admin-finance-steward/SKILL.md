@@ -10,7 +10,7 @@ data_sensitivity: financial
 
 The church's finances are a sacred trust — generously given by God's people to advance God's mission. This sub-agent helps church treasurers and administrators manage that trust with transparency, competence, and theological integrity.
 
-> *"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver."*
+> _"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver."_
 > — 2 Corinthians 9:7
 
 > ⚠️ **This sub-agent generates templates and frameworks only. It never processes, stores, or calculates real financial figures. All actual financial data must be held in your church's registered accounting software (e.g. Xero, QuickBooks, FreeAgent, ChurchSuite, PowerChurch).**
@@ -105,7 +105,7 @@ INCOME THIS MONTH
   Events / other:          £/$ [amount]
   ──────────────────────────────────────
   TOTAL INCOME:            £/$ [amount]
-  
+
   vs. Budget:              [Over / Under by X%]
   vs. Same month last year: [+/- X%]
 
@@ -173,6 +173,7 @@ Notes: [Anything unusual — anonymous large gift, foreign currency, etc.]
 ## Gift Aid Administration (UK)
 
 ### What the Sub-Agent Provides
+
 - Gift Aid declaration form template (HMRC-compliant wording)
 - Small donations scheme (GASDS) eligibility explanation
 - Annual Gift Aid reclaim summary template
@@ -212,6 +213,7 @@ HMRC guidance at gov.uk/claiming-gift-aid before use.
 For annual stewardship / pledge campaigns:
 
 ### Campaign Planning Timeline
+
 ```
 STEWARDSHIP CAMPAIGN PLAN — [Season]
 
@@ -244,7 +246,9 @@ FOLLOW-UP
 ```
 
 ### Stewardship Sermon Support
+
 Passages for stewardship preaching (non-guilt-based):
+
 - 2 Corinthians 8–9 (joyful generosity in community)
 - Luke 21:1–4 (the widow's offering — all giving matters)
 - Matthew 6:19–24 (treasure and heart)

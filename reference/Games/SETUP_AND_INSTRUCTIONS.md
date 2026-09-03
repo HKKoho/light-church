@@ -1,4 +1,5 @@
 # Clawix × TypeScript Game v2 — Storyboard-First
+
 ## Setup & Agent Instructions
 
 ---
@@ -42,6 +43,7 @@ game_controller.start_game
 ```
 
 Trying to call `start_game` before this sequence returns:
+
 ```json
 { "ok": false, "error": "Cannot start game: no approved storyboard loaded." }
 ```
@@ -51,16 +53,20 @@ Trying to call `start_game` before this sequence returns:
 ## SETUP (6 steps)
 
 ### Step 1 — Install dependencies
+
 ```bash
 npm install ws typescript
 npm install --save-dev @types/ws ts-node
 ```
 
 ### Step 2 — Start the game server
+
 ```bash
 npx ts-node server/game-server.ts
 ```
+
 Output:
+
 ```
 🎮 Game server v2 (storyboard-aware)
    Browser → ws://localhost:9090
@@ -69,15 +75,19 @@ Output:
 ```
 
 ### Step 3 — Open the browser renderer
+
 Open `client/index.html`. The canvas shows the storyboard gate overlay until
 a storyboard is loaded. The premise text appears at the bottom once loaded.
 
 ### Step 4 — Register skills in Clawix
+
 In **Dashboard → Skills → Create Skill**, register two skills:
+
 - `storyboard_director` — using the YAML block at the bottom of `storyboard-skill.ts`
 - `game_controller` — using the YAML block at the bottom of `game-controller-skill.ts`
 
 ### Step 5 — Create the GAME-MASTER agent
+
 In **Agents → Create Agent**:
 
 ```yaml
@@ -131,6 +141,7 @@ system_prompt: |
 ```
 
 ### Step 6 — Run a complete session
+
 Try this conversation with GAME-MASTER:
 
 ```
@@ -140,6 +151,7 @@ in a dark city. For a player who feels lost but keeps going.
 ```
 
 GAME-MASTER will:
+
 1. Call `produce_storyboard` with a GameBrief derived from your description
 2. Present the storyboard (premise, persona, emotional arc, panels, briefs)
 3. Wait for you to say "looks good, approve it"
@@ -152,15 +164,15 @@ GAME-MASTER will:
 
 ## WHAT CHANGED FROM v1
 
-| | v1 (original zip) | v2 (this pack) |
-|---|---|---|
-| Storyboard | None | `storyboard-agent.ts` — typed classes |
-| Storyboard skill | None | `storyboard-skill.ts` — produce / approve / assert |
-| Game skill | `game_controller_skill.yaml` | `game-controller-skill.ts` — TypeScript |
-| Game server | v1 game-server.ts | Imports storyboard types, enforces HITL gate |
-| `start_game` | Always works | Blocked unless storyboard loaded |
-| Canvas theme | Fixed dark | Driven by `StoryboardPackage.panels[n].canvasHint` |
-| File format | Mixed (YAML + TS + HTML) | Pure TypeScript + HTML |
+|                  | v1 (original zip)            | v2 (this pack)                                     |
+| ---------------- | ---------------------------- | -------------------------------------------------- |
+| Storyboard       | None                         | `storyboard-agent.ts` — typed classes              |
+| Storyboard skill | None                         | `storyboard-skill.ts` — produce / approve / assert |
+| Game skill       | `game_controller_skill.yaml` | `game-controller-skill.ts` — TypeScript            |
+| Game server      | v1 game-server.ts            | Imports storyboard types, enforces HITL gate       |
+| `start_game`     | Always works                 | Blocked unless storyboard loaded                   |
+| Canvas theme     | Fixed dark                   | Driven by `StoryboardPackage.panels[n].canvasHint` |
+| File format      | Mixed (YAML + TS + HTML)     | Pure TypeScript + HTML                             |
 
 ---
 
@@ -180,4 +192,4 @@ in the storyboard, the skill, and the game loop — one stack, one author.
 
 ---
 
-*Clawix × TypeScript Game v2 · AIbyML · clawix.aibyml.com*
+_Clawix × TypeScript Game v2 · AIbyML · clawix.aibyml.com_

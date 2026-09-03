@@ -123,7 +123,9 @@ export class AgentsService {
   ): void {
     if (input.toolConfig?.browserToolsEnabled !== true) return;
     if (!userRole || !BROWSER_TOOLS_CONFIG_ROLES.has(userRole)) {
-      throw new ForbiddenException('Only pastoral or admin staff may enable browser tools on an agent');
+      throw new ForbiddenException(
+        'Only pastoral or admin staff may enable browser tools on an agent',
+      );
     }
   }
 

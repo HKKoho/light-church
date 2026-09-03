@@ -1,53 +1,91 @@
-Clawix for NGOs — Licensing Notice
-==================================
+Light Church Platform — Licensing Notice
+========================================
 
-This repository is licensed under TWO licenses. Which one applies depends on the
-file or directory.
+This entire repository is governed by the following two licenses, applied
+together. There is no longer a MIT-licensed "core" — the whole codebase is
+covered by the terms below.
 
-1. Core Clawix platform — MIT License
--------------------------------------
-Copyright (c) 2026 ClawixAI
+1. PolyForm Noncommercial License 1.0.0
+----------------------------------------
+Copyright (c) 2026 Victor HUNG / Light Church Project
+https://polyformproject.org/licenses/noncommercial/1.0.0
 
-Everything in this repository EXCEPT the NGO-specific components listed in
-section 2 below is licensed under the MIT License. See the LICENSE file at the
-repository root for the full text. You may use, modify, and distribute these
-parts — including commercially — under the MIT terms.
+The full text of the PolyForm Noncommercial License is included in the root
+LICENSE file. In summary:
 
-2. NGO-specific components — PolyForm Noncommercial License 1.0.0
------------------------------------------------------------------
-Copyright 2026 Victorius Hung (aibyml-ngo)
-https://github.com/aibyml-ngo/clawix-ngo
+  - You may use, copy, modify, and distribute this software for any
+    noncommercial purpose.
+  - Use by charitable organizations, educational institutions, public research
+    organizations, public safety or health organizations, environmental
+    organizations, and government institutions is explicitly permitted,
+    regardless of funding source.
+  - Commercial use — selling the software, offering it as a paid SaaS product,
+    or using it to generate direct revenue — requires a separate commercial
+    license from the maintainers.
 
-The following paths are licensed under the PolyForm Noncommercial License 1.0.0
-(https://polyformproject.org/licenses/noncommercial/1.0.0). They may be used
-only for noncommercial purposes. Note that the PolyForm Noncommercial license
-expressly permits use by charitable organizations, educational institutions,
-public research/health/safety organizations, environmental organizations, and
-government institutions — so NGOs and similar nonprofits may use them freely.
+2. Christian Ministry Grant
+----------------------------
+Copyright (c) 2026 Victor HUNG / Light Church Project
+See LICENSE-CHURCH at the repository root for the full text.
 
-  reference/Clawix SKILL and Agent/**     (NGO agents, skills, proposal, docs)
-  skills/ARIA/**                          (ARIA Foundation skill)
-  packages/web/src/app/(dashboard)/ngo/** (NGO dashboard pages)
-  packages/api/prisma/setup-ngo.ts        (NGO workspace seeding)
-  packages/api/prisma/seed-ngo-agents.ts  (NGO agent seeding)
-  scripts/setup-ngo.mjs                   (NGO workspace seeding)
-  scripts/seed-ngo-agents.mjs             (NGO agent seeding)
+In addition to the PolyForm Noncommercial terms above, the maintainers grant
+qualifying Christian organizations a supplemental royalty-free license to
+use, self-host, and adapt this software for ministry activities — including
+contexts involving tithes, offerings, or charitable donations — provided the
+software is not resold as a standalone commercial product or SaaS offering.
 
-The two directories above (reference/Clawix SKILL and Agent, skills/ARIA) each
-contain a copy of the full PolyForm Noncommercial License text in a local
-LICENSE file. The remaining NGO files in the list live inside otherwise-MIT-
-licensed packages but are nonetheless governed by the PolyForm Noncommercial
-License per this NOTICE.
+Qualifying organizations include (but are not limited to):
+  - Local churches and congregations of any Christian denomination
+  - Christian missionary societies and mission organizations
+  - Christian schools, seminaries, and Bible colleges
+  - Christian healthcare, social care, and charitable bodies
+  - Para-church organizations whose primary purpose is Christian ministry
+
+Scope
+-----
+Both licenses apply to the entire repository, including:
+
+  Core platform:
+    packages/api/**              (NestJS API, engine, channels, database)
+    packages/web/**              (Next.js dashboard)
+    packages/shared/**           (shared types, schemas, logger)
+
+  Talking-face feature:
+    packages/api/src/tts/**
+    packages/api/src/talkingface/**
+    packages/shared/src/schemas/talkingface.schema.ts
+    packages/web/src/app/(dashboard)/talkingface/**
+    packages/web/src/components/dashboard/talkingface/**
+    packages/web/src/hooks/use-speech-input.ts
+
+  NGO / Ministry components:
+    reference/Clawix SKILL and Agent/**
+    skills/ARIA/**
+    packages/web/src/app/(dashboard)/ngo/**
+    packages/api/prisma/setup-ngo.ts
+    packages/api/prisma/seed-ngo-agents.ts
+    scripts/setup-ngo.mjs
+    scripts/seed-ngo-agents.mjs
+
+  Infrastructure and tooling:
+    infra/**
+    scripts/**
+    docs/**
 
 Precedence
 ----------
-Where a directory contains its own LICENSE file, that file governs the contents
-of that directory. Everything else is governed by the root LICENSE (MIT), except
-the individually listed NGO files above, which are governed by the PolyForm
-Noncommercial License.
+Where a directory contains its own LICENSE file, that file governs the
+contents of that directory. Otherwise, the root LICENSE (PolyForm
+Noncommercial 1.0.0 + Christian Ministry Grant) governs all files.
+
+Commercial Licensing
+--------------------
+Organizations that wish to use this software commercially (e.g. as a paid
+product or SaaS service offered to third parties) must obtain a separate
+commercial license. Contact the maintainers to discuss terms.
 
 Disclaimer
 ----------
 This NOTICE describes the project maintainers' intended licensing. It is not
-legal advice. If commercial enforceability of the noncommercial terms matters to
-you, have this reviewed by a qualified attorney.
+legal advice. If commercial enforceability matters to you, have this reviewed
+by a qualified attorney.

@@ -230,8 +230,7 @@ export default function ProjectorPage() {
     setSaveStatus(null);
   }, []);
 
-  const dialogTitle =
-    activeItem === DEMO_KEY ? t.demoCardTitle : (activeItem ?? t.fallbackTitle);
+  const dialogTitle = activeItem === DEMO_KEY ? t.demoCardTitle : (activeItem ?? t.fallbackTitle);
 
   if (loading) {
     return (

@@ -267,7 +267,8 @@ async function main() {
     where: { id: primary.id },
     data: {
       name: 'NGO Program Assistant',
-      description: 'Central orchestrator for NGO operations. Routes requests to the right specialist agent.',
+      description:
+        'Central orchestrator for NGO operations. Routes requests to the right specialist agent.',
       systemPrompt: NGO_ORCHESTRATOR_PROMPT,
     },
   });
@@ -299,12 +300,17 @@ async function main() {
       foldersCreated++;
     }
   }
-  console.log(`  ✓ Folders: ${foldersCreated} created, ${WORKSPACE_FOLDERS.length - foldersCreated} already exist`);
+  console.log(
+    `  ✓ Folders: ${foldersCreated} created, ${WORKSPACE_FOLDERS.length - foldersCreated} already exist`,
+  );
 
   // Create audit log if missing
   const auditLog = path.join(workspaceDir, '.clawix', 'audit.log');
   if (!existsSync(auditLog)) {
-    writeFileSync(auditLog, `# Clawix audit log — ${new Date().toISOString()}\n# Format: timestamp | agent | action | target\n`);
+    writeFileSync(
+      auditLog,
+      `# Clawix audit log — ${new Date().toISOString()}\n# Format: timestamp | agent | action | target\n`,
+    );
     console.log('  ✓ .clawix/audit.log initialised');
   }
 
@@ -335,7 +341,9 @@ async function main() {
   // Write workspace README
   const readmePath = path.join(workspaceDir, 'README.md');
   if (!existsSync(readmePath)) {
-    writeFileSync(readmePath, `# NGO Workspace
+    writeFileSync(
+      readmePath,
+      `# NGO Workspace
 
 This workspace is managed by Clawix. Seventeen specialist agents operate within it.
 
@@ -372,7 +380,8 @@ This workspace is managed by Clawix. Seventeen specialist agents operate within 
 ## Folder layout
 
 See the primary agent's system prompt for the full layout description.
-`);
+`,
+    );
     console.log('  ✓ README.md written');
   }
 

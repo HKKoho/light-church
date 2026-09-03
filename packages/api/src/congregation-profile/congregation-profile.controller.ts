@@ -1,7 +1,10 @@
 import { Body, Controller, Get, Patch } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { updateCongregationProfileSchema, type UpdateCongregationProfileInput } from '@clawix/shared';
+import {
+  updateCongregationProfileSchema,
+  type UpdateCongregationProfileInput,
+} from '@clawix/shared';
 import { Roles } from '../auth/roles.decorator.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';

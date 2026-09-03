@@ -50,7 +50,9 @@ export function Phase2RoadmapCard() {
           <Map className="size-3.5" />
           Phase 2 Roadmap
         </CardTitle>
-        <CardDescription className="text-[11px]">Planning estimates, not commitments.</CardDescription>
+        <CardDescription className="text-[11px]">
+          Planning estimates, not commitments.
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3 px-4 text-xs">
         <RoadmapSection label="Phase 2D" items={PHASE_2D} />

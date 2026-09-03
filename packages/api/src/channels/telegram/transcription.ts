@@ -8,7 +8,9 @@ const TTS_MAX_CHARS = 4000;
 export async function downloadTelegramFile(fileUrl: string): Promise<Buffer> {
   const response = await fetch(fileUrl);
   if (!response.ok) {
-    throw new Error(`Failed to download file from Telegram: ${response.status} ${response.statusText}`);
+    throw new Error(
+      `Failed to download file from Telegram: ${response.status} ${response.statusText}`,
+    );
   }
   return Buffer.from(await response.arrayBuffer());
 }

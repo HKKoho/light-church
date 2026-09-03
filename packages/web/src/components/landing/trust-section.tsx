@@ -6,7 +6,8 @@ import { useT, type Messages } from '@/lib/i18n';
 const messages = {
   en: {
     title: 'Faithful stewardship is the foundation',
-    verse: '"It is required that those who have been given a trust must prove faithful." — 1 Corinthians 4:2',
+    verse:
+      '"It is required that those who have been given a trust must prove faithful." — 1 Corinthians 4:2',
     points: [
       {
         title: 'Human sign-off, always',

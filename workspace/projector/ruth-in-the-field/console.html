@@ -1,223 +1,449 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ruth in the Field of Boaz — Console</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0a0602; color: #e0d0b0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-
-  .header { background: linear-gradient(135deg, #1a1208, #120e06); padding: 12px 24px; border-bottom: 1px solid #2a1e0a; display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-  .header h1 { font-size: 15px; color: #e8c87a; font-weight: 400; }
-  .header h1 strong { font-weight: 600; }
-  .header .tag { font-size: 10px; background: #1e1408; border: 1px solid #3a2a0a; border-radius: 4px; padding: 2px 8px; color: #6a4a1a; letter-spacing: 0.04em; text-transform: uppercase; }
-  .status-wrap { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-  .status-label { font-size: 10px; color: #4a3a1a; letter-spacing: 0.06em; text-transform: uppercase; }
-  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #2a1e0a; border: 1.5px solid #3a2a0a; transition: all 0.5s; }
-  .status-dot.running { background: #c47a18; border-color: #e0921e; box-shadow: 0 0 8px rgba(196,122,24,0.6); }
-
-  .body { flex: 1; display: flex; overflow: hidden; }
-
-  .game-pane { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; padding: 20px; background: #0c0804; border-right: 1px solid #2a1e0a; }
-  .game-frame { border: 1px solid #2a1e0a; border-radius: 8px; overflow: hidden; box-shadow: 0 0 48px rgba(196,122,24,0.06); }
-  .game-frame iframe { display: block; border: none; }
-
-  .info-pane { flex: 1; overflow-y: auto; padding: 20px 22px; display: flex; flex-direction: column; gap: 22px; min-width: 230px; max-width: 310px; }
-
-  .section-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: #3a2a0a; text-transform: uppercase; margin-bottom: 8px; }
-
-  .premise { color: #7a6040; font-size: 12px; line-height: 1.7; }
-  .verse { color: #c47a18; font-style: italic; font-size: 12px; line-height: 1.55; margin-top: 10px; border-left: 2px solid rgba(196,122,24,0.3); padding-left: 10px; }
-
-  .panel-list { display: flex; flex-direction: column; gap: 4px; }
-  .panel-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 6px; border: 1px solid transparent; transition: background 0.4s, border-color 0.4s, opacity 0.4s; }
-  .panel-item.active  { background: rgba(196,122,24,0.07); border-color: rgba(196,122,24,0.22); }
-  .panel-item.done    { opacity: 0.28; }
-  .panel-dot { flex: 0 0 7px; width: 7px; height: 7px; border-radius: 50%; background: #1a1208; border: 1.5px solid #2a1e0a; margin-top: 4px; transition: all 0.4s; }
-  .panel-item.active .panel-dot  { background: #c47a18; border-color: #e0921e; box-shadow: 0 0 6px rgba(196,122,24,0.5); }
-  .panel-item.done   .panel-dot  { background: #2a1e0a; border-color: #2a1e0a; }
-  .panel-scene { font-size: 11px; color: #4a3010; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 1px; }
-  .panel-title { font-size: 12px; color: #9a7840; font-weight: 500; }
-  .panel-emotion { font-size: 11px; color: #3a2a10; margin-top: 2px; line-height: 1.4; }
-  .panel-item.active .panel-emotion { color: rgba(196,122,24,0.65); }
-
-  .arc-row { display: flex; align-items: center; flex-wrap: wrap; row-gap: 5px; }
-  .arc-beat { font-size: 10px; color: #251a08; transition: color 0.4s; padding: 1px 0; }
-  .arc-beat.reached { color: #5a4020; }
-  .arc-beat.current { color: #c47a18; font-weight: 700; }
-  .arc-sep  { font-size: 9px; color: #1e1408; margin: 0 4px; }
-
-  .end-card { background: rgba(196,122,24,0.05); border: 1px solid rgba(196,122,24,0.18); border-radius: 8px; padding: 14px; display: none; }
-  .end-card.visible { display: block; }
-  .end-card-label { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #c47a18; text-transform: uppercase; margin-bottom: 6px; }
-  .end-card-text  { font-size: 12px; color: #8a6840; line-height: 1.65; }
-
-  .passage-ref { font-size: 11px; color: #2a1e08; border-top: 1px solid #1e1408; padding-top: 14px; line-height: 1.6; }
-  .passage-ref strong { color: #4a3010; }
-</style>
-</head>
-<body>
-
-<div class="header">
-  <h1><strong>Ruth in the Field of Boaz</strong> — Console</h1>
-  <span class="tag">Facilitator View</span>
-  <div class="status-wrap">
-    <span class="status-label" id="statusLabel">Waiting</span>
-    <div class="status-dot" id="statusDot"></div>
-  </div>
-</div>
-
-<div class="body">
-  <div class="game-pane">
-    <div class="game-frame">
-      <iframe id="gameFrame" src="./index.html" width="800" height="500"
-        sandbox="allow-scripts allow-same-origin" title="Ruth in the Field of Boaz"></iframe>
-    </div>
-  </div>
-
-  <div class="info-pane">
-
-    <div>
-      <div class="section-label">About this game</div>
-      <p class="premise">Faithfulness finds you a place when the world has moved on. Ruth moves through four scenes — from the vow on the road to the meal at the threshing floor — gathering every sheaf left behind.</p>
-      <p class="verse">"Where you go, I will go. Where you die, I will die." — Ruth 1:16–17</p>
-    </div>
-
-    <div>
-      <div class="section-label">Scene progress</div>
-      <div class="panel-list" id="panelList"></div>
-    </div>
-
-    <div>
-      <div class="section-label">Emotional arc</div>
-      <div class="arc-row" id="arcRow"></div>
-    </div>
-
-    <div class="end-card" id="endCard">
-      <div class="end-card-label">Carry forward</div>
-      <p class="end-card-text">You belong somewhere you did not expect to belong.</p>
-    </div>
-
-    <div class="passage-ref">
-      <strong>Scripture:</strong> Ruth 1–2<br>
-      <strong>Theme:</strong> Costly faithfulness · belonging · redemption<br>
-      <strong>Audience:</strong> Youth group, ages 13–17
-    </div>
-
-  </div>
-</div>
-
-<script>
-  // Injected from storyboard — panel titles and emotional targets drive the scene tracker.
-  const PANELS = [
-    { title: "The Vow on the Road",   emotionalTarget: "The weight of a promise that costs everything" },
-    { title: "Arriving in Bethlehem", emotionalTarget: "The sting of being seen as foreign, and the refusal to be ashamed" },
-    { title: "The Field of Boaz",     emotionalTarget: "The slow surprise of being noticed and protected without earning it" },
-    { title: "The Evening Meal",      emotionalTarget: "You belong somewhere you did not expect to belong" },
-  ];
-
-  const ARC = [
-    { stage: "opening",      playerEmotion: "warmth-and-dread" },
-    { stage: "inciting",     playerEmotion: "grief"            },
-    { stage: "rising",       playerEmotion: "determination"    },
-    { stage: "dark_night",   playerEmotion: "exposure"         },
-    { stage: "turn",         playerEmotion: "recognition"      },
-    { stage: "climax",       playerEmotion: "quiet-effort"     },
-    { stage: "resolution",   playerEmotion: "belonging"        },
-    { stage: "carry_forward",playerEmotion: "still-joy"        },
-  ];
-
-  let activePanelIndex = -1;
-  let arcReachedIndex  = -1;
-
-  // Build panel list
-  const panelList = document.getElementById('panelList');
-  PANELS.forEach((p, i) => {
-    const item = document.createElement('div');
-    item.className = 'panel-item';
-    item.id = `panel-${i}`;
-    item.innerHTML =
-      `<div class="panel-dot"></div>` +
-      `<div>` +
-        `<div class="panel-scene">Scene ${i + 1}</div>` +
-        `<div class="panel-title">${p.title}</div>` +
-        `<div class="panel-emotion">${p.emotionalTarget}</div>` +
-      `</div>`;
-    panelList.appendChild(item);
-  });
-
-  // Build arc row
-  const arcRow = document.getElementById('arcRow');
-  ARC.forEach((beat, i) => {
-    if (i > 0) {
-      const sep = document.createElement('span');
-      sep.className = 'arc-sep';
-      sep.textContent = '→';
-      arcRow.appendChild(sep);
-    }
-    const el = document.createElement('span');
-    el.className = 'arc-beat';
-    el.id = `arc-${i}`;
-    el.title = beat.playerEmotion;
-    el.textContent = beat.stage;
-    arcRow.appendChild(el);
-  });
-
-  function activatePanel(index) {
-    if (index === activePanelIndex) return;
-    PANELS.forEach((_, i) => {
-      const el = document.getElementById(`panel-${i}`);
-      if (!el) return;
-      el.classList.remove('active', 'done');
-      if (i < index) el.classList.add('done');
-      else if (i === index) el.classList.add('active');
-    });
-
-    // Map panel proportionally to an arc beat
-    const arcIndex = Math.min(
-      Math.floor((index / Math.max(PANELS.length - 1, 1)) * (ARC.length - 1)),
-      ARC.length - 1
-    );
-    if (arcIndex !== arcReachedIndex) {
-      for (let i = 0; i <= arcIndex; i++) {
-        const el = document.getElementById(`arc-${i}`);
-        if (el) el.className = 'arc-beat ' + (i === arcIndex ? 'current' : 'reached');
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ruth in the Field of Boaz — Console</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
       }
-      arcReachedIndex = arcIndex;
-    }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: #0a0602;
+        color: #e0d0b0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+      }
 
-    activePanelIndex = index;
-  }
+      .header {
+        background: linear-gradient(135deg, #1a1208, #120e06);
+        padding: 12px 24px;
+        border-bottom: 1px solid #2a1e0a;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .header h1 {
+        font-size: 15px;
+        color: #e8c87a;
+        font-weight: 400;
+      }
+      .header h1 strong {
+        font-weight: 600;
+      }
+      .header .tag {
+        font-size: 10px;
+        background: #1e1408;
+        border: 1px solid #3a2a0a;
+        border-radius: 4px;
+        padding: 2px 8px;
+        color: #6a4a1a;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .status-wrap {
+        margin-left: auto;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .status-label {
+        font-size: 10px;
+        color: #4a3a1a;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2a1e0a;
+        border: 1.5px solid #3a2a0a;
+        transition: all 0.5s;
+      }
+      .status-dot.running {
+        background: #c47a18;
+        border-color: #e0921e;
+        box-shadow: 0 0 8px rgba(196, 122, 24, 0.6);
+      }
 
-  // postMessage bridge — receives events from the game iframe
-  window.addEventListener('message', (e) => {
-    const msg = e.data;
-    if (!msg || typeof msg !== 'object') return;
-    switch (msg.type) {
-      case 'game:start':
-        document.getElementById('statusDot').classList.add('running');
-        document.getElementById('statusLabel').textContent = 'Running';
-        activatePanel(0);
-        break;
-      case 'game:panel':
-        if (typeof msg.panelIndex === 'number') activatePanel(msg.panelIndex);
-        break;
-      case 'game:end':
-        document.getElementById('statusDot').classList.remove('running');
-        document.getElementById('statusLabel').textContent = 'Complete';
-        document.getElementById('endCard').classList.add('visible');
+      .body {
+        flex: 1;
+        display: flex;
+        overflow: hidden;
+      }
+
+      .game-pane {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: #0c0804;
+        border-right: 1px solid #2a1e0a;
+      }
+      .game-frame {
+        border: 1px solid #2a1e0a;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 0 48px rgba(196, 122, 24, 0.06);
+      }
+      .game-frame iframe {
+        display: block;
+        border: none;
+      }
+
+      .info-pane {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+        min-width: 230px;
+        max-width: 310px;
+      }
+
+      .section-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: #3a2a0a;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+
+      .premise {
+        color: #7a6040;
+        font-size: 12px;
+        line-height: 1.7;
+      }
+      .verse {
+        color: #c47a18;
+        font-style: italic;
+        font-size: 12px;
+        line-height: 1.55;
+        margin-top: 10px;
+        border-left: 2px solid rgba(196, 122, 24, 0.3);
+        padding-left: 10px;
+      }
+
+      .panel-list {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .panel-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        transition:
+          background 0.4s,
+          border-color 0.4s,
+          opacity 0.4s;
+      }
+      .panel-item.active {
+        background: rgba(196, 122, 24, 0.07);
+        border-color: rgba(196, 122, 24, 0.22);
+      }
+      .panel-item.done {
+        opacity: 0.28;
+      }
+      .panel-dot {
+        flex: 0 0 7px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #1a1208;
+        border: 1.5px solid #2a1e0a;
+        margin-top: 4px;
+        transition: all 0.4s;
+      }
+      .panel-item.active .panel-dot {
+        background: #c47a18;
+        border-color: #e0921e;
+        box-shadow: 0 0 6px rgba(196, 122, 24, 0.5);
+      }
+      .panel-item.done .panel-dot {
+        background: #2a1e0a;
+        border-color: #2a1e0a;
+      }
+      .panel-scene {
+        font-size: 11px;
+        color: #4a3010;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 1px;
+      }
+      .panel-title {
+        font-size: 12px;
+        color: #9a7840;
+        font-weight: 500;
+      }
+      .panel-emotion {
+        font-size: 11px;
+        color: #3a2a10;
+        margin-top: 2px;
+        line-height: 1.4;
+      }
+      .panel-item.active .panel-emotion {
+        color: rgba(196, 122, 24, 0.65);
+      }
+
+      .arc-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        row-gap: 5px;
+      }
+      .arc-beat {
+        font-size: 10px;
+        color: #251a08;
+        transition: color 0.4s;
+        padding: 1px 0;
+      }
+      .arc-beat.reached {
+        color: #5a4020;
+      }
+      .arc-beat.current {
+        color: #c47a18;
+        font-weight: 700;
+      }
+      .arc-sep {
+        font-size: 9px;
+        color: #1e1408;
+        margin: 0 4px;
+      }
+
+      .end-card {
+        background: rgba(196, 122, 24, 0.05);
+        border: 1px solid rgba(196, 122, 24, 0.18);
+        border-radius: 8px;
+        padding: 14px;
+        display: none;
+      }
+      .end-card.visible {
+        display: block;
+      }
+      .end-card-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        color: #c47a18;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+      .end-card-text {
+        font-size: 12px;
+        color: #8a6840;
+        line-height: 1.65;
+      }
+
+      .passage-ref {
+        font-size: 11px;
+        color: #2a1e08;
+        border-top: 1px solid #1e1408;
+        padding-top: 14px;
+        line-height: 1.6;
+      }
+      .passage-ref strong {
+        color: #4a3010;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1><strong>Ruth in the Field of Boaz</strong> — Console</h1>
+      <span class="tag">Facilitator View</span>
+      <div class="status-wrap">
+        <span class="status-label" id="statusLabel">Waiting</span>
+        <div class="status-dot" id="statusDot"></div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="game-pane">
+        <div class="game-frame">
+          <iframe
+            id="gameFrame"
+            src="./index.html"
+            width="800"
+            height="500"
+            sandbox="allow-scripts allow-same-origin"
+            title="Ruth in the Field of Boaz"
+          ></iframe>
+        </div>
+      </div>
+
+      <div class="info-pane">
+        <div>
+          <div class="section-label">About this game</div>
+          <p class="premise">
+            Faithfulness finds you a place when the world has moved on. Ruth moves through four
+            scenes — from the vow on the road to the meal at the threshing floor — gathering every
+            sheaf left behind.
+          </p>
+          <p class="verse">"Where you go, I will go. Where you die, I will die." — Ruth 1:16–17</p>
+        </div>
+
+        <div>
+          <div class="section-label">Scene progress</div>
+          <div class="panel-list" id="panelList"></div>
+        </div>
+
+        <div>
+          <div class="section-label">Emotional arc</div>
+          <div class="arc-row" id="arcRow"></div>
+        </div>
+
+        <div class="end-card" id="endCard">
+          <div class="end-card-label">Carry forward</div>
+          <p class="end-card-text">You belong somewhere you did not expect to belong.</p>
+        </div>
+
+        <div class="passage-ref">
+          <strong>Scripture:</strong> Ruth 1–2<br />
+          <strong>Theme:</strong> Costly faithfulness · belonging · redemption<br />
+          <strong>Audience:</strong> Youth group, ages 13–17
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Injected from storyboard — panel titles and emotional targets drive the scene tracker.
+      const PANELS = [
+        {
+          title: 'The Vow on the Road',
+          emotionalTarget: 'The weight of a promise that costs everything',
+        },
+        {
+          title: 'Arriving in Bethlehem',
+          emotionalTarget: 'The sting of being seen as foreign, and the refusal to be ashamed',
+        },
+        {
+          title: 'The Field of Boaz',
+          emotionalTarget: 'The slow surprise of being noticed and protected without earning it',
+        },
+        {
+          title: 'The Evening Meal',
+          emotionalTarget: 'You belong somewhere you did not expect to belong',
+        },
+      ];
+
+      const ARC = [
+        { stage: 'opening', playerEmotion: 'warmth-and-dread' },
+        { stage: 'inciting', playerEmotion: 'grief' },
+        { stage: 'rising', playerEmotion: 'determination' },
+        { stage: 'dark_night', playerEmotion: 'exposure' },
+        { stage: 'turn', playerEmotion: 'recognition' },
+        { stage: 'climax', playerEmotion: 'quiet-effort' },
+        { stage: 'resolution', playerEmotion: 'belonging' },
+        { stage: 'carry_forward', playerEmotion: 'still-joy' },
+      ];
+
+      let activePanelIndex = -1;
+      let arcReachedIndex = -1;
+
+      // Build panel list
+      const panelList = document.getElementById('panelList');
+      PANELS.forEach((p, i) => {
+        const item = document.createElement('div');
+        item.className = 'panel-item';
+        item.id = `panel-${i}`;
+        item.innerHTML =
+          `<div class="panel-dot"></div>` +
+          `<div>` +
+          `<div class="panel-scene">Scene ${i + 1}</div>` +
+          `<div class="panel-title">${p.title}</div>` +
+          `<div class="panel-emotion">${p.emotionalTarget}</div>` +
+          `</div>`;
+        panelList.appendChild(item);
+      });
+
+      // Build arc row
+      const arcRow = document.getElementById('arcRow');
+      ARC.forEach((beat, i) => {
+        if (i > 0) {
+          const sep = document.createElement('span');
+          sep.className = 'arc-sep';
+          sep.textContent = '→';
+          arcRow.appendChild(sep);
+        }
+        const el = document.createElement('span');
+        el.className = 'arc-beat';
+        el.id = `arc-${i}`;
+        el.title = beat.playerEmotion;
+        el.textContent = beat.stage;
+        arcRow.appendChild(el);
+      });
+
+      function activatePanel(index) {
+        if (index === activePanelIndex) return;
         PANELS.forEach((_, i) => {
           const el = document.getElementById(`panel-${i}`);
-          if (el) { el.classList.remove('active'); el.classList.add('done'); }
+          if (!el) return;
+          el.classList.remove('active', 'done');
+          if (i < index) el.classList.add('done');
+          else if (i === index) el.classList.add('active');
         });
-        ARC.forEach((_, i) => {
-          const el = document.getElementById(`arc-${i}`);
-          if (el) el.className = 'arc-beat reached';
-        });
-        break;
-    }
-  });
-</script>
-</body>
+
+        // Map panel proportionally to an arc beat
+        const arcIndex = Math.min(
+          Math.floor((index / Math.max(PANELS.length - 1, 1)) * (ARC.length - 1)),
+          ARC.length - 1,
+        );
+        if (arcIndex !== arcReachedIndex) {
+          for (let i = 0; i <= arcIndex; i++) {
+            const el = document.getElementById(`arc-${i}`);
+            if (el) el.className = 'arc-beat ' + (i === arcIndex ? 'current' : 'reached');
+          }
+          arcReachedIndex = arcIndex;
+        }
+
+        activePanelIndex = index;
+      }
+
+      // postMessage bridge — receives events from the game iframe
+      window.addEventListener('message', (e) => {
+        const msg = e.data;
+        if (!msg || typeof msg !== 'object') return;
+        switch (msg.type) {
+          case 'game:start':
+            document.getElementById('statusDot').classList.add('running');
+            document.getElementById('statusLabel').textContent = 'Running';
+            activatePanel(0);
+            break;
+          case 'game:panel':
+            if (typeof msg.panelIndex === 'number') activatePanel(msg.panelIndex);
+            break;
+          case 'game:end':
+            document.getElementById('statusDot').classList.remove('running');
+            document.getElementById('statusLabel').textContent = 'Complete';
+            document.getElementById('endCard').classList.add('visible');
+            PANELS.forEach((_, i) => {
+              const el = document.getElementById(`panel-${i}`);
+              if (el) {
+                el.classList.remove('active');
+                el.classList.add('done');
+              }
+            });
+            ARC.forEach((_, i) => {
+              const el = document.getElementById(`arc-${i}`);
+              if (el) el.className = 'arc-beat reached';
+            });
+            break;
+        }
+      });
+    </script>
+  </body>
 </html>

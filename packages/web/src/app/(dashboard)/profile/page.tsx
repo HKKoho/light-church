@@ -346,10 +346,9 @@ export default function ProfilePage() {
               <p className="text-xs text-muted-foreground">
                 {t.whatsappHelp1}{' '}
                 <code className="font-mono">&lt;countrycode&gt;&lt;number&gt;@s.whatsapp.net</code>{' '}
-                {t.whatsappHelp2}{' '}
-                <code className="font-mono">15551234567@s.whatsapp.net</code>
-                {t.whatsappHelp3}{' '}
-                <code className="font-mono">&lt;id&gt;@lid</code> {t.whatsappHelp4}
+                {t.whatsappHelp2} <code className="font-mono">15551234567@s.whatsapp.net</code>
+                {t.whatsappHelp3} <code className="font-mono">&lt;id&gt;@lid</code>{' '}
+                {t.whatsappHelp4}
               </p>
             </div>
           )}

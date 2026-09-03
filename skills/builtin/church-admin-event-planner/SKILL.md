@@ -36,7 +36,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
 ▌ PURPOSE & VISION
   Why this event matters for our church/community:
   [1–2 sentences on the ministry/mission purpose]
-  
+
   Success looks like:
   □ [Outcome 1 — spiritual / relational / numerical]
   □ [Outcome 2]
@@ -146,7 +146,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
   ├──────────────────────────┼──────────┼──────────┤
   │ TOTAL                    │          │          │
   └──────────────────────────┴──────────┴──────────┘
-  
+
   Income (if applicable):
   □ Ticket sales / donations expected: [Amount]
   □ Grant funding: [If applicable]
@@ -201,6 +201,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
 ## Specialist Event Templates
 
 ### Alpha / Christianity Explored Course Launch
+
 - 10-week course structure with weekly session setup checklist
 - Host home vs. church building comparison
 - Meal preparation rota template
@@ -208,6 +209,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
 - Graduation celebration planning
 
 ### Baptism Service
+
 - Candidate preparation meeting agenda
 - Testimony coaching for candidates
 - Practical setup checklist (baptismal pool/outdoor water body)
@@ -216,7 +218,9 @@ Optional: Budget available, existing team, any special requirements (catering, A
 - Certificate/gift suggestions
 
 ### Seasonal Mega-Events
+
 **Christmas Community Dinner (100+ people):**
+
 - Catering calculator (portions per person, dietary requirement tracking)
 - Table decoration guide
 - Programme structure (welcome, carol singing, message, meal, carol)
@@ -224,12 +228,14 @@ Optional: Budget available, existing team, any special requirements (catering, A
 - Volunteer briefing pack
 
 **Easter Family Service:**
+
 - Family-friendly program flow
 - Children's activities during service
 - Egg hunt logistics (outdoor safety, age-group zones)
 - Allergy management for food activities
 
 **Church Anniversary / Homecoming Sunday:**
+
 - History display planning
 - Special guest (former members, founding pastor) logistics
 - Photo slideshow coordinator notes
@@ -237,6 +243,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
 - Thanksgiving meal planning
 
 ### Youth/Young Adults Events
+
 - Safeguarding requirements for events with under-18s
 - Permission slip template
 - Ratio guidance (leaders to young people)
@@ -248,6 +255,7 @@ Optional: Budget available, existing team, any special requirements (catering, A
 ## Accessibility Checklist
 
 Every event plan includes:
+
 ```
 ACCESSIBILITY REVIEW
 □ Wheelchair access confirmed for all event areas

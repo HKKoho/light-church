@@ -46,7 +46,8 @@ const DENY_PATTERNS: readonly DenyPattern[] = [
   // Note: script-file invocations (python3 script.py) cannot be inspected this way —
   // full isolation requires the Phase 2 python-runner (see docs/PHASE2.md P2-001).
   {
-    regex: /subprocess\.(run|call|popen|check_output|check_call)\s*\(.*['"](rm|sudo|shutdown|reboot|poweroff|halt|mkfs|dd)\b/,
+    regex:
+      /subprocess\.(run|call|popen|check_output|check_call)\s*\(.*['"](rm|sudo|shutdown|reboot|poweroff|halt|mkfs|dd)\b/,
     reason: 'dangerous command via Python subprocess is not allowed',
   },
   {

@@ -61,8 +61,7 @@ const messages = {
     members: 'Members',
     remove: 'Remove',
     removeTitle: 'Remove Group',
-    removeDescription:
-      'This will remove the group and all its member associations.',
+    removeDescription: 'This will remove the group and all its member associations.',
     removeConfirm: (name: string) => `Are you sure you want to remove ${name}?`,
     cancel: 'Cancel',
     successTitle: 'Group Created',

@@ -87,7 +87,7 @@ describe('WorkspaceController', () => {
       const result = await controller.listFiles(mockReq, undefined);
 
       expect(result).toEqual(mockListing);
-      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/');
+      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/', 'admin', undefined);
     });
 
     it('should list files at specified path', async () => {
@@ -95,7 +95,7 @@ describe('WorkspaceController', () => {
 
       await controller.listFiles(mockReq, '/src');
 
-      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/src');
+      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/src', 'admin', undefined);
     });
 
     it('should propagate NotFoundException', async () => {
@@ -112,7 +112,7 @@ describe('WorkspaceController', () => {
       const result = await controller.getFileContent(mockReq, '/index.ts');
 
       expect(result).toEqual(mockFileContent);
-      expect(mockService.readFile).toHaveBeenCalledWith('user-1', '/index.ts');
+      expect(mockService.readFile).toHaveBeenCalledWith('user-1', '/index.ts', 'admin', undefined);
     });
 
     it('should throw BadRequestException when path is missing', async () => {
@@ -129,7 +129,13 @@ describe('WorkspaceController', () => {
       const result = await controller.createEntry(mockReq, { path: '/newfile.ts', type: 'file' });
 
       expect(result).toEqual(mockFileEntry);
-      expect(mockService.createEntry).toHaveBeenCalledWith('user-1', '/newfile.ts', 'file');
+      expect(mockService.createEntry).toHaveBeenCalledWith(
+        'user-1',
+        '/newfile.ts',
+        'file',
+        'admin',
+        undefined,
+      );
     });
 
     it('should call service with directory type', async () => {
@@ -146,7 +152,13 @@ describe('WorkspaceController', () => {
       const result = await controller.createEntry(mockReq, { path: '/newdir', type: 'directory' });
 
       expect(result).toEqual(mockDirEntry);
-      expect(mockService.createEntry).toHaveBeenCalledWith('user-1', '/newdir', 'directory');
+      expect(mockService.createEntry).toHaveBeenCalledWith(
+        'user-1',
+        '/newdir',
+        'directory',
+        'admin',
+        undefined,
+      );
     });
 
     it('should throw ZodError when body is missing type', async () => {
@@ -177,7 +189,13 @@ describe('WorkspaceController', () => {
       });
 
       expect(result).toEqual(renamedEntry);
-      expect(mockService.renameEntry).toHaveBeenCalledWith('user-1', '/newfile.ts', 'renamed.ts');
+      expect(mockService.renameEntry).toHaveBeenCalledWith(
+        'user-1',
+        '/newfile.ts',
+        'renamed.ts',
+        'admin',
+        undefined,
+      );
     });
 
     it('should throw ZodError when newName contains slashes', async () => {
@@ -210,7 +228,13 @@ describe('WorkspaceController', () => {
       });
 
       expect(result).toEqual(movedEntry);
-      expect(mockService.moveEntry).toHaveBeenCalledWith('user-1', '/newfile.ts', '/src');
+      expect(mockService.moveEntry).toHaveBeenCalledWith(
+        'user-1',
+        '/newfile.ts',
+        '/src',
+        'admin',
+        undefined,
+      );
     });
 
     it('should throw ZodError when destination is missing', async () => {
@@ -234,7 +258,12 @@ describe('WorkspaceController', () => {
       const result = await controller.deleteEntry(mockReq, { path: '/newfile.ts' });
 
       expect(result).toEqual(deleteResponse);
-      expect(mockService.deleteEntry).toHaveBeenCalledWith('user-1', '/newfile.ts');
+      expect(mockService.deleteEntry).toHaveBeenCalledWith(
+        'user-1',
+        '/newfile.ts',
+        'admin',
+        undefined,
+      );
     });
 
     it('should throw ZodError when path is empty', async () => {
@@ -263,7 +292,12 @@ describe('WorkspaceController', () => {
 
       await controller.downloadFile(mockReq, '/index.ts', mockReply);
 
-      expect(mockService.downloadFile).toHaveBeenCalledWith('user-1', '/index.ts');
+      expect(mockService.downloadFile).toHaveBeenCalledWith(
+        'user-1',
+        '/index.ts',
+        'admin',
+        undefined,
+      );
       expect(mockReply.header).toHaveBeenCalledWith('Content-Type', 'text/plain');
       expect(mockReply.header).toHaveBeenCalledWith(
         'Content-Disposition',

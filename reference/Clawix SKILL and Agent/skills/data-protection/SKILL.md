@@ -1,7 +1,8 @@
 ---
 name: data-protection
 description: Beneficiary data handling — consent capture, anonymization, GDPR-aligned retention, and the file-marking conventions every agent in this configuration honors. Read before processing or sharing data that involves identifiable people.
-applies-to: [donor-engagement, monitoring-evaluation, communications, field-operations, program-coordinator]
+applies-to:
+  [donor-engagement, monitoring-evaluation, communications, field-operations, program-coordinator]
 ---
 
 # Data protection — operational rules

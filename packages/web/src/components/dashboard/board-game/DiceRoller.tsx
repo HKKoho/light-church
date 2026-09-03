@@ -28,12 +28,7 @@ export function DiceRoller({ lastRoll, phase, currentPlayerName, onRoll, onEndTu
       </div>
 
       <div className="flex gap-2">
-        <Button
-          size="sm"
-          disabled={phase !== 'ROLL'}
-          onClick={onRoll}
-          className="flex-1"
-        >
+        <Button size="sm" disabled={phase !== 'ROLL'} onClick={onRoll} className="flex-1">
           Roll Dice
         </Button>
         <Button

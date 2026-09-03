@@ -10,7 +10,9 @@ import { RedisService } from '../redis.service.js';
 vi.mock('ioredis', () => {
   const mockClient = createMockRedisClient();
   return {
-    Redis: vi.fn(() => mockClient),
+    Redis: vi.fn(function () {
+      return mockClient;
+    }),
     __mockClient: mockClient,
   };
 });

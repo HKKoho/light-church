@@ -11,7 +11,7 @@ highly sensitive beneficiary data.
 
 **Status:** Deferred — accepted risk for Phase 1  
 **Priority:** Medium  
-**Effort:** High  
+**Effort:** High
 
 ### Background
 
@@ -54,6 +54,7 @@ network policy and resource limits.
 ### Interim mitigation already applied (Option 1)
 
 Python-aware deny patterns added to `shell.ts` (2026-06-13) covering:
+
 - `subprocess.run/call/Popen/check_output/check_call` with dangerous commands
 - `os.system` with dangerous commands
 - `os.execv/execve/execvp` (process replacement)
@@ -86,6 +87,7 @@ isolation requires the Phase 2 python-runner below.
 ## Where `quick_validate.py` and `package_skill.py` run
 
 These scripts live at:
+
 ```
 skills/builtin/skill-creator/scripts/quick_validate.py
 skills/builtin/skill-creator/scripts/package_skill.py
@@ -108,6 +110,7 @@ Result returned to agent, then to user.
 ```
 
 The scripts run **inside** the agent container because:
+
 - `skills/builtin/` is mounted into agent containers at `/skills/builtin/`
 - `python3` is available (agent image is `python:3.12-slim`)
 - The workspace skill folders are at `/workspace/` inside the container
@@ -131,12 +134,12 @@ use Python standard library (`pathlib`, `zipfile`, `re`, `sys`) plus optional
 
 ### Summary
 
-| Context | Where it runs | Trigger |
-|---|---|---|
+| Context                         | Where it runs              | Trigger                        |
+| ------------------------------- | -------------------------- | ------------------------------ |
 | Agent asked to validate a skill | Inside `clawix-agent-xxxx` | `shell` tool via `docker exec` |
-| Agent asked to package a skill | Inside `clawix-agent-xxxx` | `shell` tool via `docker exec` |
-| Developer local check | Host machine | Direct `python3` call |
-| CI pipeline (future) | CI runner (host-level) | Script step in workflow |
+| Agent asked to package a skill  | Inside `clawix-agent-xxxx` | `shell` tool via `docker exec` |
+| Developer local check           | Host machine               | Direct `python3` call          |
+| CI pipeline (future)            | CI runner (host-level)     | Script step in workflow        |
 
 > Note: until P2-001 is implemented, these scripts run inside the same
 > container as the agent — meaning they share the agent's filesystem access.

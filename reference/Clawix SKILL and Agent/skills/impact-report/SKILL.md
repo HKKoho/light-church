@@ -23,30 +23,39 @@ In all three, the variance section is non-optional.
 ## Section-by-section rules
 
 ### Executive summary
+
 Half a page maximum. What was the period, what was promised, what was delivered, what shifted, what's next. No surprises later in the document.
 
 ### Context update
+
 Has the operating environment changed? Conflict, drought, election, currency shock, partner staffing. Be specific. Supporters cross-reference this against ReliefWeb, INFORM, and their own field intel.
 
 ### Activity progress
+
 A table: planned activity, planned dose (e.g., trainings × beneficiaries), actual dose, % of plan, brief commentary. Numbers come from `mne/processed/<period>.md`. Cite the path.
 
 ### Outcome and indicator results
+
 A table per result statement: indicator, baseline, target, actual, % achieved, source-of-verification path, commentary. Variance > 20% in either direction needs a real explanation, not a sentence of weather.
 
 ### Beneficiary stories
-Two or three. Each requires a source file with `consent: shareable` and `consent-type: named` or `pseudonym`. Each story shows the *change*, not the *suffering*. Avoid the "before they had nothing, now they smile" structure.
+
+Two or three. Each requires a source file with `consent: shareable` and `consent-type: named` or `pseudonym`. Each story shows the _change_, not the _suffering_. Avoid the "before they had nothing, now they smile" structure.
 
 ### Risks and mitigations
+
 Update the risk matrix. Risks that materialized: what was the response, what is the residual. New risks: what is the mitigation.
 
 ### Financial narrative (if requested)
+
 Variance against budget by line. Reasons. Reallocations approved by the supporter in writing only.
 
 ### Lessons and adaptations
+
 What did the period teach the NGO? What changes in the next period? Supporters notice the absence of this section.
 
 ### Next period plan
+
 Brief. Keyed to the workplan and any supporter-approved changes.
 
 ## Evidence-citation rules
@@ -56,12 +65,14 @@ Every numeric claim cites a path inside the workspace: `(see mne/processed/2026-
 ## Variance reporting — the part most NGOs do badly
 
 If actual is below target:
+
 - State the percentage gap plainly.
 - Explain the cause in operational terms (what did and did not happen on the ground).
 - Distinguish between activity-side causes (we delivered fewer trainings) and uptake-side causes (we delivered all the trainings; people did not adopt the practice as expected).
 - State what is being adjusted in the next period and why.
 
 If actual is above target:
+
 - State it. Don't pretend you nailed the prediction.
 - Check: were beneficiaries double-counted? Was the indicator definition slipped to make the number bigger? Be honest.
 - Consider whether the target was set too low and should be revised upward in the next period.

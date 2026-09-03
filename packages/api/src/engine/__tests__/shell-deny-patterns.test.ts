@@ -103,7 +103,11 @@ describe('checkDenyPatterns — subshell commands', () => {
 
 describe('checkDenyPatterns — Python inline bypass patterns', () => {
   it('blocks subprocess.run with rm', () => {
-    expect(checkDenyPatterns(`python3 -c "import subprocess; subprocess.run(['rm', '-rf', '/workspace'])"`)).toBeDefined();
+    expect(
+      checkDenyPatterns(
+        `python3 -c "import subprocess; subprocess.run(['rm', '-rf', '/workspace'])"`,
+      ),
+    ).toBeDefined();
   });
 
   it('blocks subprocess.call with sudo', () => {
@@ -111,7 +115,9 @@ describe('checkDenyPatterns — Python inline bypass patterns', () => {
   });
 
   it('blocks subprocess.Popen with shutdown', () => {
-    expect(checkDenyPatterns(`python3 -c "subprocess.Popen(['shutdown', '-h', 'now'])"`)).toBeDefined();
+    expect(
+      checkDenyPatterns(`python3 -c "subprocess.Popen(['shutdown', '-h', 'now'])"`),
+    ).toBeDefined();
   });
 
   it('blocks subprocess.check_output with halt', () => {
@@ -119,7 +125,9 @@ describe('checkDenyPatterns — Python inline bypass patterns', () => {
   });
 
   it('blocks os.system with rm -rf', () => {
-    expect(checkDenyPatterns(`python3 -c "import os; os.system('rm -rf /workspace')"`)).toBeDefined();
+    expect(
+      checkDenyPatterns(`python3 -c "import os; os.system('rm -rf /workspace')"`),
+    ).toBeDefined();
   });
 
   it('blocks os.system with sudo', () => {
@@ -147,7 +155,9 @@ describe('checkDenyPatterns — Python inline bypass patterns', () => {
   });
 
   it('allows subprocess.run with safe commands', () => {
-    expect(checkDenyPatterns(`python3 -c "import subprocess; subprocess.run(['ls', '-la'])"`)).toBeUndefined();
+    expect(
+      checkDenyPatterns(`python3 -c "import subprocess; subprocess.run(['ls', '-la'])"`),
+    ).toBeUndefined();
   });
 
   it('allows os.system with safe command', () => {
@@ -155,11 +165,17 @@ describe('checkDenyPatterns — Python inline bypass patterns', () => {
   });
 
   it('allows legitimate python3 data processing', () => {
-    expect(checkDenyPatterns(`python3 -c "import csv, statistics; print(statistics.mean([1,2,3]))"`)).toBeUndefined();
+    expect(
+      checkDenyPatterns(`python3 -c "import csv, statistics; print(statistics.mean([1,2,3]))"`),
+    ).toBeUndefined();
   });
 
   it('allows python3 script file invocation', () => {
-    expect(checkDenyPatterns(`python3 /skills/builtin/skill-creator/scripts/quick_validate.py /workspace/my-skill`)).toBeUndefined();
+    expect(
+      checkDenyPatterns(
+        `python3 /skills/builtin/skill-creator/scripts/quick_validate.py /workspace/my-skill`,
+      ),
+    ).toBeUndefined();
   });
 });
 

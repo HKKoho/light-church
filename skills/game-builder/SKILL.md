@@ -55,14 +55,14 @@ TypeScript code never changes — only the JSON file changes between games.
 
 ## Space types and their visual styles
 
-| type      | color   | use when                               |
-|-----------|---------|----------------------------------------|
-| start     | green   | starting position                      |
-| finish    | amber   | winning space                          |
-| event     | blue    | neutral card draw                      |
-| challenge | red     | obstacle — skip turn or lose resources |
-| blessing  | violet  | positive reward                        |
-| safe      | grey    | no effect — just movement              |
+| type      | color  | use when                               |
+| --------- | ------ | -------------------------------------- |
+| start     | green  | starting position                      |
+| finish    | amber  | winning space                          |
+| event     | blue   | neutral card draw                      |
+| challenge | red    | obstacle — skip turn or lose resources |
+| blessing  | violet | positive reward                        |
+| safe      | grey   | no effect — just movement              |
 
 ## Writing a new game
 
@@ -86,16 +86,17 @@ TypeScript code never changes — only the JSON file changes between games.
 {
   "id": "my-game",
   "title": "My Game",
-  "minPlayers": 2, "maxPlayers": 4,
+  "minPlayers": 2,
+  "maxPlayers": 4,
   "dice": { "count": 1, "sides": 6 },
   "resources": ["faith"],
   "winCondition": { "type": "reachSpace", "spaceId": 9 },
   "board": {
-    "path": [0,1,2,3,4,5,6,7,8,9],
+    "path": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
     "spaces": [
-      { "id": 0, "label": "Start",  "type": "start" },
+      { "id": 0, "label": "Start", "type": "start" },
       { "id": 1, "label": "Step 1", "type": "safe" },
-      { "id": 2, "label": "Trial",  "type": "challenge", "cardId": "trial1" },
+      { "id": 2, "label": "Trial", "type": "challenge", "cardId": "trial1" },
       { "id": 9, "label": "Finish", "type": "finish" }
     ]
   },

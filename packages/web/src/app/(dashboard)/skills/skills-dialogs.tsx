@@ -114,7 +114,8 @@ const messages = {
     },
     edit: {
       titlePrefix: '編輯',
-      description: 'Frontmatter 必須維持有效（name、description）。如需更複雜的編輯，請使用工作區檔案編輯器。',
+      description:
+        'Frontmatter 必須維持有效（name、description）。如需更複雜的編輯，請使用工作區檔案編輯器。',
       cancel: '取消',
       save: '儲存',
       errFailed: '儲存失敗',
@@ -193,7 +194,8 @@ const messages = {
 //  Skill scaffold template                                            //
 // ------------------------------------------------------------------ //
 
-const SKILL_CONTENT_TEMPLATE = (name: string, description: string) => `---
+const SKILL_CONTENT_TEMPLATE = (name: string, description: string) =>
+  `---
 name: ${name || 'my-skill'}
 description: ${description || 'What this skill does and when the agent should use it.'}
 version: 1.0.0
@@ -246,7 +248,8 @@ const SKILL_SAMPLES: SkillSample[] = [
   {
     label: 'Image → Video (Gemini + Banana API)',
     name: 'create-video-from-images',
-    description: 'Convert uploaded PNG or JPG images into an 8-second short video using Gemini and Banana API. Use when the user asks to turn a set of images into a short video clip.',
+    description:
+      'Convert uploaded PNG or JPG images into an 8-second short video using Gemini and Banana API. Use when the user asks to turn a set of images into a short video clip.',
     content: `---
 name: create-video-from-images
 description: Convert uploaded PNG or JPG images into an 8-second short video using Gemini and Banana API. Use when the user asks to turn a set of images into a short video clip.
@@ -298,7 +301,8 @@ See \`scripts/upload_and_convert.py\` for the full implementation.`,
   {
     label: 'Images → PowerPoint Template (python-pptx)',
     name: 'create-ppt-from-images',
-    description: 'Convert a set of PNG or JPG images into a PowerPoint presentation template, arranging images into slides with suggested titles. Use when the user wants to build a presentation from photos or activity images.',
+    description:
+      'Convert a set of PNG or JPG images into a PowerPoint presentation template, arranging images into slides with suggested titles. Use when the user wants to build a presentation from photos or activity images.',
     content: `---
 name: create-ppt-from-images
 description: Convert a set of PNG or JPG images into a PowerPoint presentation template, arranging images into slides with suggested titles. Use when the user wants to build a presentation from photos or activity images.
@@ -350,7 +354,8 @@ See \`scripts/generate_ppt.py\` for the full implementation.`,
   {
     label: 'OCR + Question Answering (pytesseract)',
     name: 'ocr-and-question-answering',
-    description: 'Extract text from PNG or JPG images using OCR (pytesseract) and answer questions based on the extracted content. Use when the user uploads a scanned document, receipt, form, or image containing text and wants to query it.',
+    description:
+      'Extract text from PNG or JPG images using OCR (pytesseract) and answer questions based on the extracted content. Use when the user uploads a scanned document, receipt, form, or image containing text and wants to query it.',
     content: `---
 name: ocr-and-question-answering
 description: Extract text from PNG or JPG images using OCR (pytesseract) and answer questions based on the extracted content. Use when the user uploads a scanned document, receipt, form, or image containing text and wants to query it.
@@ -407,7 +412,8 @@ See \`scripts/ocr_extract.py\` for the full implementation.`,
   {
     label: 'NGO Field Report Compiler',
     name: 'ngo-field-report-compiler',
-    description: 'Compile structured field reports from raw notes, photos, and data files in the workspace. Use when a field officer needs to turn unstructured observations into a formatted impact report for supporters or management.',
+    description:
+      'Compile structured field reports from raw notes, photos, and data files in the workspace. Use when a field officer needs to turn unstructured observations into a formatted impact report for supporters or management.',
     content: `---
 name: ngo-field-report-compiler
 description: Compile structured field reports from raw notes, photos, and data files in the workspace. Use when a field officer needs to turn unstructured observations into a formatted impact report for supporters or management.
@@ -567,7 +573,9 @@ export function CreateDialog({
         <div className="flex flex-col gap-3">
           {/* Name */}
           <div className="flex flex-col gap-1">
-            <label className="text-xs font-medium text-muted-foreground">{t.create.nameLabel}</label>
+            <label className="text-xs font-medium text-muted-foreground">
+              {t.create.nameLabel}
+            </label>
             <Input
               placeholder={t.create.namePlaceholder}
               value={name}
@@ -608,7 +616,9 @@ export function CreateDialog({
               value=""
               onChange={(e) => loadSample(e.target.value)}
             >
-              <option value="" disabled>{t.create.selectExample}</option>
+              <option value="" disabled>
+                {t.create.selectExample}
+              </option>
               {SKILL_SAMPLES.map((s) => (
                 <option key={s.name} value={s.label}>
                   {t.sampleLabels[s.name as keyof typeof t.sampleLabels] ?? s.label}
@@ -628,7 +638,9 @@ export function CreateDialog({
                 {t.create.contentLabelPrefix}{' '}
                 {content.trim() ? t.create.contentCustomised : t.create.contentOptional}
               </span>
-              <ChevronDown className={`size-3.5 transition-transform ${contentOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown
+                className={`size-3.5 transition-transform ${contentOpen ? 'rotate-180' : ''}`}
+              />
             </button>
             {contentOpen && (
               <div className="border-t p-2">
@@ -637,7 +649,10 @@ export function CreateDialog({
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   className="min-h-[40vh] font-mono text-xs leading-relaxed"
-                  placeholder={SKILL_CONTENT_TEMPLATE('my-skill', t.create.contentPlaceholderDescription)}
+                  placeholder={SKILL_CONTENT_TEMPLATE(
+                    'my-skill',
+                    t.create.contentPlaceholderDescription,
+                  )}
                 />
               </div>
             )}

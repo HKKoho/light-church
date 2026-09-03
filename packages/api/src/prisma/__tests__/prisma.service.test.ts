@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 vi.mock('@prisma/adapter-pg', () => ({
-  PrismaPg: vi.fn().mockImplementation(() => ({
-    provider: 'postgres',
-    adapterName: '@prisma/adapter-pg',
-  })),
+  PrismaPg: vi.fn().mockImplementation(function () {
+    return { provider: 'postgres', adapterName: '@prisma/adapter-pg' };
+  }),
 }));
 
 const mockConnect = vi.fn().mockResolvedValue(undefined);

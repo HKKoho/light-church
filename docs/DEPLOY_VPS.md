@@ -4,7 +4,7 @@ This is the cheapest way to put Light Church online. It doesn't touch Railway or
 managed database — everything (Postgres, Redis, the API, the web dashboard, and every
 agent's Docker container) runs on one small server, using the installer this repo
 already ships (`pnpm run install:clawix`, documented in `docs/GET_STARTED.md`). This
-doc covers everything *around* that installer: picking a server, DNS, TLS, firewall,
+doc covers everything _around_ that installer: picking a server, DNS, TLS, firewall,
 and ongoing maintenance — none of which exists elsewhere in the repo yet.
 
 **Why not a "normal" PaaS (Vercel/Render/Railway/Fly)?** The engine spawns each agent
@@ -12,15 +12,15 @@ run as its own Docker container via the Docker CLI directly
 (`ContainerPoolService`/`ContainerRunner` in `packages/api/src/engine/`). That needs a
 real Docker daemon the API process can reach. Most managed platforms don't give you
 that without extra cost or complexity, so a plain VPS with Docker installed is both the
-simplest *and* the cheapest option here.
+simplest _and_ the cheapest option here.
 
 ## 1. Pick a server
 
-| Provider | Spec | Price |
-|---|---|---|
+| Provider                             | Spec                          | Price           |
+| ------------------------------------ | ----------------------------- | --------------- |
 | **Hetzner Cloud CX22** (recommended) | 2 vCPU / 4 GB RAM / 40 GB SSD | ~€3.79/mo (~$4) |
-| Hetzner Cloud CX32 | 4 vCPU / 8 GB RAM / 80 GB SSD | ~€7.59/mo (~$8) |
-| Oracle Cloud "Always Free" | 4 ARM cores / 24 GB RAM | $0/mo |
+| Hetzner Cloud CX32                   | 4 vCPU / 8 GB RAM / 80 GB SSD | ~€7.59/mo (~$8) |
+| Oracle Cloud "Always Free"           | 4 ARM cores / 24 GB RAM       | $0/mo           |
 
 Start with **CX22** — Postgres, Redis, the API, the web dashboard, and a couple of
 warm/active agent containers (512 MB each, per `CLAUDE.md`) fit comfortably in 4 GB for
@@ -98,6 +98,7 @@ pnpm run install:clawix
 ```
 
 When prompted:
+
 - **Deploy mode:** production
 - **AI provider + key:** pick one (see the cost note below before choosing a model)
 - **Public host or IP:** `churchclawix.aibyml.uk` (your domain, no `https://`, no port)
@@ -148,9 +149,9 @@ Caddy issues and renews Let's Encrypt certificates for both automatically (it us
 port 80 for the ACME challenge regardless of which port the site block listens on —
 that's why port 80 is open in the firewall).
 
-*(Want the classic port-less `https://churchclawix.aibyml.uk` URL instead? That needs
+_(Want the classic port-less `https://churchclawix.aibyml.uk` URL instead? That needs
 docker-compose.prod.yml's port mappings changed and a rebuild — ask and I can make
-that small change.)*
+that small change.)_
 
 ## 6. Verify
 
@@ -180,10 +181,10 @@ pnpm run uninstall:clawix -- --full    # removes .env, ./data, skills/custom too
 
 ## Cost recap
 
-| Item | Monthly |
-|---|---|
-| Hetzner CX22 VPS | ~$4 |
-| Domain (amortized, optional) | ~$1 |
-| Caddy, Docker, TLS | $0 |
-| **Infra total** | **~$5/mo** |
-| LLM API usage | variable — dominates the bill; pick a cheap default model |
+| Item                         | Monthly                                                   |
+| ---------------------------- | --------------------------------------------------------- |
+| Hetzner CX22 VPS             | ~$4                                                       |
+| Domain (amortized, optional) | ~$1                                                       |
+| Caddy, Docker, TLS           | $0                                                        |
+| **Infra total**              | **~$5/mo**                                                |
+| LLM API usage                | variable — dominates the bill; pick a cheap default model |

@@ -235,7 +235,8 @@ export function classifyError(err: unknown): ClassifiedError {
     return build('payload_too_large', err);
   }
   if (matchesAny(lower, PROVIDER_POLICY_PATTERNS)) return build('provider_policy', err);
-  if (matchesAny(lower, MODEL_NOT_FOUND_PATTERNS) || shape.status === 404) return build('model_not_found', err);
+  if (matchesAny(lower, MODEL_NOT_FOUND_PATTERNS) || shape.status === 404)
+    return build('model_not_found', err);
   if (matchesAny(lower, AUTH_PATTERNS) || shape.status === 401) return build('auth', err);
   if (matchesAny(lower, BILLING_PATTERNS) || shape.status === 402) return build('billing', err);
   if (matchesAny(lower, RATE_LIMIT_PATTERNS) || shape.status === 429) {

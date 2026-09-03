@@ -71,8 +71,7 @@ const messages = {
       policy: 'Policy',
       agent: 'Primary Agent',
       selectAgent: 'Select an agent...',
-      help:
-        'Clients must be bound to a primary agent — this is what they chat with over the API.',
+      help: 'Clients must be bound to a primary agent — this is what they chat with over the API.',
       cancel: 'Cancel',
       submit: 'Create',
     },
@@ -86,7 +85,8 @@ const messages = {
     errors: { load: 'Failed to load API clients', create: 'Failed to create API client' },
   },
   'zh-TW': {
-    intro: '無頭 API 帳戶。每個用戶端透過 HTTP／WebSocket 登入，並以 JWT 限定在自己的資料範圍內 — 無儀表板存取權限。',
+    intro:
+      '無頭 API 帳戶。每個用戶端透過 HTTP／WebSocket 登入，並以 JWT 限定在自己的資料範圍內 — 無儀表板存取權限。',
     addClient: '新增用戶端',
     columns: {
       name: '名稱',
@@ -124,7 +124,14 @@ const messages = {
 } satisfies Messages<{
   intro: string;
   addClient: string;
-  columns: { name: string; email: string; policy: string; agent: string; status: string; created: string };
+  columns: {
+    name: string;
+    email: string;
+    policy: string;
+    agent: string;
+    status: string;
+    created: string;
+  };
   status: { active: string; inactive: string };
   empty: string;
   actions: { deactivate: string; activate: string; remove: string };
@@ -141,7 +148,12 @@ const messages = {
     cancel: string;
     submit: string;
   };
-  deleteDialog: { title: string; confirm: (name: string, email: string) => string; cancel: string; remove: string };
+  deleteDialog: {
+    title: string;
+    confirm: (name: string, email: string) => string;
+    cancel: string;
+    remove: string;
+  };
   errors: { load: string; create: string };
 }>;
 
@@ -209,7 +221,9 @@ export function ApiClientsTab() {
           '/api/v1/agents/user-agents',
         ),
       ]);
-      setClients(Array.isArray(usersRes.data) ? usersRes.data.filter((u) => u.role === 'client') : []);
+      setClients(
+        Array.isArray(usersRes.data) ? usersRes.data.filter((u) => u.role === 'client') : [],
+      );
       setPolicies(Array.isArray(policiesRes.data) ? policiesRes.data : []);
       setAgentDefs(
         Array.isArray(agentsRes.data)
@@ -449,7 +463,9 @@ export function ApiClientsTab() {
                 name="policyId"
                 id="client-policy"
                 className="rounded-md border bg-background px-3 py-2 text-sm"
-                defaultValue={policies.find((p) => p.name === 'Standard')?.id ?? policies[0]?.id ?? ''}
+                defaultValue={
+                  policies.find((p) => p.name === 'Standard')?.id ?? policies[0]?.id ?? ''
+                }
               >
                 {policies
                   .filter((p) => p.isActive)

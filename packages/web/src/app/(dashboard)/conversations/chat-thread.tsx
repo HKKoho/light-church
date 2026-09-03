@@ -138,12 +138,7 @@ function AgentMessage({
           <Copy className="size-3.5 text-muted-foreground" />
         </Button>
         {onToggleSpeak && (
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-7"
-            onClick={onToggleSpeak}
-          >
+          <Button variant="ghost" size="icon" className="size-7" onClick={onToggleSpeak}>
             {isSpeaking ? (
               <Square className="size-3.5 text-muted-foreground" />
             ) : (

@@ -16,7 +16,7 @@ this skill supplements those rules and never overrides them. If a crisis disclos
 occurs while using this skill, follow the agent's own crisis workflow, not any
 crisis-response steps implied below.
 
-> *"Carry each other's burdens, and in this way you will fulfil the law of Christ."*
+> _"Carry each other's burdens, and in this way you will fulfil the law of Christ."_
 > — Galatians 6:2
 
 ---
@@ -24,21 +24,26 @@ crisis-response steps implied below.
 ## Situation Categories
 
 ### 1. Grief & Bereavement
+
 **Signs:** recent death of a loved one, anniversary grief, pregnancy loss, pet loss, loss of a relationship.
 
 **Conversation approach:**
+
 - Let them speak first. Ask: "How are you really doing?"
 - Sit with silence if they stop talking — it's not awkward, it's sacred.
 - Acknowledge the specific, unique pain rather than generalizing.
 
 **Avoid saying:**
+
 - "They're in a better place." / "Everything happens for a reason." / "Stay strong."
 - "At least they had a good life." / "I know how you feel."
 
 **What helps:**
+
 - "I'm so sorry. I'm here." / "Tell me about [name]." (invite memories)
 
 **Scripture for comfort** (offer only when invited or at a natural close):
+
 - Psalm 23 — God present in the valley
 - John 11:35 — "Jesus wept." God is not unmoved by our grief
 - Romans 8:38–39 — nothing separates us from God's love
@@ -57,14 +62,17 @@ traumatic, or a suicide loss — treat the last one as a crisis-adjacent disclos
 the agent's own crisis workflow, not routine grief support.
 
 ### 2. Illness & Hospitalisation
+
 **Signs:** member in hospital, chronic illness, terminal diagnosis, surgery recovery.
 
 **Conversation approach:**
+
 - Ask before praying — don't assume.
 - Terminal illness: be honest about what is and isn't known; people need truth and hope together, not false reassurance.
 - Keep the conversation as long as the person wants, but don't push past what they have energy for — illness is tiring, and a shorter, warmer exchange beats an exhausting one.
 
 **Prayer offered, not imposed** (only after asking):
+
 ```
 Lord, [Name] is in your hands — and those are the best possible hands to be in.
 We don't always understand why [he/she/they] faces this.
@@ -76,12 +84,14 @@ In Jesus' name, Amen.
 ```
 
 ### 3. Marriage & Family Crisis
+
 **Signs:** marital conflict, separation, divorce, a prodigal child, family breakdown.
 
 **Critical boundary:** this is not couples counselling. Know the limit and say so
 plainly if asked to mediate or take sides.
 
 **Conversation approach:**
+
 - Listen to whichever party is present without prejudging the other — you only ever have one side.
 - Affirm the pain without condemning the absent party.
 - Offer the presence of God in the difficulty, not a quick fix.
@@ -91,11 +101,13 @@ plainly if asked to mediate or take sides.
   ordinary marriage-crisis support.
 
 ### 4. Spiritual Dryness / Crisis of Faith
+
 **Signs:** feeling spiritually empty, doubting, angry at God, disengaged from church.
 
 **This is not a problem to fix — it is often a season of deepening.**
 
 **Conversation approach:**
+
 - Don't immediately offer spiritual disciplines as a fix ("pray more, read more").
 - Validate: "Many of the greatest saints went through exactly this — even Jesus cried out 'My God, why have you forsaken me?'"
 - Normalize the journey: the "Dark Night of the Soul" (St. John of the Cross), Psalms of lament (Psalm 13, 22, 88).
@@ -103,6 +115,7 @@ plainly if asked to mediate or take sides.
 - Invite, don't push: "You don't need to feel anything right now. Would it help to keep talking about this season?"
 
 ### 5. Addiction & Substance Issues
+
 **Approach:** listen with compassion, not condemnation. Point toward professional
 recovery programmes. Maintain the caring relationship throughout recovery — don't
 withdraw if there's a relapse. Involve family only with the person's permission.
@@ -140,6 +153,7 @@ CLOSING
 ## Message Templates
 
 ### Follow-up note
+
 ```
 Subject: Thinking of you
 
@@ -157,6 +171,7 @@ With love and prayer,
 ```
 
 ### Encouragement card (e.g. for a hospital stay)
+
 ```
 Dear [Name],
 
@@ -184,4 +199,4 @@ exhaustion, overwhelm, or vicarious trauma in conversation:
 3. Suggest a debrief with the senior pastor, a peer-support group for care workers, or personal spiritual direction.
 4. Ask gently: "Who is caring for you right now?"
 
-*"Take care of yourself — you cannot share what you do not have."*
+_"Take care of yourself — you cannot share what you do not have."_

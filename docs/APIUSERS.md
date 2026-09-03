@@ -93,10 +93,14 @@ const AUTH_TAG_LENGTH = 16;
 function getEncryptionKey(): Buffer {
   const keyHex = process.env['PROVIDER_ENCRYPTION_KEY'];
   if (!keyHex || keyHex.length === 0) {
-    throw new Error('PROVIDER_ENCRYPTION_KEY is required. Set a 64-character hex string (32 bytes).');
+    throw new Error(
+      'PROVIDER_ENCRYPTION_KEY is required. Set a 64-character hex string (32 bytes).',
+    );
   }
   if (keyHex.length !== 64) {
-    throw new Error(`PROVIDER_ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes); got ${keyHex.length}.`);
+    throw new Error(
+      `PROVIDER_ENCRYPTION_KEY must be exactly 64 hex characters (32 bytes); got ${keyHex.length}.`,
+    );
   }
   return Buffer.from(keyHex, 'hex');
 }
@@ -173,11 +177,22 @@ import { encrypt, decrypt, maskApiKey } from '../common/crypto.js';
 const logger = createLogger('provider-config');
 const CACHE_TTL_MS = 60_000;
 
-interface CachedEntry { apiKey: string; apiBaseUrl: string | null; expiresAt: number }
+interface CachedEntry {
+  apiKey: string;
+  apiBaseUrl: string | null;
+  expiresAt: number;
+}
 export interface MaskedProviderConfig {
-  id: string; provider: string; displayName: string; apiKey: string;
-  apiBaseUrl: string | null; isEnabled: boolean; isDefault: boolean;
-  sortOrder: number; createdAt: Date; updatedAt: Date;
+  id: string;
+  provider: string;
+  displayName: string;
+  apiKey: string;
+  apiBaseUrl: string | null;
+  isEnabled: boolean;
+  isDefault: boolean;
+  sortOrder: number;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 @Injectable()
@@ -190,53 +205,85 @@ export class ProviderConfigService {
     if (cached && cached.expiresAt > Date.now()) {
       return { apiKey: cached.apiKey, apiBaseUrl: cached.apiBaseUrl };
     }
-    const config = await this.prisma.providerConfig.findUnique({ where: { provider: providerName } });
+    const config = await this.prisma.providerConfig.findUnique({
+      where: { provider: providerName },
+    });
     if (config && config.isEnabled) {
       const decryptedKey = decrypt(config.apiKey);
-      this.cache.set(providerName, { apiKey: decryptedKey, apiBaseUrl: config.apiBaseUrl, expiresAt: Date.now() + CACHE_TTL_MS });
+      this.cache.set(providerName, {
+        apiKey: decryptedKey,
+        apiBaseUrl: config.apiBaseUrl,
+        expiresAt: Date.now() + CACHE_TTL_MS,
+      });
       return { apiKey: decryptedKey, apiBaseUrl: config.apiBaseUrl };
     }
     const spec = findProviderByName(providerName);
     const envKey = spec?.envKey ?? `${providerName.toUpperCase().replace(/-/g, '_')}_API_KEY`;
     const envValue = process.env[envKey];
     if (envValue) return { apiKey: envValue, apiBaseUrl: null };
-    throw new Error(`No provider config found for "${providerName}". Add it via the admin API or set ${envKey}.`);
+    throw new Error(
+      `No provider config found for "${providerName}". Add it via the admin API or set ${envKey}.`,
+    );
   }
 
   async getDefaultProviderName() {
-    const config = await this.prisma.providerConfig.findMany({ where: { isDefault: true, isEnabled: true }, take: 1 });
+    const config = await this.prisma.providerConfig.findMany({
+      where: { isDefault: true, isEnabled: true },
+      take: 1,
+    });
     return config[0]?.provider ?? null;
   }
 
   async findAll(): Promise<readonly MaskedProviderConfig[]> {
-    const configs = await this.prisma.providerConfig.findMany({ orderBy: [{ isDefault: 'desc' }, { sortOrder: 'asc' }] });
+    const configs = await this.prisma.providerConfig.findMany({
+      orderBy: [{ isDefault: 'desc' }, { sortOrder: 'asc' }],
+    });
     return configs.map((c) => {
       let maskedKey: string;
-      try { maskedKey = maskApiKey(decrypt(c.apiKey)); } catch { maskedKey = '****'; }
+      try {
+        maskedKey = maskApiKey(decrypt(c.apiKey));
+      } catch {
+        maskedKey = '****';
+      }
       return { ...c, apiKey: maskedKey };
     });
   }
 
   async findByProvider(providerName: string) {
-    const config = await this.prisma.providerConfig.findUnique({ where: { provider: providerName } });
+    const config = await this.prisma.providerConfig.findUnique({
+      where: { provider: providerName },
+    });
     if (!config) return null;
     let maskedKey: string;
-    try { maskedKey = maskApiKey(decrypt(config.apiKey)); } catch { maskedKey = '****'; }
+    try {
+      maskedKey = maskApiKey(decrypt(config.apiKey));
+    } catch {
+      maskedKey = '****';
+    }
     return { ...config, apiKey: maskedKey };
   }
 
   async create(input: CreateProviderConfigInput) {
     if (input.isDefault) {
-      const existingDefaults = await this.prisma.providerConfig.count({ where: { isDefault: true } });
+      const existingDefaults = await this.prisma.providerConfig.count({
+        where: { isDefault: true },
+      });
       if (existingDefaults > 0) {
-        await this.prisma.providerConfig.updateMany({ where: { isDefault: true }, data: { isDefault: false } });
+        await this.prisma.providerConfig.updateMany({
+          where: { isDefault: true },
+          data: { isDefault: false },
+        });
       }
     }
     const config = await this.prisma.providerConfig.create({
       data: {
-        provider: input.provider, displayName: input.displayName, apiKey: encrypt(input.apiKey),
-        apiBaseUrl: input.apiBaseUrl ?? null, isEnabled: input.isEnabled ?? true,
-        isDefault: input.isDefault ?? false, sortOrder: input.sortOrder ?? 0,
+        provider: input.provider,
+        displayName: input.displayName,
+        apiKey: encrypt(input.apiKey),
+        apiBaseUrl: input.apiBaseUrl ?? null,
+        isEnabled: input.isEnabled ?? true,
+        isDefault: input.isDefault ?? false,
+        sortOrder: input.sortOrder ?? 0,
       },
     });
     this.invalidateCache(config.provider);
@@ -245,11 +292,17 @@ export class ProviderConfigService {
 
   async update(providerName: string, input: UpdateProviderConfigInput) {
     if (input.isDefault === true) {
-      await this.prisma.providerConfig.updateMany({ where: { isDefault: true, provider: { not: providerName } }, data: { isDefault: false } });
+      await this.prisma.providerConfig.updateMany({
+        where: { isDefault: true, provider: { not: providerName } },
+        data: { isDefault: false },
+      });
     }
     const data: Record<string, unknown> = { ...input };
     if (input.apiKey) data['apiKey'] = encrypt(input.apiKey);
-    const config = await this.prisma.providerConfig.update({ where: { provider: providerName }, data });
+    const config = await this.prisma.providerConfig.update({
+      where: { provider: providerName },
+      data,
+    });
     this.invalidateCache(providerName);
     const maskedKey = input.apiKey ? maskApiKey(input.apiKey) : maskApiKey(decrypt(config.apiKey));
     return { ...config, apiKey: maskedKey };
@@ -275,14 +328,24 @@ export class ProviderConfigService {
       if (apiKey) {
         const spec = findProviderByName(provider);
         await this.prisma.providerConfig.create({
-          data: { provider, displayName, apiKey: encrypt(apiKey), apiBaseUrl: spec?.defaultBaseUrl ?? null, isEnabled: true, isDefault: isFirst, sortOrder: 0 },
+          data: {
+            provider,
+            displayName,
+            apiKey: encrypt(apiKey),
+            apiBaseUrl: spec?.defaultBaseUrl ?? null,
+            isEnabled: true,
+            isDefault: isFirst,
+            sortOrder: 0,
+          },
         });
         isFirst = false;
       }
     }
   }
 
-  private invalidateCache(providerName: string) { this.cache.delete(providerName); }
+  private invalidateCache(providerName: string) {
+    this.cache.delete(providerName);
+  }
 }
 ```
 
@@ -303,11 +366,26 @@ import { ProviderConfigService } from './provider-config.service.js';
 export class ProviderConfigController {
   constructor(private readonly providerConfigService: ProviderConfigService) {}
 
-  @Get() findAll() { return this.providerConfigService.findAll(); }
-  @Get(':provider') findOne(@Param('provider') provider: string) { return this.providerConfigService.findByProvider(provider); }
-  @Post() create(@Body(new ZodValidationPipe(createProviderConfigSchema)) body: CreateProviderConfigInput) { return this.providerConfigService.create(body); }
-  @Patch(':provider') update(@Param('provider') provider: string, @Body(new ZodValidationPipe(updateProviderConfigSchema)) body: UpdateProviderConfigInput) { return this.providerConfigService.update(provider, body); }
-  @Delete(':provider') remove(@Param('provider') provider: string) { return this.providerConfigService.remove(provider); }
+  @Get() findAll() {
+    return this.providerConfigService.findAll();
+  }
+  @Get(':provider') findOne(@Param('provider') provider: string) {
+    return this.providerConfigService.findByProvider(provider);
+  }
+  @Post() create(
+    @Body(new ZodValidationPipe(createProviderConfigSchema)) body: CreateProviderConfigInput,
+  ) {
+    return this.providerConfigService.create(body);
+  }
+  @Patch(':provider') update(
+    @Param('provider') provider: string,
+    @Body(new ZodValidationPipe(updateProviderConfigSchema)) body: UpdateProviderConfigInput,
+  ) {
+    return this.providerConfigService.update(provider, body);
+  }
+  @Delete(':provider') remove(@Param('provider') provider: string) {
+    return this.providerConfigService.remove(provider);
+  }
 }
 ```
 
@@ -332,8 +410,11 @@ export class ProvidersController {
     return enabledConfigs.map((c) => {
       const spec = registrySpecs.find((s) => s.name === c.provider);
       return {
-        provider: c.provider, displayName: c.displayName, isDefault: c.isDefault,
-        supportsTools: spec?.supportsTools ?? false, supportsThinking: spec?.supportsThinking ?? false,
+        provider: c.provider,
+        displayName: c.displayName,
+        isDefault: c.isDefault,
+        supportsTools: spec?.supportsTools ?? false,
+        supportsThinking: spec?.supportsThinking ?? false,
         defaultModel: spec?.defaultModel ?? null,
       };
     });
@@ -360,7 +441,9 @@ import { ProviderConfigService } from './provider-config.service.js';
 })
 export class ProviderConfigModule implements OnModuleInit {
   constructor(private readonly providerConfigService: ProviderConfigService) {}
-  async onModuleInit() { await this.providerConfigService.seedFromEnv(); }
+  async onModuleInit() {
+    await this.providerConfigService.seedFromEnv();
+  }
 }
 ```
 
@@ -378,7 +461,7 @@ const client = createProvider(providerName, apiKey, apiBaseUrl ?? undefined, mod
 
 This repo's version lives in `packages/api/src/engine/providers/provider-factory.ts`
 (`createProvider(providerName, apiKey, baseURL?, model?)`) — the factory itself stays
-provider-key-agnostic; only the *caller* resolves the key via `ProviderConfigService` before
+provider-key-agnostic; only the _caller_ resolves the key via `ProviderConfigService` before
 invoking it. If the target app has its own equivalent factory, keep that pattern:
 `ProviderConfigService` never leaks into the provider SDK wrapper classes.
 
@@ -395,7 +478,9 @@ export default function ProvidersPage() {
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Providers</h1>
-        <p className="text-sm text-muted-foreground">Manage AI provider API keys and configurations.</p>
+        <p className="text-sm text-muted-foreground">
+          Manage AI provider API keys and configurations.
+        </p>
       </div>
       <ProvidersTab />
     </div>
@@ -433,7 +518,7 @@ the target app is localized; otherwise hardcode the label.
 4. `GET /admin/providers` as a non-admin → 403 (RolesGuard); as admin → 200 with `apiKey`
    masked (`AQ.A…wxyz` style, not plaintext).
 5. `POST /admin/providers` with a new key → row created, `SELECT apiKey FROM
-   "ProviderConfig"` in psql shows `iv:ciphertext:authTag`, not plaintext.
+"ProviderConfig"` in psql shows `iv:ciphertext:authTag`, not plaintext.
 6. Toggle `isEnabled` off → confirm `resolveProvider()` falls through to the env var (or
    throws if none) rather than serving the disabled DB key — restart or wait out the 60s
    cache to see the effect if you just wrote it, since `update()` invalidates the cache

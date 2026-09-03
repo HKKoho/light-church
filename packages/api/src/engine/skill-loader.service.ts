@@ -2,7 +2,10 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import { Injectable } from '@nestjs/common';
 import { createLogger } from '@clawix/shared';
-import { parseFrontmatter as parseGenericFrontmatter, stripFrontmatter } from '../common/frontmatter.js';
+import {
+  parseFrontmatter as parseGenericFrontmatter,
+  stripFrontmatter,
+} from '../common/frontmatter.js';
 import { scanContextContent } from './prompt-injection-scanner.js';
 import type { SkillFrontmatter, SkillInfo } from './skill-loader.types.js';
 import {
@@ -69,7 +72,10 @@ export class SkillLoaderService {
     ];
   }
 
-  async buildSkillsSummary(customDir: string, allowedDirNames?: readonly string[]): Promise<string> {
+  async buildSkillsSummary(
+    customDir: string,
+    allowedDirNames?: readonly string[],
+  ): Promise<string> {
     const allSkills = await this.listSkills(customDir);
     const skills =
       allowedDirNames && allowedDirNames.length > 0

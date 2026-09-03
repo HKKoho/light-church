@@ -6,7 +6,7 @@ applies-to: donor-engagement
 
 # Supporter proposal — drafting standard
 
-A proposal is not a wish list. It is a chain of logic: *if we do these activities, we will produce these outputs, which will achieve these outcomes, contributing to this impact, given these assumptions.* If the chain breaks, the proposal fails — even if every section reads beautifully.
+A proposal is not a wish list. It is a chain of logic: _if we do these activities, we will produce these outputs, which will achieve these outcomes, contributing to this impact, given these assumptions._ If the chain breaks, the proposal fails — even if every section reads beautifully.
 
 ## Drafting order (do not reorder)
 
@@ -25,15 +25,15 @@ If you start with "activities" you will produce a list of things the NGO knows h
 
 Map your indicators against the supporter's reporting framework. Common frameworks:
 
-| Supporter / framework | Indicator style | Notes |
-|--|--|--|
-| FCDO (UK) | Output + outcome split, value-for-money KPIs | Disaggregate by sex, age, disability where possible. |
-| USAID | F-indicators or custom; rigorous baseline expected | Often requires standard F-indicators *plus* a few custom. |
-| ECHO (EU) | KOIs + custom; MEAL plan separate | Beneficiary count rules are strict; read ECHO's beneficiary guidance. |
-| GAC (Canada) | Feminist policy indicators preferred | Disaggregation by sex/age is mandatory. |
-| SDC (Switzerland) | Outcome-focused, Theory of Change central | Light on activity reporting; heavy on outcome story. |
-| BMZ (Germany) | KOMPASS framework, GIZ-style | Strong sustainability and partner-capacity emphasis. |
-| Private foundations | Variable; read their template | Start by reading their last three funded proposals if public. |
+| Supporter / framework | Indicator style                                    | Notes                                                                 |
+| --------------------- | -------------------------------------------------- | --------------------------------------------------------------------- |
+| FCDO (UK)             | Output + outcome split, value-for-money KPIs       | Disaggregate by sex, age, disability where possible.                  |
+| USAID                 | F-indicators or custom; rigorous baseline expected | Often requires standard F-indicators _plus_ a few custom.             |
+| ECHO (EU)             | KOIs + custom; MEAL plan separate                  | Beneficiary count rules are strict; read ECHO's beneficiary guidance. |
+| GAC (Canada)          | Feminist policy indicators preferred               | Disaggregation by sex/age is mandatory.                               |
+| SDC (Switzerland)     | Outcome-focused, Theory of Change central          | Light on activity reporting; heavy on outcome story.                  |
+| BMZ (Germany)         | KOMPASS framework, GIZ-style                       | Strong sustainability and partner-capacity emphasis.                  |
+| Private foundations   | Variable; read their template                      | Start by reading their last three funded proposals if public.         |
 
 ## Budget narrative — what to include
 

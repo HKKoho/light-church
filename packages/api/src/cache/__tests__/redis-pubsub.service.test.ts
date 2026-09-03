@@ -13,7 +13,7 @@ const mockSubscriber = createMockRedisClient();
 let constructorCallCount = 0;
 
 vi.mock('ioredis', () => ({
-  Redis: vi.fn(() => {
+  Redis: vi.fn(function () {
     constructorCallCount++;
     // First call = publisher, second = subscriber
     return constructorCallCount % 2 === 1 ? mockPublisher : mockSubscriber;

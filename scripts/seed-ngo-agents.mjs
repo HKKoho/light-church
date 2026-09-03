@@ -27,7 +27,7 @@ const env = parseEnv(ENV_FILE);
 
 const pgUser = env['POSTGRES_USER'] || 'clawix';
 const pgPass = env['POSTGRES_PASSWORD'];
-const pgDb   = env['POSTGRES_DB']   || 'clawix';
+const pgDb = env['POSTGRES_DB'] || 'clawix';
 
 if (!pgPass) {
   console.error('❌  POSTGRES_PASSWORD not found in .env — cannot connect to database.');

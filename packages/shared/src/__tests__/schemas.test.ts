@@ -121,7 +121,7 @@ describe('createUserSchema', () => {
       email: 'user@example.com',
       name: 'Test User',
       password: 'securePass1!',
-      role: 'developer',
+      role: 'admin_staff',
       policyId: 'clxxxxxxxxxxxxxxxxxxxxxxxxx',
     });
 
@@ -132,7 +132,7 @@ describe('createUserSchema', () => {
     const result = createUserSchema.safeParse({
       email: 'not-an-email',
       name: 'Test',
-      role: 'developer',
+      role: 'admin_staff',
       policyId: 'clxxxxxxxxxxxxxxxxxxxxxxxxx',
     });
 
@@ -150,12 +150,12 @@ describe('createUserSchema', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should accept admin role (replaces tenant_admin)', () => {
+  it('should accept senior_pastor role', () => {
     const result = createUserSchema.safeParse({
       email: 'admin@example.com',
       name: 'Admin',
       password: 'securePass1!',
-      role: 'admin',
+      role: 'senior_pastor',
       policyId: 'clxxxxxxxxxxxxxxxxxxxxxxxxx',
     });
 

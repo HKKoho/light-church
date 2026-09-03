@@ -66,7 +66,7 @@ Skills cannot grant new tools. Agents cannot embed credentials. This separation 
 3. **Install skills.** Copy `skills/*` into Clawix's skill directory. Each agent's frontmatter lists which skills it consults.
 4. **Approve MCPs (optional).** When an agent first asks for KoboToolbox or a supporter portal, the user gets a `request_access` prompt. Approve only what is needed.
 5. **Set the audit log path.** The agents append to `.clawix/audit.log` in the workspace. Make this file append-only at the OS level if your platform supports it.
-6. **Dry run.** Ask the Supporter Engagement agent to redraft a *finished* proposal as a smoke test. Inspect the diff. Inspect the audit log.
+6. **Dry run.** Ask the Supporter Engagement agent to redraft a _finished_ proposal as a smoke test. Inspect the diff. Inspect the audit log.
 7. **Phase 1 go-live.** See PROPOSAL.md §6.
 
 ## Operating rules for staff
@@ -74,7 +74,7 @@ Skills cannot grant new tools. Agents cannot embed credentials. This separation 
 - One named **AI Assistant Owner** at the NGO is accountable for the audit log, MCP approvals, and skill updates.
 - No agent ever sends external comms or moves money. If an agent's draft is ready to send, a human sends it.
 - Beneficiary PII goes into the workspace only inside files marked with `pii: true` in their YAML frontmatter or filename suffix `.pii.md`. The data-protection skill enforces this convention.
-- Safeguarding incidents bypass the AI entirely for the first triage step. The field-ops agent only assists with documentation *after* a human has assessed safety.
+- Safeguarding incidents bypass the AI entirely for the first triage step. The field-ops agent only assists with documentation _after_ a human has assessed safety.
 - Skills are reviewed quarterly. Supporter templates change; safeguarding policies tighten; the skill files must keep pace.
 
 ## What this configuration explicitly does NOT do

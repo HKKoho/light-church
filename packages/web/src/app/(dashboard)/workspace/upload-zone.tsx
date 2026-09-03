@@ -352,7 +352,9 @@ export function UploadZone({ currentPath, onUploadComplete, onClose }: UploadZon
             {t.uploadFolder}
           </button>
         </p>
-        <p className="text-xs text-muted-foreground">{t.maxFileSize(formatFileSize(MAX_FILE_SIZE))}</p>
+        <p className="text-xs text-muted-foreground">
+          {t.maxFileSize(formatFileSize(MAX_FILE_SIZE))}
+        </p>
       </div>
 
       {/* Hidden file input */}

@@ -32,6 +32,7 @@ Never spawn a build before the storyboard's `readyForBuild` flag is `true`. A go
 Gather a brief from the conversation: the emotional/spiritual truth or Bible passage (e.g. "the prodigal son's road home", "David facing Goliath with nothing but trust", "the Good Samaritan's costly compassion"), a genre, the audience (age range, VBS class, youth group, family devotion), and roughly how many minutes of play.
 
 **Genres** (no combat/arena genre — Light Church games are non-violent by policy):
+
 - `puzzle` — gravity 0, friction 1.0
 - `platformer` — gravity 0.45, friction 0.88
 - `narrative` — gravity 0, friction 1.0, dialogue-heavy
@@ -40,6 +41,7 @@ Gather a brief from the conversation: the emotional/spiritual truth or Bible pas
 Read `references/storyboard-schema.md` for the full field list, a worked Good-Samaritan example, and the panel-count formula. Write the storyboard to `/workspace/games/<slug>/storyboard.md` with frontmatter `readyForBuild: false`.
 
 **Content boundaries — apply to every storyboard, no exceptions:**
+
 - No violence or combat against any character; conflict is resolved through courage, compassion, obedience, or trust — never through harming another character.
 - No fear-based or manipulative mechanics (jump-scares, shame mechanics, punishing the player for "wrong" answers about faith).
 - Theologically sound — if a passage's meaning is contested or unclear, say so in the storyboard's premise and ask the human reviewer rather than guessing. Cross-check tone against the `gospel-mission` skill when in doubt.
@@ -48,7 +50,7 @@ Read `references/storyboard-schema.md` for the full field list, a worked Good-Sa
 
 ## Phase 2 — APPROVE (you do this directly, no spawn)
 
-Show the human the storyboard's premise, persona, and panel list. Ask plainly: *"Does this storyboard reflect the story and feel you want? Reply with 'approved' (and any notes) to open the build gate, or tell me what to change."*
+Show the human the storyboard's premise, persona, and panel list. Ask plainly: _"Does this storyboard reflect the story and feel you want? Reply with 'approved' (and any notes) to open the build gate, or tell me what to change."_
 
 On approval: edit `storyboard.md` frontmatter to `readyForBuild: true`, and append the reviewer's notes and today's date under a `## Reviewer notes` heading. **Do not proceed to Phase 3 while `readyForBuild` is false.**
 
