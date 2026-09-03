@@ -7,12 +7,12 @@ import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    title: 'Ready to put your first agent to work for the mission?',
+    title: 'Ready to put your first helper agent to work for the mission?',
     openDashboard: 'Open the dashboard',
     seeHowItWorks: 'See how it works',
   },
   'zh-TW': {
-    title: '準備好讓第一位代理為使命效力了嗎？',
+    title: '準備好讓第一位小幫手代理為使命效力了嗎？',
     openDashboard: '進入儀表板',
     seeHowItWorks: '了解運作方式',
   },

@@ -13,7 +13,7 @@ const messages = {
       },
       {
         title: 'Dispatch & Draft',
-        body: 'Specialist agents work in parallel inside isolated containers, drafting from your actual workspace files — never inventing numbers.',
+        body: 'Specialist helper agents work in parallel inside isolated containers, drafting from your actual workspace files — never inventing numbers.',
       },
       {
         title: 'Discern & Act',
@@ -30,7 +30,7 @@ const messages = {
       },
       {
         title: '派遣與草擬',
-        body: '專屬代理在隔離的容器中平行作業，根據您工作區的實際檔案草擬內容 — 絕不捏造數字。',
+        body: '專屬小幫手代理在隔離的容器中平行作業，根據您工作區的實際檔案草擬內容 — 絕不捏造數字。',
       },
       {
         title: '辨明與行動',

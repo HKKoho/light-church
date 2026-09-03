@@ -8,9 +8,9 @@ import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    headline: 'Your gospel mission, carried by a team of agents.',
+    headline: 'Your gospel mission, carried by a team of helper agents.',
     subheadline:
-      "Tell your ministry's specialist agents what's needed in plain English. They draft stewardship letters, discipleship reports, and Kingdom Impact data — self-hosted, source-traced, and always reviewed by a human before anything is sent.",
+      "Tell your ministry's specialist helper agents what's needed in plain English. They draft stewardship letters, discipleship reports, and Kingdom Impact data — self-hosted, source-traced, and always reviewed by a human before anything is sent.",
     openDashboard: 'Open the dashboard',
     seeHowItWorks: 'See how it works',
     tags: [
@@ -22,9 +22,9 @@ const messages = {
     ],
   },
   'zh-TW': {
-    headline: '讓一支代理團隊，承擔你的福音使命。',
+    headline: '讓一支小幫手代理團隊，承擔你的福音使命。',
     subheadline:
-      '用平實的語言告訴事工的專屬代理你需要什麼。他們會草擬財務報告、門徒訓練報告與國度成效資料 — 全部自架伺服器、可追溯來源，且在發出前永遠經過人員審閱。',
+      '用平實的語言告訴事工的專屬小幫手代理你需要什麼。他們會草擬財務報告、門徒訓練報告與國度成效資料 — 全部自架伺服器、可追溯來源，且在發出前永遠經過人員審閱。',
     openDashboard: '進入儀表板',
     seeHowItWorks: '了解運作方式',
     tags: ['事工報告', '財務管理更新', '國度成效追蹤', '門徒訓練資料', '自架伺服器'],

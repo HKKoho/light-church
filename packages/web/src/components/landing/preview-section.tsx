@@ -15,7 +15,7 @@ const messages = {
       { title: 'Outreach Budget Variance — Aug', agent: 'Stewardship', status: 'flagged' },
       { title: 'Discipleship Intake — New Believers', agent: 'Kingdom Impact', status: 'drafted' },
     ],
-    responseLabel: 'Kingdom Impact Agent · Q2 Ministry Report (draft)',
+    responseLabel: 'Kingdom Impact Helper Agent · Q2 Ministry Report (draft)',
     responseBody:
       '42 new discipleship groups launched this quarter (see mne/processed/2026-q2.md). Scripture engagement among participants rose from 61% to 78%. Two groups now report being self-sustaining without missionary staff present — early fruit of the multiplication model described in the Q1 proposal (see proposals/foundation-grace-q1.md).',
     responseFooter: 'Awaiting human review before this is sent to the foundation.',
@@ -29,7 +29,7 @@ const messages = {
       { title: '外展預算差異 — 8月', agent: '財務管理', status: '已標示' },
       { title: '門徒訓練名冊 — 新信徒', agent: '國度成效', status: '已草擬' },
     ],
-    responseLabel: '國度成效代理 · Q2 事工報告（草稿）',
+    responseLabel: '國度成效小幫手代理 · Q2 事工報告（草稿）',
     responseBody:
       '本季新成立 42 個門徒訓練小組（見 mne/processed/2026-q2.md）。參與者的聖經閱讀比例由 61% 提升至 78%。其中兩組已能在無宣教士常駐的情況下自行運作 — 正是 Q1 提案中倍增模式的初步成果（見 proposals/foundation-grace-q1.md）。',
     responseFooter: '尚待人員審閱，方可發送給基金會。',

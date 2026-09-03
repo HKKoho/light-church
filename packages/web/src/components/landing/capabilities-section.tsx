@@ -10,20 +10,20 @@ const messages = {
     subtitle: 'Everything a gospel-centred ministry needs to run lean and stay faithful.',
     features: [
       {
-        title: 'Five ministry specialist agents',
-        body: 'Ministry Coordinator, Stewardship, Kingdom Impact, Proclamation, and Mission Field agents, each scoped to its own workspace folders and refusal patterns.',
+        title: 'Five ministry specialist helper agents',
+        body: 'Ministry Coordinator, Stewardship, Kingdom Impact, Proclamation, and Mission Field helper agents, each scoped to its own workspace folders and refusal patterns.',
       },
       {
         title: 'Document intake & OCR',
-        body: 'Drop in scanned receipts, supporter letters, or field notes — agents extract and file them automatically.',
+        body: 'Drop in scanned receipts, supporter letters, or field notes — helper agents extract and file them automatically.',
       },
       {
         title: 'Learns your conventions',
-        body: "Agents pick up your organisation's templates, terminology, and reporting style over time.",
+        body: "Helper agents pick up your organisation's templates, terminology, and reporting style over time.",
       },
       {
         title: 'Self-hosted Docker infrastructure',
-        body: 'Every agent runs in its own isolated container on infrastructure you control — no data leaves your servers.',
+        body: 'Every helper agent runs in its own isolated container on infrastructure you control — no data leaves your servers.',
       },
       {
         title: 'Role-based access & audit logging',
@@ -40,20 +40,20 @@ const messages = {
     subtitle: '一個以福音為中心的事工，精簡運作、忠心管理所需的一切。',
     features: [
       {
-        title: '五位事工專屬代理',
-        body: '事工協調員、財務管理、國度成效、宣揚福音與宣教工場代理，各自僅限存取自己的工作區資料夾與拒絕準則。',
+        title: '五位事工專屬小幫手代理',
+        body: '事工協調員、財務管理、國度成效、宣揚福音與宣教工場小幫手代理，各自僅限存取自己的工作區資料夾與拒絕準則。',
       },
       {
         title: '文件擷取與 OCR',
-        body: '上傳收據、捐助者信件或現場筆記的掃描檔 — 代理會自動擷取並歸檔。',
+        body: '上傳收據、捐助者信件或現場筆記的掃描檔 — 小幫手代理會自動擷取並歸檔。',
       },
       {
         title: '學習您的慣例',
-        body: '代理會逐漸熟悉您機構的範本、用語與報告風格。',
+        body: '小幫手代理會逐漸熟悉您機構的範本、用語與報告風格。',
       },
       {
         title: '自架 Docker 基礎設施',
-        body: '每個代理皆於您掌控的基礎設施上以獨立容器執行 — 資料不會外流。',
+        body: '每個小幫手代理皆於您掌控的基礎設施上以獨立容器執行 — 資料不會外流。',
       },
       {
         title: '角色權限與稽核記錄',

@@ -15,7 +15,7 @@ const messages = {
       },
       {
         title: 'Every figure traced to source',
-        body: 'Numbers come from your workspace files, never from memory. If a figure is missing, the agent marks it [FILL] instead of guessing.',
+        body: 'Numbers come from your workspace files, never from memory. If a figure is missing, the helper agent marks it [FILL] instead of guessing.',
       },
       {
         title: 'Self-hosted data',
@@ -23,7 +23,7 @@ const messages = {
       },
       {
         title: 'Container isolation',
-        body: "Each agent runs in its own sandboxed container — no agent can read another's workspace without an explicit brief.",
+        body: "Each helper agent runs in its own sandboxed container — no helper agent can read another's workspace without an explicit brief.",
       },
       {
         title: 'Immutable audit log',
@@ -45,7 +45,7 @@ const messages = {
       },
       {
         title: '每項數字皆可追溯來源',
-        body: '數字皆來自您工作區的檔案，絕非憑空想像。若數據缺漏，代理會標示 [FILL] 而非臆測。',
+        body: '數字皆來自您工作區的檔案，絕非憑空想像。若數據缺漏，小幫手代理會標示 [FILL] 而非臆測。',
       },
       {
         title: '資料自行架設',
@@ -53,7 +53,7 @@ const messages = {
       },
       {
         title: '容器彼此隔離',
-        body: '每個代理皆在獨立的沙箱容器中執行 — 未經明確交付，代理彼此無法讀取對方的工作區。',
+        body: '每個小幫手代理皆在獨立的沙箱容器中執行 — 未經明確交付，小幫手代理彼此無法讀取對方的工作區。',
       },
       {
         title: '不可竄改的稽核記錄',
