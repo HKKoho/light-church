@@ -401,7 +401,7 @@ This project is **dual-licensed**:
 - **Core Clawixea platform:** [MIT License](LICENSE). Free to use, modify and distribute, including commercially.
 - **NGO/ministry-specific components:** [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only, but the terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations and governments, so **churches, ministries and nonprofits may use them freely.**
 
-See the [NOTICE](NOTICE) file for the exact paths covered by each license. It's still titled "Clawix for NGOs", which is the legal/platform identity those paths are governed under. The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own `LICENSE` files.
+See the [NOTICE](NOTICE) file for the exact paths covered by each license. It's still titled "Clawixea for NGOs", which is the legal/platform identity those paths are governed under. The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own `LICENSE` files.
 
 ---
 
