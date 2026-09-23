@@ -19,6 +19,12 @@ process.on('unhandledRejection', (reason: unknown) => {
   logger.error({ err: reason }, 'unhandledRejection — process kept alive');
 });
 process.on('uncaughtException', (err: Error) => {
+  // A failed listen is not recoverable: staying alive would leave a zombie API
+  // that never serves (in dev, each watch reload stacked another ~400 MB copy).
+  if ((err as NodeJS.ErrnoException).code === 'EADDRINUSE') {
+    logger.fatal({ err }, 'Port already in use — exiting');
+    process.exit(1);
+  }
   logger.error({ err }, 'uncaughtException — process kept alive');
 });
 
