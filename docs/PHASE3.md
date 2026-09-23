@@ -2,7 +2,7 @@
 
 This document plans how to bring the capabilities of two standalone prototype
 apps — `ai-sunday-school.vercel.app` and `ai-admin-sunday-school.vercel.app` —
-under Light Church / Clawix orchestration, instead of linking or iframing them
+under Light Church / Clawixea orchestration, instead of linking or iframing them
 as-is. It follows the `docs/PHASE2.md` convention: numbered items, each with
 Status/Priority/Effort, so they can be picked up independently.
 
@@ -68,7 +68,7 @@ prototype**, not just Sunday school:
 
 ## Why not just link/iframe them
 
-Every one of Clawix's stated invariants (`CLAUDE.md`) cuts against embedding
+Every one of Clawixea's stated invariants (`CLAUDE.md`) cuts against embedding
 these as-is:
 
 - _"No direct LLM calls outside the engine"_ — both apps call Gemini directly
@@ -92,7 +92,7 @@ decision game with baked-in branching, no live scoring).
 
 **Recommendation:** treat these two apps as validated prototypes / feature
 specs, not as code to port. Rebuild each capability natively through the
-existing Clawix agent/skill/DB architecture, reusing what already overlaps
+existing Clawixea agent/skill/DB architecture, reusing what already overlaps
 and adding only the genuinely new piece (Hebrew/Greek pronunciation
 learning).
 

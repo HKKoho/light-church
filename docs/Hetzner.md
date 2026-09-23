@@ -3,12 +3,12 @@
 This doc covers a different scenario from `Hetzner_deploy.md` (fresh server) and
 `docs/DEPLOY_VPS.md` (general VPS guide): you already have a Hetzner Cloud
 server running another app — referred to below as **`gracemission`** — and you
-want to deploy this repo (Light Church / Clawix) onto that **same instance**,
+want to deploy this repo (Light Church / Clawixea) onto that **same instance**,
 under a **new domain**, replacing `gracemission` rather than standing up a
 second server.
 
 > **Assumption check:** this guide assumes `gracemission` is itself a
-> Docker-based stack (possibly an earlier Clawix deployment) reachable via
+> Docker-based stack (possibly an earlier Clawixea deployment) reachable via
 > `docker compose` on the box, fronted by Caddy or nginx for TLS. SSH in and
 > confirm with the commands in Step 1 before proceeding — if `gracemission`
 > turns out to be something else (a different framework, bare-metal process,
@@ -35,7 +35,7 @@ docker exec <gracemission-postgres-container> pg_dump -U <db_user> <db_name> \
   | gzip > ~/backups/gracemission-final/db-$(date +%F).sql.gz
 ```
 
-If it has a workspace/data directory (Clawix-style deployments keep one at
+If it has a workspace/data directory (Clawixea-style deployments keep one at
 `./data`):
 
 ```bash

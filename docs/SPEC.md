@@ -1,4 +1,4 @@
-# Clawix — Technical Specification
+# Clawixea — Technical Specification
 
 > Open-source, self-hosted, single-org, multi-agent AI orchestration platform.
 > This document reflects the state of the code at the time of writing. Sections that describe code that does not yet exist are marked **[pending]**.
@@ -7,7 +7,7 @@
 
 ## 1. Architecture
 
-Clawix is a layered, security-first orchestration platform that runs LLM-backed agents inside isolated Docker containers and exposes them to users through multiple messaging channels. All model calls, tool calls, and container operations flow through a single NestJS API server so that authorization, token accounting, and auditing can be enforced in one place.
+Clawixea is a layered, security-first orchestration platform that runs LLM-backed agents inside isolated Docker containers and exposes them to users through multiple messaging channels. All model calls, tool calls, and container operations flow through a single NestJS API server so that authorization, token accounting, and auditing can be enforced in one place.
 
 ### 1.1 High-level layers
 
@@ -395,7 +395,7 @@ Per-agent streaming delivery flag. When enabled, intermediate agent messages (to
 
 ## 12. MCP Servers — **[pending]**
 
-MCP (Model Context Protocol) is **not yet integrated**. The Anthropic SDK shipped with the repo (`@anthropic-ai/sdk`) includes MCP helpers, but no Clawix code imports them and there is no MCP server registry, config table, or tool adapter.
+MCP (Model Context Protocol) is **not yet integrated**. The Anthropic SDK shipped with the repo (`@anthropic-ai/sdk`) includes MCP helpers, but no Clawixea code imports them and there is no MCP server registry, config table, or tool adapter.
 
 Tools today are internal TypeScript modules registered against a JSON-Schema-validated `ToolRegistry` in `packages/api/src/engine/tool-registry.ts` (`shell`, `file-io`, `web` fetch/search, `memory`, `spawn`, `cron`).
 

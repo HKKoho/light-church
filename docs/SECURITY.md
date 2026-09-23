@@ -1,8 +1,8 @@
-# Clawix — Security Architecture
+# Clawixea — Security Architecture
 
-> How Clawix protects itself and its users. Items marked **[pending]** are on the roadmap but not yet live.
+> How Clawixea protects itself and its users. Items marked **[pending]** are on the roadmap but not yet live.
 
-Clawix runs LLM-backed agents that can read files, execute shell commands, and call external APIs. That combination demands a security posture built on three principles:
+Clawixea runs LLM-backed agents that can read files, execute shell commands, and call external APIs. That combination demands a security posture built on three principles:
 
 1. **Containment over correctness** — even if an agent is tricked or misbehaves, the blast radius is bounded by the sandbox.
 2. **Zero-trust for agent output** — anything an LLM or tool produces is treated as potentially hostile.
@@ -92,7 +92,7 @@ A path must pass both layers. Symlinks are resolved before validation so travers
 
 ## Prompt injection defenses
 
-Clawix does not claim to prevent prompt injection outright, but structures the pipeline so that a successful injection has bounded consequences:
+Clawixea does not claim to prevent prompt injection outright, but structures the pipeline so that a successful injection has bounded consequences:
 
 - The system prompt is assembled server-side and never concatenated with user content — user messages always arrive in a separate `role: user` turn.
 - Skill names, descriptions, and memory items are XML-entity-escaped before being interpolated into the system prompt.

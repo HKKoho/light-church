@@ -2,7 +2,7 @@
 
 ## What is Memory?
 
-In Clawix, **memory** is the collective term for all persistent context that is loaded into an agent's system prompt at the start of every run. It is what gives agents continuity — the ability to remember who you are, what you have worked on, what you have learned, and what you have decided — across separate conversations.
+In Clawixea, **memory** is the collective term for all persistent context that is loaded into an agent's system prompt at the start of every run. It is what gives agents continuity — the ability to remember who you are, what you have worked on, what you have learned, and what you have decided — across separate conversations.
 
 Memory is **not** a single monolithic file. It is a layered system with four distinct components, each serving a different purpose:
 
@@ -32,7 +32,7 @@ Without memory, every conversation with an agent starts from scratch. The agent 
 
 ## Public vs Private Memory
 
-Clawix implements a **three-tier visibility model** for database memory items. The tier is determined by whether a `MemoryShare` record exists and what its `targetType` is.
+Clawixea implements a **three-tier visibility model** for database memory items. The tier is determined by whether a `MemoryShare` record exists and what its `targetType` is.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -346,7 +346,7 @@ Sharing is **idempotent** — calling `share_memory` on an already-shared item r
 
 ## Memory Consolidation (Automatic)
 
-When a conversation session grows large enough to approach the **context window limit** (default: 65 536 tokens), Clawix automatically runs **memory consolidation**.
+When a conversation session grows large enough to approach the **context window limit** (default: 65 536 tokens), Clawixea automatically runs **memory consolidation**.
 
 ```mermaid
 flowchart TD

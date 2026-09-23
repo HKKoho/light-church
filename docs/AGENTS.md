@@ -2,7 +2,7 @@
 
 ## What is a Primary Agent?
 
-A **Primary Agent** (role: `primary`) is the main conversational AI agent assigned to a user. It is the single entry-point through which a user interacts with Clawix. Every user is bound to exactly one primary agent through a **UserAgent** binding that also defines that user's workspace path.
+A **Primary Agent** (role: `primary`) is the main conversational AI agent assigned to a user. It is the single entry-point through which a user interacts with Clawixea. Every user is bound to exactly one primary agent through a **UserAgent** binding that also defines that user's workspace path.
 
 Primary agents are **long-lived and stateful**: they load conversation history from the session, persist every exchange, consolidate memory when context grows large, and maintain a continuous working relationship with the user across multiple conversations.
 

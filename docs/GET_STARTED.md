@@ -1,4 +1,4 @@
-# Clawix
+# Clawixea
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
@@ -6,7 +6,7 @@
 
 **Enterprise-grade, self-hosted multi-agent AI orchestration platform.**
 
-Clawix lets you securely run AI-powered agents in isolated containers, coordinate swarms of specialized agents for complex tasks, and maintain full governance with token tracking and audit logs. Built for organizations that need auditable, scalable AI deployments across multiple channels.
+Clawixea lets you securely run AI-powered agents in isolated containers, coordinate swarms of specialized agents for complex tasks, and maintain full governance with token tracking and audit logs. Built for organizations that need auditable, scalable AI deployments across multiple channels.
 
 ## Key Features
 
@@ -121,7 +121,7 @@ docker compose -f docker-compose.prod.yml logs api | grep '\[bootstrap\]'
 
 ### Uninstallation
 
-Remove Clawix completely:
+Remove Clawixea completely:
 
 ```bash
 pnpm run uninstall:clawix               # preserve host data
@@ -179,7 +179,7 @@ pnpm run install:clawix
 
 ## Multi-Provider AI System
 
-Clawix supports multiple AI providers through a unified interface:
+Clawixea supports multiple AI providers through a unified interface:
 
 | Provider     | Detection                      | Notes                  | Status  |
 | ------------ | ------------------------------ | ---------------------- | ------- |
@@ -215,7 +215,7 @@ New providers can be added by defining a `ProviderSpec` entry—no code changes 
 
 ## Skills Framework
 
-Clawix includes a pluggable skills system:
+Clawixea includes a pluggable skills system:
 
 ```
 skills/
@@ -346,7 +346,7 @@ See [docs/implementation-plan/README.md](docs/implementation-plan/README.md) for
 
 ## Acknowledgments
 
-Clawix is inspired by and builds upon ideas from:
+Clawixea is inspired by and builds upon ideas from:
 
 - [nanoClaw](https://github.com/qwibitai/nanoclaw) - Container-isolated agent execution
 - [nanobot](https://github.com/HKUDS/nanobot) - Multi-provider AI design patterns

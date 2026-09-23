@@ -1,4 +1,4 @@
-cd# Porting "Provider API Account Settings" to another Clawix app
+cd# Porting "Provider API Account Settings" to another Clawixea app
 
 Source: this repo (`clawix`, branch `feat/mcp-catalog`), the admin **Settings → Providers**
 feature — an encrypted, DB-backed store of LLM provider API keys (Anthropic, OpenAI,
