@@ -80,6 +80,9 @@ services:
       # WhatsApp Baileys auth state — written under the persistent /data mount
       # so the QR pairing survives container restarts.
       WHATSAPP_AUTH_DIR: /data/whatsapp-auth
+      # Talking Face sidecars — optional; leave the cartoonize service
+      # commented out below and this URL unset if you don't need it.
+      CARTOONIZE_URL: ${CARTOONIZE_URL:-http://cartoonize:7861}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
@@ -127,6 +130,31 @@ services:
     networks:
       - clawix-browser-egress
       - clawix-browser-net
+
+  # Optional: selfie -> cartoon/anime portrait for the talking-face pipeline
+  # (docs/self2talkface.md). Not started by default — uncomment to enable,
+  # and set CARTOONIZE_URL=http://cartoonize:7861 above if you change the
+  # default. Build once (~tens of MB of model weights, unlike sadtalker):
+  #   docker compose -f docker-compose.prod.yml build cartoonize
+  # cartoonize:
+  #   build:
+  #     context: .
+  #     dockerfile: infra/docker/cartoonize/Dockerfile
+  #   image: clawix-cartoonize:latest
+  #   container_name: lightchurch-cartoonize
+  #   restart: unless-stopped
+  #   environment:
+  #     CARTOONIZE_DEVICE: cpu # or cuda
+  #   networks:
+  #     - default
+  #   # GPU (uncomment if using a CUDA build):
+  #   # deploy:
+  #   #   resources:
+  #   #     reservations:
+  #   #       devices:
+  #   #         - driver: nvidia
+  #   #           count: 1
+  #   #           capabilities: [gpu]
 
   web:
     build:
