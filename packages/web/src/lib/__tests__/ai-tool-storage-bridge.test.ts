@@ -1,8 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  TOOL_FETCH_RESULT,
   TOOL_SERVER_UNAVAILABLE,
   TOOL_STORAGE_MESSAGE,
   buildToolSrcDoc,
+  isToolFetchRequest,
   isToolStorageMessage,
 } from '../ai-tool-storage-bridge';
 
@@ -64,24 +66,54 @@ describe('storage shim at runtime', () => {
   });
 });
 
-describe('fetch guard at runtime', () => {
+describe('fetch forwarding at runtime', () => {
   const originalFetch = window.fetch;
   afterEach(() => {
     window.fetch = originalFetch;
+    vi.useRealTimers();
+    vi.restoreAllMocks();
   });
 
-  it('answers relative-URL fetches with a 503 explaining server features are off', async () => {
+  it('forwards relative-URL fetches to the parent and resolves with its reply', async () => {
     const passthrough = vi.fn(async () => new Response('ok'));
     window.fetch = passthrough as unknown as typeof fetch;
+    const post = vi.spyOn(window, 'postMessage').mockImplementation(() => undefined);
     new Function(extractShim(buildToolSrcDoc('<head></head>', {})))();
 
-    const res = await window.fetch('/api/analyze-bulletins', { method: 'POST' });
+    const pending = window.fetch('/api/analyze-bulletins', { method: 'post', body: '{"a":1}' });
+    const request = post.mock.calls.at(-1)?.[0] as Record<string, unknown>;
+    expect(isToolFetchRequest(request)).toBe(true);
+    expect(request).toMatchObject({
+      url: '/api/analyze-bulletins',
+      method: 'POST',
+      body: '{"a":1}',
+    });
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        source: window,
+        data: { type: TOOL_FETCH_RESULT, id: request['id'], status: 503, body: '{"error":"x"}' },
+      }),
+    );
+    const res = await pending;
     expect(res.status).toBe(503);
-    expect(((await res.json()) as { error: string }).error).toBe(TOOL_SERVER_UNAVAILABLE);
+    expect(await res.json()).toEqual({ error: 'x' });
     expect(passthrough).not.toHaveBeenCalled();
 
     await window.fetch('https://fonts.googleapis.com/css2');
     expect(passthrough).toHaveBeenCalledTimes(1);
+  });
+
+  it('falls back to a 503 explanation if the parent never answers', async () => {
+    vi.useFakeTimers();
+    vi.spyOn(window, 'postMessage').mockImplementation(() => undefined);
+    new Function(extractShim(buildToolSrcDoc('<head></head>', {})))();
+
+    const pending = window.fetch('/api/anything');
+    vi.advanceTimersByTime(120_000);
+    const res = await pending;
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: string }).error).toBe(TOOL_SERVER_UNAVAILABLE);
   });
 });
 

@@ -10,12 +10,44 @@
  * `PUT /api/v1/ai-tools/:name/storage`. sessionStorage is in-memory only.
  *
  * Tools have no server of their own here, so fetches to relative URLs (e.g. a
- * bundled app's `/api/analyze-bulletins`) get a clear 503 JSON reply instead of
- * a cryptic network error. Server-side features such as AI calls will be wired
- * through the Light Church engine in a later phase.
+ * bundled app's `/api/analyze-bulletins`) are forwarded to the dashboard page
+ * (`TOOL_FETCH_REQUEST`), which decides per tool what they may reach
+ * (`lib/ai-tool-server-routes.ts`) and replies (`TOOL_FETCH_RESULT`). Anything
+ * unhandled gets a clear 503 JSON reply instead of a cryptic network error.
  */
 
 export const TOOL_STORAGE_MESSAGE = 'light-church:ai-tool-storage';
+
+export const TOOL_FETCH_REQUEST = 'light-church:ai-tool-fetch';
+export const TOOL_FETCH_RESULT = 'light-church:ai-tool-fetch-result';
+const TOOL_FETCH_TIMEOUT_MS = 120_000;
+
+export interface ToolFetchRequest {
+  readonly type: typeof TOOL_FETCH_REQUEST;
+  readonly id: number;
+  readonly url: string;
+  readonly method: string;
+  readonly body: string | null;
+}
+
+export interface ToolFetchResult {
+  readonly type: typeof TOOL_FETCH_RESULT;
+  readonly id: number;
+  readonly status: number;
+  readonly body: string;
+}
+
+export function isToolFetchRequest(value: unknown): value is ToolFetchRequest {
+  if (typeof value !== 'object' || value === null) return false;
+  const msg = value as Partial<Record<keyof ToolFetchRequest, unknown>>;
+  return (
+    msg.type === TOOL_FETCH_REQUEST &&
+    typeof msg.id === 'number' &&
+    typeof msg.url === 'string' &&
+    typeof msg.method === 'string' &&
+    (msg.body === null || typeof msg.body === 'string')
+  );
+}
 
 export const TOOL_SERVER_UNAVAILABLE =
   '此工具的伺服器功能（例如 AI 分析）尚未在光教會啟用。 ' +
@@ -69,14 +101,34 @@ function shimScript(snapshot: Record<string, string>): string {
     Object.defineProperty(window, 'sessionStorage', { value: makeStorage({}, false), configurable: true });
   } catch (e) {}
   addEventListener('pagehide', function () { if (timer) flush(); });
+  var unavailable = JSON.stringify({ error: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)}, message: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)} });
+  var pending = {};
+  var seq = 0;
+  addEventListener('message', function (e) {
+    var d = e.data;
+    if (e.source !== parent || !d || d.type !== ${JSON.stringify(TOOL_FETCH_RESULT)} || !pending[d.id]) return;
+    pending[d.id](d);
+    delete pending[d.id];
+  });
   var realFetch = window.fetch;
   if (realFetch) {
     window.fetch = function (input, init) {
       if (typeof input === 'string' && !/^(https?:|data:|blob:)/i.test(input)) {
-        return Promise.resolve(new Response(
-          JSON.stringify({ error: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)}, message: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)} }),
-          { status: 503, headers: { 'Content-Type': 'application/json' } }
-        ));
+        return new Promise(function (resolve) {
+          var id = ++seq;
+          function respond(status, body) {
+            resolve(new Response(body, { status: status, headers: { 'Content-Type': 'application/json' } }));
+          }
+          var timeout = setTimeout(function () { delete pending[id]; respond(503, unavailable); }, ${TOOL_FETCH_TIMEOUT_MS});
+          pending[id] = function (d) { clearTimeout(timeout); respond(d.status, d.body); };
+          parent.postMessage({
+            type: ${JSON.stringify(TOOL_FETCH_REQUEST)},
+            id: id,
+            url: input,
+            method: String((init && init.method) || 'GET').toUpperCase(),
+            body: init && typeof init.body === 'string' ? init.body : null
+          }, '*');
+        });
       }
       return realFetch.call(window, input, init);
     };

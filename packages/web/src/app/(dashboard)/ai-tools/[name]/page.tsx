@@ -8,7 +8,14 @@ import type { AiToolDetail } from '@clawix/shared';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authFetch } from '@/lib/auth';
-import { buildToolSrcDoc, isToolStorageMessage } from '@/lib/ai-tool-storage-bridge';
+import {
+  TOOL_FETCH_RESULT,
+  buildToolSrcDoc,
+  isToolFetchRequest,
+  isToolStorageMessage,
+  type ToolFetchResult,
+} from '@/lib/ai-tool-storage-bridge';
+import { handleToolServerRequest, type ToolServerNotice } from '@/lib/ai-tool-server-routes';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { aiToolDescription, aiToolLabel } from '@/hooks/use-ai-tools';
 
@@ -20,6 +27,9 @@ const messages = {
     externalHint:
       'This tool is hosted outside Light Church. Do not paste member personal data into it.',
     saved: 'Saved',
+    bulletinsArchived: (archived: number, duplicates: number) =>
+      `Archived ${archived} past bulletin${archived === 1 ? '' : 's'}` +
+      (duplicates > 0 ? ` (${duplicates} already archived)` : ''),
     saveFailed: 'Could not save — changes may be lost',
     storageUnavailable: 'Saved data could not be loaded, so changes in this tool will not be kept',
   },
@@ -29,6 +39,8 @@ const messages = {
     openExternal: '在新分頁開啟',
     externalHint: '此工具由 Light Church 以外的服務提供，請勿貼上會友個人資料。',
     saved: '已儲存',
+    bulletinsArchived: (archived: number, duplicates: number) =>
+      `已存檔 ${archived} 份過去週刊` + (duplicates > 0 ? `（${duplicates} 份已存在）` : ''),
     saveFailed: '無法儲存——變更可能會遺失',
     storageUnavailable: '無法載入已儲存的資料，此工具內的變更將不會保留',
   },
@@ -40,6 +52,7 @@ const messages = {
   saved: string;
   saveFailed: string;
   storageUnavailable: string;
+  bulletinsArchived: (archived: number, duplicates: number) => string;
 }>;
 
 type SaveState = 'idle' | 'saved' | 'failed' | 'unavailable';
@@ -55,6 +68,7 @@ export default function AiToolViewerPage() {
   const [srcDoc, setSrcDoc] = useState<string | null>(null);
   const [error, setError] = useState(false);
   const [saveState, setSaveState] = useState<SaveState>('idle');
+  const [notice, setNotice] = useState<ToolServerNotice | null>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const canPersist = useRef(false);
   const pending = useRef<Record<string, string> | null>(null);
@@ -67,6 +81,7 @@ export default function AiToolViewerPage() {
     setSrcDoc(null);
     setError(false);
     setSaveState('idle');
+    setNotice(null);
     canPersist.current = false;
 
     const load = async () => {
@@ -119,7 +134,22 @@ export default function AiToolViewerPage() {
     };
     const onMessage = (event: MessageEvent) => {
       // Only trust messages from this page's own tool frame.
-      if (event.source !== iframeRef.current?.contentWindow) return;
+      const frame = iframeRef.current?.contentWindow;
+      if (!frame || event.source !== frame) return;
+      if (isToolFetchRequest(event.data)) {
+        const request = event.data;
+        void handleToolServerRequest(name, request).then((res) => {
+          if (res.notice) setNotice(res.notice);
+          const result: ToolFetchResult = {
+            type: TOOL_FETCH_RESULT,
+            id: request.id,
+            status: res.status,
+            body: res.body,
+          };
+          frame.postMessage(result, '*');
+        });
+        return;
+      }
       if (!isToolStorageMessage(event.data)) return;
       pending.current = event.data.data;
       if (saveTimer.current) clearTimeout(saveTimer.current);
@@ -131,7 +161,7 @@ export default function AiToolViewerPage() {
       if (saveTimer.current) clearTimeout(saveTimer.current);
       save(true); // flush on navigation away
     };
-  }, [storageUrl]);
+  }, [storageUrl, name]);
 
   return (
     <div className="flex h-[calc(100vh-3.5rem)] flex-col gap-3 p-4">
@@ -143,21 +173,28 @@ export default function AiToolViewerPage() {
           </Link>
         </Button>
         <h1 className="truncate text-lg font-semibold">{tool ? aiToolLabel(tool, lang) : name}</h1>
-        {saveState !== 'idle' && (
-          <span
-            className={
-              saveState === 'saved'
-                ? 'ml-auto text-xs text-muted-foreground'
-                : 'ml-auto text-xs text-amber-600 dark:text-amber-400'
-            }
-          >
-            {saveState === 'saved'
-              ? t.saved
-              : saveState === 'failed'
-                ? t.saveFailed
-                : t.storageUnavailable}
-          </span>
-        )}
+        <div className="ml-auto flex items-center gap-3">
+          {notice?.kind === 'bulletinsArchived' && (
+            <span className="text-xs text-muted-foreground">
+              {t.bulletinsArchived(notice.archived, notice.duplicates)}
+            </span>
+          )}
+          {saveState !== 'idle' && (
+            <span
+              className={
+                saveState === 'saved'
+                  ? 'text-xs text-muted-foreground'
+                  : 'text-xs text-amber-600 dark:text-amber-400'
+              }
+            >
+              {saveState === 'saved'
+                ? t.saved
+                : saveState === 'failed'
+                  ? t.saveFailed
+                  : t.storageUnavailable}
+            </span>
+          )}
+        </div>
       </div>
 
       {error ? (
