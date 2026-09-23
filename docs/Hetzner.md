@@ -118,7 +118,7 @@ Put this app in its own directory, separate from `$GRACEMISSION_DIR`:
 
 ```bash
 cd ~
-git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+git clone https://github.com/HKKoho/light-church.git lightchurch
 cd lightchurch
 pnpm run install:clawix
 ```
