@@ -135,7 +135,20 @@ export { talkingFaceSpeakSchema, type TalkingFaceSpeakInput } from './talkingfac
 
 export {
   aiToolNameSchema,
+  aiToolStorageSchema,
+  MAX_AI_TOOL_STORAGE_BYTES,
+  type AiToolStorageInput,
   type AiToolDetail,
+  type AiToolDisplayName,
   type AiToolKind,
   type AiToolSummary,
 } from './ai-tools.schema.js';
+
+export {
+  archiveBulletinsSchema,
+  MAX_ARCHIVE_FILES,
+  MAX_ARCHIVE_FILE_BYTES,
+  type ArchiveBulletinsInput,
+  type ArchiveBulletinsResult,
+  type BulletinArchiveEntry,
+} from './bulletin-archive.schema.js';

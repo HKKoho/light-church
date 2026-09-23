@@ -34,6 +34,12 @@ Phase status lives in one file:
   (`components/dashboard/to-be-constructed.tsx`).
 - `live` — the phase is complete; the label disappears.
 
+The Conversations quick-start cards are phase-tagged the same way
+(`conversations/chat-input.tsx`): the four P1 AI Tool cards (Game Builder,
+Mission/Camp Companion, Roll Call, Sunday Service Bulletin) show now; Gospel
+Outreach, Stewardship Search and Ministry Proposal (P2), Church Partnership
+(P3a) and Kingdom Impact (P3b) reappear when their phase is built.
+
 Pages that already exist (Conversations, Agents, Pastoral Care, Audit Logs, …)
 stay reachable under their phase's group while it is marked TO BE CONSTRUCTED,
 so current users are not cut off.
@@ -71,6 +77,46 @@ builds familiarity and trust cheaply, so the church is ready for Phase 2.
   safe path segments: letters (incl. CJK), digits, spaces, `_`, `-` and `.`.
 - **Admin upload / remove UI** on `/ai-tools`, with a confirmation before removal.
 
+### Shipped: first tools from `reference/` (staged)
+
+Sidebar: **AI Tools** (opens the overview) with a dropdown listing every tool.
+Tool folders use plain ids; `tool.json` gives per-language `displayName` and
+`description` (`{ "en": …, "zh-TW": … }`).
+
+- **Game Builder / 遊戲工坊** — the existing Game Studio page, now a _built-in_
+  AI Tool (`components/dashboard/built-in-ai-tools.ts`).
+- **Roll Call / 點名** (`roll-call`) — `reference/RollCall` (no AI, no server) inlined into one
+  HTML file by `scripts/build-ai-tool-bundle.mjs` and hosted in the sandbox.
+  Its `localStorage` is bridged to per-user server storage
+  (`/api/v1/ai-tools/:name/storage` → `AITools-data/<userId>/`), kept outside
+  agent workspaces because attendance lists hold member names.
+- **Mission/Camp Companion / 訪宣/營會指南** (`mission-camp-companion`) —
+  `reference/CampMissionHdBk` as a link tool to its live deployment (its 151 MB
+  of media rules out bundling).
+- **Sunday Service Bulletin / 主日崇拜週刊** (`sunday-service-bulletin`) —
+  `reference/SundayServices` bundled as one file; rebuild with
+  `scripts/ai-tool-builds/sunday-service-bulletin/build.sh`. The build adds an
+  in-memory IndexedDB fallback (the sandbox blocks IndexedDB), so uploaded past
+  bulletins last for the session. Its AI "analyse past bulletins" call gets a
+  clear "not yet enabled" reply from the tool shim until the AI stage below.
+- Defaults live in `ai-tools/`; install with `node scripts/seed-ai-tools.mjs`.
+
+**Bulletin archive (done):** past-bulletin PDFs uploaded in the tool are
+archived in Postgres (`BulletinArchive`: file bytes, church, name, size,
+sha256, uploader; deduplicated per church). The tool's `/api/analyze-bulletins`
+call is forwarded by the dashboard (`lib/ai-tool-server-routes.ts`) to
+`POST /api/v1/bulletin-archive`. The archive never appears in the weekly
+editor; staff can list metadata via `GET /api/v1/bulletin-archive`.
+
+**Next (needs the engine):** Sunday Service Bulletin's AI analysis — read the
+archived PDFs (reuse the RAGplan Option B PDF→text/OCR converter) and draft next
+week's bulletin through `engine/providers/*`, with `[FILL]` for what only a
+person knows — and `reference/GetinBible` (Gemini/OpenAI/Google TTS
+keys in the browser + its own Supabase). Their AI calls must move behind a
+Light Church engine endpoint — no provider keys in tool pages, and all LLM
+calls through `engine/providers/*` for token accounting — and GetinBible needs
+a decision on keeping Supabase vs. moving student progress into Light Church.
+
 ### Remaining Phase 1 work
 
 1. **Starter tool set.** Seed 5–8 tools deacons actually need: sermon-outline
@@ -102,7 +148,14 @@ Coordinator + 10 NGO Operations + 7 Church Ministries agents, one specialist at
 a time, draft-only, human sends.
 
 **Sidebar (AI Volunteers):** Conversations, Agents, Talking Face, Skills,
-Scheduled Tasks, Workspace, Game Studio.
+Scheduled Tasks, Workspace. (Game Studio moved to AI Tools as the built-in **Game Builder**.)
+
+**Projectors live in the Workspace.** Agent-built micro-tools and games
+(`workspace/projector/<name>/index.html`) show in the Workspace listing as
+**Projector** entries — alongside folders and files — and play in place
+(`components/dashboard/projector-player.tsx`). A **Projectors** toolbar button
+jumps to `projector/`. The old Projector page (now WkFlow Generation, P3a) is
+kept for its future role as the workflow generator.
 
 ### Work items
 
@@ -206,14 +259,14 @@ corpus with citations; the attribution rule is enforced and tested.
 
 ## Sidebar map (current code)
 
-| Group (phase)                           | Items                                                                                |
-| --------------------------------------- | ------------------------------------------------------------------------------------ |
-| AI Tools (P1)                           | All AI Tools, one entry per tool in `AITools/`                                       |
-| AI Volunteers (P2)                      | Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace, Game Studio |
-| Care & Discipleship                     | Shown for decentralized (cell-group) churches only: Prayer, Scripture, Outreach      |
-| Ministry Delegation (P3a)               | Delegation Register, WkFlow Generation, Pastoral Care                                |
-| Governance, Assurance & Liability (P3b) | Dashboard, Token Usage, Audit Logs, Escalation & Override, Settings                  |
-| Data & Domain Curation (P3c)            | Knowledge Curation                                                                   |
+| Group (phase)                           | Items                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| AI Tools (P1)                           | All AI Tools, one entry per tool in `AITools/`                                  |
+| AI Volunteers (P2)                      | Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace         |
+| Care & Discipleship                     | Shown for decentralized (cell-group) churches only: Prayer, Scripture, Outreach |
+| Ministry Delegation (P3a)               | Delegation Register, WkFlow Generation, Pastoral Care                           |
+| Governance, Assurance & Liability (P3b) | Dashboard, Token Usage, Audit Logs, Escalation & Override, Settings             |
+| Data & Domain Curation (P3c)            | Knowledge Curation                                                              |
 
 ## Housekeeping
 

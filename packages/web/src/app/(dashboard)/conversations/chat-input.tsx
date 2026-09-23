@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   BarChart3,
   BookOpen,
@@ -13,12 +14,17 @@ import {
   Heart,
   Mic,
   MicOff,
+  Music,
   Network,
+  Newspaper,
+  Presentation,
   Search,
   Send,
   Sparkles,
   Target,
+  Tent,
   TrendingUp,
+  UserCheck,
   Users,
   Wrench,
 } from 'lucide-react';
@@ -27,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { authFetch } from '@/lib/auth';
 import { useT, type Messages } from '@/lib/i18n';
 import { useSpeechInput } from './use-speech-input';
+import { isPhaseConstructed, type AdoptionPhaseId } from '@/components/dashboard/adoption-phases';
 
 /* ------------------------------------------------------------------ */
 /*  Slash commands & skills                                            */
@@ -91,13 +98,33 @@ const messages = {
       },
       gameBuilder: {
         title: 'Game Builder',
-        subtitle: 'spawn game-studio · storyboard · build',
+        subtitle: 'storyboard · approve · play in Workspace',
         description:
-          'Spawn the game-studio agent to design a short Scripture-rooted game for VBS or youth ministry — it drafts a storyboard for your approval, then builds it on your Projector page.',
+          'Spawn the game-studio agent to design a short Scripture-rooted game for VBS or youth ministry — it drafts a storyboard for your approval, then builds it so you can play it in your Workspace.',
         prompt:
           'Use the spawn tool to invoke the agent named game-studio: build a short (~5 minute) narrative game about the Good Samaritan (Luke 10:25–37) for a youth-group audience, ages 10–14. Start with the storyboard.',
       },
+      missionCamp: {
+        title: 'Mission/Camp Companion',
+        subtitle: 'devotionals · hymns · logistics',
+        description:
+          'Carry the daily devotionals, hymns and trip logistics for a mission trip or camp on your phone — currently the 2026 Indonesia short-term mission trip.',
+      },
+      rollCall: {
+        title: 'Roll Call',
+        subtitle: 'attendance · names · export',
+        description:
+          'Take attendance for a service, fellowship or meeting — add or import names, tick who is present, see the attendance rate and export the list.',
+      },
+      bulletin: {
+        title: 'Sunday Service Bulletin',
+        subtitle: 'service order · bulletin · export',
+        description:
+          'Edit this Sunday’s service order and bulletin, then export it to PowerPoint, Excel or a ZIP for printing and projection.',
+      },
     },
+    badgePrefill: 'edit & send',
+    badgeOpen: 'open tool',
   },
   'zh-TW': {
     cmdReset: '開始全新對話（目前的工作階段將被封存）',
@@ -151,13 +178,31 @@ const messages = {
       },
       gameBuilder: {
         title: '遊戲工坊',
-        subtitle: '啟動 game-studio · 故事板 · 製作',
+        subtitle: '故事板 · 核准 · 於工作區遊玩',
         description:
-          '啟動 game-studio 代理，為暑期聖經班或青少年事工設計短篇聖經主題遊戲——先產出故事板供您核准，核准後才於投影台製作完成。',
+          '啟動 game-studio 代理，為暑期聖經班或青少年事工設計短篇聖經主題遊戲——先產出故事板供您核准，核准後才製作完成，可在工作區中遊玩。',
         prompt:
           '使用 spawn 工具呼叫名為 game-studio 的代理：製作一款約 5 分鐘的敘事遊戲，主題是好撒馬利亞人的比喻（路加福音 10:25–37），對象為 10–14 歲的青少年小組。請先從故事板開始。',
       },
+      missionCamp: {
+        title: '訪宣/營會指南',
+        subtitle: '靈修 · 詩歌 · 行程',
+        description: '把訪宣或營會的每日靈修、詩歌與行程資料帶在手機上——現為 2026 印尼短期訪宣隊。',
+      },
+      rollCall: {
+        title: '點名',
+        subtitle: '出席 · 名單 · 匯出',
+        description: '為崇拜、團契或聚會點名——新增或匯入名單、點選出席者、查看出席率並匯出名單。',
+      },
+      bulletin: {
+        title: '主日崇拜週刊',
+        subtitle: '崇拜程序 · 週刊 · 匯出',
+        description:
+          '編輯本主日的崇拜程序及週刊，並匯出為 PowerPoint、Excel 或 ZIP，以供列印及投影。',
+      },
     },
+    badgePrefill: '編輯後傳送',
+    badgeOpen: '開啟工具',
   },
 } satisfies Messages<{
   cmdReset: string;
@@ -169,16 +214,36 @@ const messages = {
   disconnected: string;
   disclaimer: string;
   scenarios: Record<
-    'campaign' | 'funding' | 'application' | 'cooperation' | 'mne' | 'gameBuilder',
-    { title: string; subtitle: string; description: string; prompt: string }
+    ScenarioKey,
+    { title: string; subtitle: string; description: string; prompt?: string }
   >;
+  badgePrefill: string;
+  badgeOpen: string;
 }>;
 
-type ScenarioKey = 'campaign' | 'funding' | 'application' | 'cooperation' | 'mne' | 'gameBuilder';
+type ScenarioKey =
+  | 'gameBuilder'
+  | 'missionCamp'
+  | 'rollCall'
+  | 'bulletin'
+  | 'campaign'
+  | 'funding'
+  | 'application'
+  | 'cooperation'
+  | 'mne';
 
 /* ------------------------------------------------------------------ */
 /*  NGO scenario cards                                                 */
 /* ------------------------------------------------------------------ */
+
+type ScenarioAction = 'send' | 'prefill' | 'open';
+
+interface ScenarioText {
+  readonly title: string;
+  readonly subtitle: string;
+  readonly description: string;
+  readonly prompt?: string;
+}
 
 interface NgoScenario {
   readonly step: string;
@@ -193,18 +258,19 @@ interface NgoScenario {
   readonly shadow: string;
   readonly prompt: string;
   readonly span: 'col-span-1' | 'col-span-2' | 'col-span-3';
-  readonly action: 'send' | 'prefill';
+  readonly action: ScenarioAction;
+  readonly href?: string;
 }
 
 // Static (non-text) presentation metadata. Visible text is pulled from i18n by key.
-// Ordered for the 3-col grid:
-//   Row 1 → [01 Campaign (×2)]  [02 Funding Search (×1)]
-//   Row 2 → [03 Application (×1)]  [05 Cooperation (×2)]
-//   Row 3 → [04 M&E (×3 full)]
-//   Row 4 → [06 Game Builder (×3 full, prefill-only)]
+// Each card belongs to an AI adoption phase and only shows once that phase is
+// built (see components/dashboard/adoption-phases.ts). Ordered for the 3-col grid:
+//   P1 (AI Tools) → [Game Builder (×2)] [Mission/Camp (×1)] / [Roll Call (×1)] [Bulletin (×2)]
+//   P2 (AI Volunteers) → [Outreach (×2)] [Stewardship (×1)] / [Proposal (×1)] …
+//   P3a/3b → [Church Partnership (×2)] / [Kingdom Impact (×3)]
 interface NgoScenarioMeta {
-  readonly step: string;
   readonly key: ScenarioKey;
+  readonly phase: AdoptionPhaseId;
   readonly icons: readonly React.ElementType[];
   readonly accentBorder: string;
   readonly accentBg: string;
@@ -213,15 +279,65 @@ interface NgoScenarioMeta {
   readonly span: 'col-span-1' | 'col-span-2' | 'col-span-3';
   // 'prefill' loads the prompt into the input for review instead of sending it immediately —
   // spawning an agent by name is consequential enough that the user should see the exact
-  // text before it goes out.
-  readonly action: 'send' | 'prefill';
+  // text before it goes out. 'open' navigates to an AI Tool (`href`).
+  readonly action: ScenarioAction;
+  readonly href?: string;
 }
 
 const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
   {
+    // Game Builder — spawns the game-studio agent; prompt is prefilled, not auto-sent,
+    // since it names a specific agent to invoke and is worth a glance before sending.
+    key: 'gameBuilder',
+    phase: '1',
+    icons: [Gamepad2, Sparkles],
+    accentBorder: 'border-l-indigo-500/70',
+    accentBg: 'hover:bg-indigo-500/10',
+    accentText: 'text-indigo-500',
+    shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(99,102,241,0.45)]',
+    span: 'col-span-2',
+    action: 'prefill',
+  },
+  {
+    key: 'missionCamp',
+    phase: '1',
+    icons: [Tent, Music],
+    accentBorder: 'border-l-emerald-500/70',
+    accentBg: 'hover:bg-emerald-500/10',
+    accentText: 'text-emerald-500',
+    shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(16,185,129,0.45)]',
+    span: 'col-span-1',
+    action: 'open',
+    href: '/ai-tools/mission-camp-companion',
+  },
+  {
+    key: 'rollCall',
+    phase: '1',
+    icons: [UserCheck, Users],
+    accentBorder: 'border-l-sky-500/70',
+    accentBg: 'hover:bg-sky-500/10',
+    accentText: 'text-sky-500',
+    shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(56,189,248,0.45)]',
+    span: 'col-span-1',
+    action: 'open',
+    href: '/ai-tools/roll-call',
+  },
+  {
+    key: 'bulletin',
+    phase: '1',
+    icons: [Newspaper, Presentation],
+    accentBorder: 'border-l-amber-500/70',
+    accentBg: 'hover:bg-amber-500/10',
+    accentText: 'text-amber-500',
+    shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(245,158,11,0.45)]',
+    span: 'col-span-2',
+    action: 'open',
+    href: '/ai-tools/sunday-service-bulletin',
+  },
+  {
     // Gospel Outreach — evangelism planning, wide card
-    step: '01',
     key: 'campaign',
+    phase: '2',
     icons: [Globe, Heart, Users],
     accentBorder: 'border-l-emerald-500/70',
     accentBg: 'hover:bg-emerald-500/10',
@@ -232,8 +348,8 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
   },
   {
     // Stewardship Search — Christian donors & grants
-    step: '02',
     key: 'funding',
+    phase: '2',
     icons: [Search, Target],
     accentBorder: 'border-l-sky-500/70',
     accentBg: 'hover:bg-sky-500/10',
@@ -244,8 +360,8 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
   },
   {
     // Ministry Proposal — grant writing & theory of change
-    step: '03',
     key: 'application',
+    phase: '2',
     icons: [FileText, CheckCircle2],
     accentBorder: 'border-l-amber-500/70',
     accentBg: 'hover:bg-amber-500/10',
@@ -255,9 +371,9 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     action: 'send',
   },
   {
-    // Church Partnership — inter-church MoU & joint mission
-    step: '04',
+    // Church Partnership — coordinating joint ministry delivery is delegation (3a)
     key: 'cooperation',
+    phase: '3a',
     icons: [Network, BookOpen],
     accentBorder: 'border-l-rose-500/70',
     accentBg: 'hover:bg-rose-500/10',
@@ -267,9 +383,9 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     action: 'send',
   },
   {
-    // Kingdom Impact — M&E for discipleship & transformation
-    step: '05',
+    // Kingdom Impact — M&E evidence belongs with assurance (3b)
     key: 'mne',
+    phase: '3b',
     icons: [BarChart3, TrendingUp, ClipboardList],
     accentBorder: 'border-l-violet-500/70',
     accentBg: 'hover:bg-violet-500/10',
@@ -278,22 +394,17 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     span: 'col-span-3',
     action: 'send',
   },
-  {
-    // Game Builder — spawns the game-studio agent; prompt is prefilled, not auto-sent,
-    // since it names a specific agent to invoke and is worth a glance before sending.
-    step: '06',
-    key: 'gameBuilder',
-    icons: [Gamepad2, Sparkles],
-    accentBorder: 'border-l-indigo-500/70',
-    accentBg: 'hover:bg-indigo-500/10',
-    accentText: 'text-indigo-500',
-    shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(99,102,241,0.45)]',
-    span: 'col-span-3',
-    action: 'prefill',
-  },
 ];
 
-function NgoScenarioCard({ scenario, onClick }: { scenario: NgoScenario; onClick: () => void }) {
+function NgoScenarioCard({
+  scenario,
+  badge,
+  onClick,
+}: {
+  scenario: NgoScenario;
+  badge: string | null;
+  onClick: () => void;
+}) {
   const isFull = scenario.span === 'col-span-3';
 
   return (
@@ -330,9 +441,9 @@ function NgoScenarioCard({ scenario, onClick }: { scenario: NgoScenario; onClick
             {scenario.step}
           </span>
           <span className="text-sm font-semibold leading-tight">{scenario.title}</span>
-          {scenario.action === 'prefill' && (
+          {badge && (
             <span className="font-mono text-[9px] uppercase tracking-wide text-muted-foreground/50">
-              edit &amp; send
+              {badge}
             </span>
           )}
         </div>
@@ -357,13 +468,31 @@ export function EmptyState({
   onPrefillSuggestion: (text: string) => void;
 }) {
   const t = useT(messages);
-  const scenarios: NgoScenario[] = NGO_SCENARIO_META.map((meta) => ({
-    ...meta,
-    title: t.scenarios[meta.key].title,
-    subtitle: t.scenarios[meta.key].subtitle,
-    description: t.scenarios[meta.key].description,
-    prompt: t.scenarios[meta.key].prompt,
-  }));
+  const router = useRouter();
+  // Only cards whose adoption phase is being built (or live) are shown; the
+  // rest return automatically when their phase is completed.
+  const scenarios: NgoScenario[] = NGO_SCENARIO_META.filter((meta) =>
+    isPhaseConstructed(meta.phase),
+  ).map((meta, i) => {
+    const text: ScenarioText = t.scenarios[meta.key];
+    return {
+      ...meta,
+      step: String(i + 1).padStart(2, '0'),
+      title: text.title,
+      subtitle: text.subtitle,
+      description: text.description,
+      prompt: text.prompt ?? '',
+    };
+  });
+
+  const badgeFor = (action: ScenarioAction) =>
+    action === 'prefill' ? t.badgePrefill : action === 'open' ? t.badgeOpen : null;
+
+  const handleClick = (s: NgoScenario) => {
+    if (s.action === 'open' && s.href) router.push(s.href);
+    else if (s.action === 'prefill') onPrefillSuggestion(s.prompt);
+    else onSelectSuggestion(s.prompt);
+  };
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-4 py-6">
@@ -377,11 +506,12 @@ export function EmptyState({
       <div className="grid w-full max-w-[768px] grid-cols-3 gap-2.5">
         {scenarios.map((s) => (
           <NgoScenarioCard
-            key={s.step}
+            key={s.key}
             scenario={s}
-            onClick={() =>
-              s.action === 'prefill' ? onPrefillSuggestion(s.prompt) : onSelectSuggestion(s.prompt)
-            }
+            badge={badgeFor(s.action)}
+            onClick={() => {
+              handleClick(s);
+            }}
           />
         ))}
       </div>

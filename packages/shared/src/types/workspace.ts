@@ -18,6 +18,11 @@ export interface FileEntry {
   readonly modifiedAt: string;
   readonly isDirectory: boolean;
   readonly type: FileType;
+  /**
+   * A playable projector item — a `/projector/<name>/` folder holding an
+   * index.html (agent-built micro-tool or game). Still a directory otherwise.
+   */
+  readonly isProjector?: boolean;
 }
 
 export interface DirectoryListing {

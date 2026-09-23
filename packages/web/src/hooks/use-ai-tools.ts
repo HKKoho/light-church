@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import type { AiToolSummary } from '@clawix/shared';
+import type { Lang } from '@/lib/i18n';
 import { authFetch } from '@/lib/auth';
 
 // Fired after an upload/delete so every mounted list (sidebar + page) refreshes.
@@ -38,4 +39,17 @@ export function useAiTools() {
   }, [reload]);
 
   return { tools, error, isLoading, reload };
+}
+
+/** The tool's name in the current language, falling back to English, then its folder id. */
+export function aiToolLabel(tool: Pick<AiToolSummary, 'name' | 'displayName'>, lang: Lang): string {
+  return tool.displayName?.[lang] ?? tool.displayName?.en ?? tool.name;
+}
+
+/** The tool's description in the current language, falling back to its plain description. */
+export function aiToolDescription(
+  tool: Pick<AiToolSummary, 'description' | 'descriptions'>,
+  lang: Lang,
+): string | null {
+  return tool.descriptions?.[lang] ?? tool.description;
 }

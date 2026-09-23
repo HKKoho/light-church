@@ -614,11 +614,7 @@ export function CreateAgentDialog({
           }}
           className="flex flex-col gap-4"
         >
-          <AgentAvatarPicker
-            idPrefix="create"
-            value={avatarPhotoId}
-            onChange={setAvatarPhotoId}
-          />
+          <AgentAvatarPicker idPrefix="create" value={avatarPhotoId} onChange={setAvatarPhotoId} />
 
           <div className="flex flex-col gap-2">
             <Label htmlFor="create-name">{t.name}</Label>
@@ -761,9 +757,7 @@ export function EditAgentDialog({
   const t = useT(messages);
   const providers = useProviders();
   const [streamingEnabled, setStreamingEnabled] = useState(agent?.streamingEnabled ?? false);
-  const [avatarPhotoId, setAvatarPhotoId] = useState<string | null>(
-    agent?.avatarPhotoId ?? null,
-  );
+  const [avatarPhotoId, setAvatarPhotoId] = useState<string | null>(agent?.avatarPhotoId ?? null);
 
   if (!agent) return null;
 

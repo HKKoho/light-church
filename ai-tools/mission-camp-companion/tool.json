@@ -1,0 +1,11 @@
+{
+  "displayName": {
+    "en": "Mission/Camp Companion",
+    "zh-TW": "訪宣/營會指南"
+  },
+  "description": {
+    "en": "Devotionals, hymns and logistics for mission trips and camps — currently the 2026 Indonesia short-term mission trip.",
+    "zh-TW": "訪宣及營會的靈修、詩歌與行程資料——現為 2026 印尼短期訪宣隊。"
+  },
+  "url": "https://indonesia-trip.vercel.app/"
+}

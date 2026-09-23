@@ -23,6 +23,7 @@ Frontend            ─▶  AvatarStageVideo.tsx plays the MP4 chunks sequential
 ```
 
 Key facts that shape this plan:
+
 - `SadTalkerService.generateVideo` takes any portrait image buffer — it has no
   dependency on the image being photorealistic. A cartoonized image is a valid
   input with zero changes to the gateway's per-sentence loop.
@@ -40,10 +41,10 @@ same way SadTalker was: a small Python HTTP sidecar + a thin NestJS client.
 
 ### Model choice
 
-| Option | Notes |
-|---|---|
-| **AnimeGANv2** ([TachibanaYoshino/AnimeGANv2](https://github.com/TachibanaYoshino/AnimeGANv2)) | Recommended default. Single forward pass, CPU-feasible (~1-3s/image), several pretrained style checkpoints (Hayao, Shinkai, Paprika). |
-| White-box-Cartoonization ([SystemErrorWang/White-box-Cartoonization](https://github.com/SystemErrorWang/White-box-Cartoonization)) | Alternative style, similarly lightweight; keep as a second selectable style rather than a replacement. |
+| Option                                                                                                                             | Notes                                                                                                                                 |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **AnimeGANv2** ([TachibanaYoshino/AnimeGANv2](https://github.com/TachibanaYoshino/AnimeGANv2))                                     | Recommended default. Single forward pass, CPU-feasible (~1-3s/image), several pretrained style checkpoints (Hayao, Shinkai, Paprika). |
+| White-box-Cartoonization ([SystemErrorWang/White-box-Cartoonization](https://github.com/SystemErrorWang/White-box-Cartoonization)) | Alternative style, similarly lightweight; keep as a second selectable style rather than a replacement.                                |
 
 Both ship pretrained weights, run on CPU or GPU, and take a single image in /
 single image out — no video, no audio, no training required.
@@ -61,10 +62,10 @@ infra/docker/cartoonize/
 
 API contract:
 
-| Method | Path | Body | Response |
-|---|---|---|---|
-| `GET` | `/health` | — | `{ "status": "ok", "device": "cpu\|cuda" }` |
-| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `style` (form field: `hayao`\|`shinkai`\|`paprika`\|`whitebox`) | `image/jpeg` cartoonized output |
+| Method | Path        | Body                                                                                                 | Response                                    |
+| ------ | ----------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| `GET`  | `/health`   | —                                                                                                    | `{ "status": "ok", "device": "cpu\|cuda" }` |
+| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `style` (form field: `hayao`\|`shinkai`\|`paprika`\|`whitebox`) | `image/jpeg` cartoonized output             |
 
 ### API package changes (`packages/api/src/talkingface/`)
 

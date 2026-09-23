@@ -1,10 +1,23 @@
 // packages/api/src/ai-tools/ai-tools.controller.ts
-import { BadRequestException, Controller, Delete, Get, Param, Post, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Req,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import type { FastifyRequest } from 'fastify';
-import type { AiToolDetail, AiToolSummary } from '@clawix/shared';
+import { aiToolStorageSchema } from '@clawix/shared';
+import type { AiToolDetail, AiToolStorageInput, AiToolSummary } from '@clawix/shared';
 
+import type { JwtPayload } from '../auth/auth.types.js';
 import { Roles } from '../auth/roles.decorator.js';
+import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { AiToolsService } from './ai-tools.service.js';
 
@@ -21,6 +34,25 @@ export class AiToolsController {
   @Get(':name')
   async get(@Param('name') name: string): Promise<{ success: boolean; data: AiToolDetail }> {
     return { success: true, data: await this.aiToolsService.get(name) };
+  }
+
+  // The signed-in user's saved localStorage for an HTML tool (storage bridge).
+  @Get(':name/storage')
+  async getStorage(
+    @Req() req: { user: JwtPayload },
+    @Param('name') name: string,
+  ): Promise<{ success: boolean; data: Record<string, string> }> {
+    return { success: true, data: await this.aiToolsService.getStorage(name, req.user.sub) };
+  }
+
+  @Put(':name/storage')
+  async putStorage(
+    @Req() req: { user: JwtPayload },
+    @Param('name') name: string,
+    @Body(new ZodValidationPipe(aiToolStorageSchema)) body: AiToolStorageInput,
+  ): Promise<{ success: boolean }> {
+    await this.aiToolsService.putStorage(name, req.user.sub, body.data);
+    return { success: true };
   }
 
   // Multipart: `name` field + one .html file. Re-uploading an existing name

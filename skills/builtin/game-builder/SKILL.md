@@ -87,13 +87,13 @@ spawn(agent_name="coder", prompt="read_file(\"/skills/builtin/game-builder/refer
 spawn(agent_name="coder", prompt="read_file(\"/skills/builtin/game-builder/references/coder-guide.md\"). Follow the 'Spawn #4 — Console' instructions for the game at slug '<slug>'.")
 ```
 
-**Then report:** "Your game **<name>** is ready! It tells the story of <premise in one sentence>. Find it on your Projector page — open `index.html` to play, or `console.html` for the facilitator view with live scene tracking. The storyboard at `/workspace/games/<slug>/storyboard.md` is yours to reuse for a lesson or devotional."
+**Then report:** "Your game **<name>** is ready! It tells the story of <premise in one sentence>. Find it in your Workspace under `projector/<slug>` (marked **Projector**) and click it to play — open `index.html` to play, or `console.html` for the facilitator view with live scene tracking. The storyboard at `/workspace/games/<slug>/storyboard.md` is yours to reuse for a lesson or devotional."
 
 **For modifications:** spawn one coder: `read_file("/skills/builtin/game-builder/references/coder-guide.md")`. Backup `index.html` to `index.backup.html`, then `edit_file` to apply the change. Verify after. Re-open the HITL gate (go back to Phase 2) first if the change alters the story itself rather than a visual or balance tweak.
 
 ## Phase 4 — DELIVER
 
-Point the user to the Projector page and to the storyboard companion file. Nothing further is owed — the artifact is static and self-contained.
+Point the user to the Workspace → `projector/<slug>` entry and to the storyboard companion file. Nothing further is owed — the artifact is static and self-contained.
 
 ---
 

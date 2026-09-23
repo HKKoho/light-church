@@ -13,6 +13,7 @@ import { useT, type Messages } from '@/lib/i18n';
 import { WorkspaceBreadcrumbs } from './breadcrumbs';
 import { WorkspaceToolbar } from './workspace-toolbar';
 import { FileList } from './file-list';
+import { ProjectorPlayer } from '@/components/dashboard/projector-player';
 import { FilePreview } from './file-preview';
 import {
   CreateDialog,
@@ -102,6 +103,7 @@ function WorkspacePageContent() {
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showCreateDialog, setShowCreateDialog] = useState<'file' | 'directory' | null>(null);
+  const [playingProjector, setPlayingProjector] = useState<string | null>(null);
   const [showUploadZone, setShowUploadZone] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<FileEntry | null>(null);
   const [moveTarget, setMoveTarget] = useState<FileEntry | null>(null);
@@ -441,6 +443,9 @@ function WorkspacePageContent() {
         onUpload={() => {
           setShowUploadZone((prev) => !prev);
         }}
+        onOpenProjectors={() => {
+          handleNavigate('/projector');
+        }}
       />
 
       {/* Upload Zone */}
@@ -475,6 +480,9 @@ function WorkspacePageContent() {
               selectedPath={selectedPath}
               onNavigate={handleNavigate}
               onSelectFile={handleSelectFile}
+              onPlayProjector={(entry) => {
+                setPlayingProjector(entry.name);
+              }}
               onDownload={handleDownload}
               onRename={handleRename}
               onMove={(entry) => {
@@ -583,6 +591,15 @@ function WorkspacePageContent() {
         open={showFullPreview}
         onOpenChange={setShowFullPreview}
         onEdit={handleEdit}
+      />
+
+      <ProjectorPlayer
+        name={playingProjector}
+        title={playingProjector ?? ''}
+        onClose={() => {
+          setPlayingProjector(null);
+        }}
+        onError={setError}
       />
     </div>
   );

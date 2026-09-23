@@ -154,7 +154,9 @@ async function main() {
   const healthy = await waitForHealth(`http://localhost:${apiPort}/health`, 180);
   if (!healthy) {
     fail('API did not become healthy within 3 minutes.');
-    console.log(`  Check logs: docker compose -f "${composeFile}" logs ${composeFile === COMPOSE_PROD ? 'api' : 'api-server'}`);
+    console.log(
+      `  Check logs: docker compose -f "${composeFile}" logs ${composeFile === COMPOSE_PROD ? 'api' : 'api-server'}`,
+    );
     process.exit(1);
   }
   ok('API is healthy');
