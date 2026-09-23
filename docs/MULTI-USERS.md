@@ -1,6 +1,6 @@
-# Clawix — Multi-User Model
+# Clawixea — Multi-User Model
 
-> How Clawix supports multiple users inside a single self-hosted organization, and how primary agents and spawned sub-agents fit into that model.
+> How Clawixea supports multiple users inside a single self-hosted organization, and how primary agents and spawned sub-agents fit into that model.
 > Sections describing code that does not yet exist are marked **[pending]**.
 
 ---
@@ -116,7 +116,7 @@ flowchart LR
 ```
 
 - **Web** — the authenticated JWT carries `userId`; the WebSocket gateway verifies the JWT on connect.
-- **Telegram** — each Clawix user can claim one `telegramId`. Messages from an un-claimed Telegram id are rejected.
+- **Telegram** — each Clawixea user can claim one `telegramId`. Messages from an un-claimed Telegram id are rejected.
 - **WhatsApp** — implemented via `@whiskeysockets/baileys` (Business API).
 - **Slack** — **[pending]** (adapter not implemented).
 
@@ -124,7 +124,7 @@ flowchart LR
 
 ## 4. Primary agent vs sub-agent
 
-Clawix distinguishes **primary** agents (the one a user chats with) from **worker** agents (sub-agents that only ever run when spawned).
+Clawixea distinguishes **primary** agents (the one a user chats with) from **worker** agents (sub-agents that only ever run when spawned).
 
 ```mermaid
 flowchart LR

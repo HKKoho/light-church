@@ -132,3 +132,10 @@ export {
 } from './skill.schema.js';
 
 export { talkingFaceSpeakSchema, type TalkingFaceSpeakInput } from './talkingface.schema.js';
+
+export {
+  aiToolNameSchema,
+  type AiToolDetail,
+  type AiToolKind,
+  type AiToolSummary,
+} from './ai-tools.schema.js';

@@ -1,9 +1,9 @@
-# Clawix — Governance & Audit
+# Clawixea — Governance & Audit
 
-> How Clawix keeps AI usage under control: who can do what, how much it costs, and who is accountable.
+> How Clawixea keeps AI usage under control: who can do what, how much it costs, and who is accountable.
 > Items marked **[pending]** are on the roadmap but not yet live.
 
-Governance in Clawix is built on two pillars:
+Governance in Clawixea is built on two pillars:
 
 1. **Policy** — a single record per user that defines quotas, permitted AI providers, and feature flags. Every enforcement decision traces back to this row.
 2. **AuditLog** — an append-only table that records every mutating action with actor, resource, IP, and a before/after snapshot.
@@ -41,7 +41,7 @@ Without governance, a single misconfigured workflow can:
 - spawn scheduled jobs that run indefinitely in the background,
 - or perform privileged actions that cannot be attributed to an individual.
 
-Clawix closes each of these gaps at the API layer — not by convention, but by guards and interceptors that run on every request.
+Clawixea closes each of these gaps at the API layer — not by convention, but by guards and interceptors that run on every request.
 
 ---
 
@@ -115,4 +115,4 @@ When an agent spawns helper sub-agents to parallelize work, each helper is bound
 
 ## Bottom line
 
-Clawix provides **policy-driven, auditable, cost-aware** AI governance enforced at the API layer through a layered guard chain. The controls required for enterprise adoption are in place today; compliance-grade hardening — signed audit logs, DB-level immutability, retention automation, and proactive alerting — is the next milestone.
+Clawixea provides **policy-driven, auditable, cost-aware** AI governance enforced at the API layer through a layered guard chain. The controls required for enterprise adoption are in place today; compliance-grade hardening — signed audit logs, DB-level immutability, retention automation, and proactive alerting — is the next milestone.

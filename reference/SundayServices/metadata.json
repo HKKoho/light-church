@@ -1,0 +1,6 @@
+{
+  "name": "BulletinPro AI",
+  "description": "Church operations and automated bulletin management platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

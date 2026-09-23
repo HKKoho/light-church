@@ -1,9 +1,9 @@
 <p align="center">
   <h1 align="center">Light Church</h1>
   <p align="center">
-    <strong>Your ministry's own team of AI assistants.</strong>
+    <strong>AI for your church — introduced one step of trust at a time.</strong>
     <br />
-    They help you draft outreach plans, stewardship reports, discipleship indicators and Scripture-rooted games — while keeping your data private and always leaving the final decision to a person.
+    Start with simple AI tools, grow into AI volunteers, and only then delegate ministry work — with governance and trusted sources built in before anything sensitive is handed over.
   </p>
 </p>
 
@@ -11,151 +11,148 @@
 
 > **Who this guide is for**
 >
-> This page is written for the people who **use** Light Church every day — ministry coordinators, stewardship and grants staff, discipleship/impact teams, communications teams and field or mission-trip coordinators. **You do not need to be technical.** If you can send a message in a chat app, you can use Light Church.
+> This page is for the people who **use** Light Church every day — deacons, ministry leaders, cell-group leaders, admin staff and volunteers. **You do not need to be technical.** If you can open a website or send a chat message, you can use Light Church.
 >
-> If you are the person who _installs or maintains_ Light Church on a server, skip to [**For administrators**](#for-administrators-technical-setup) at the bottom.
+> If you _install or maintain_ Light Church on a server, skip to [**For administrators**](#for-administrators-technical-setup).
 
 ---
 
 ## What is Light Church?
 
-Light Church gives your ministry or mission organization a small **team of AI assistants** that work the way your real team does. Instead of one generic chatbot, you get a coordinator at the "front desk" and specialists behind it — each trained for a specific part of ministry work, from outreach planning to stewardship letters to Scripture-rooted games for kids' ministry.
+Light Church gives your church AI help that grows with your team's confidence. Most deacons don't start out wanting an "AI agent". They want one thing done well, like an announcement drafted, a verse found or a prayer list tidied. So Light Church starts there, and adds more only when the church is ready.
 
-You talk to them in plain language, the same way you'd brief a colleague. They do the heavy lifting — research, first drafts, structuring data — and hand the result back to **you** to review, finish and send.
+It runs on your church's own server. It is built on **Clawixea**, a self-hosted multi-agent AI platform, and its working assumptions come from a simple theological frame: the Great Commission (Matthew 28:19–20), the Great Commandment (Matthew 22:37–39), and faithful stewardship of what's been entrusted to you. Four promises hold at every phase:
 
-Light Church is a ministry configuration of **Clawix**, a self-hosted multi-agent AI platform. Its working assumptions come from a simple theological frame: the Great Commission (Matthew 28:19–20), the Great Commandment (Matthew 22:37–39), and faithful stewardship of what's been entrusted to your organisation. Four promises sit underneath everything it does:
-
-- 🧑‍⚖️ **A human is always in charge.** Light Church only ever produces _drafts_. It never sends an email, posts to social media, publishes a game for children, or submits anything to a supporter on its own. A person always presses "send" — or "approve".
-- 🔒 **Your data stays yours.** Light Church runs on your organisation's own server. Beneficiary and congregant names and personal details are deliberately kept out of its memory.
-- ✅ **It won't make things up.** If a figure or fact is missing, the assistants mark it clearly (e.g. `[FILL: 2024 baptisms count]`) rather than inventing a number.
-- 🙏 **Prayerful discernment, not autopilot.** Every response carries the reminder that these are drafts from a capable assistant, not spiritual authority — your team's judgment and discernment always finish the work.
+- 🧑‍⚖️ **A human is always in charge.** Light Church produces _drafts_. It never sends an email, posts to social media, publishes a game for children or contacts a member on its own. A person always presses "send", or "approve".
+- 🔒 **Your data stays yours.** It runs on your own server. Members' and beneficiaries' personal details are deliberately kept out of AI memory.
+- ✅ **It won't make things up.** Missing facts are marked clearly (e.g. `[FILL: 2024 baptisms count]`), never invented.
+- 🙏 **Prayerful discernment, not autopilot.** Every output is a draft from a capable assistant, not spiritual authority. Your team's judgment finishes the work.
 
 ---
 
-## Meet your ministry team
+## How Light Church grows with your church
 
-At the front desk is the **Ministry Coordinator** (shown in-app as the primary assistant). This is who you talk to first. You describe what you need in everyday words, and it quietly hands the job to the right specialist — one at a time — then brings the result back to you. You rarely need to talk to the specialists directly.
+Development follows three phases of AI adoption, based on the _AIbyML AI Industry Positioning & Partnership Playbook_. Each phase is a step up in trust. The sidebar is grouped the same way, and a group shows **TO BE CONSTRUCTED** until its phase is complete.
 
-| The specialist           | Shown in the app as            | Ask them for…                                                                                                                                                             |
-| ------------------------ | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Ministry Coordinator** | _Ministries_                   | Workplans, partner/church registers, activity trackers, weekly status notes                                                                                               |
-| **Stewardship**          | _Stewardship_                  | Proposals, supporter reports, log-frames, and research into Christian foundations and faith-based grants                                                                  |
-| **Kingdom Impact**       | _Kingdom Impact_               | Indicators that go beyond outputs — salvations, baptisms, discipleship depth — plus data-collection forms and dashboard summaries                                         |
-| **Proclamation**         | _Proclamation_                 | Newsletters, social posts, op-eds, advocacy and witness content                                                                                                           |
-| **Mission Field**        | _Mission Field / Safeguarding_ | Logistics lists, trip risk registers, and writing up safeguarding incident records _after_ a person has handled the situation                                             |
-| **Game Studio**          | _Projector_                    | Short, Scripture-rooted narrative games for VBS, youth ministry and family devotion — built storyboard-first, with a human approving the story before anything gets built |
+| Phase  | Your team treats AI as…               | What you get                                                                      | Status            |
+| ------ | ------------------------------------- | --------------------------------------------------------------------------------- | ----------------- |
+| **1**  | a **tool**                            | **AI Tools**: ready-made tools you open and use, no setup                         | **Building now**  |
+| **2**  | a **worker / volunteer**              | **AI Volunteers**: the built-in agents you brief like a church volunteer          | TO BE CONSTRUCTED |
+| **3a** | a **delegate** for ministry and care  | **Ministry Delegation**: defined, monitored workflows with human checkpoints      | TO BE CONSTRUCTED |
+| **3b** | an **accountable** system             | **Governance, Assurance & Liability**: escalation, override, assurance reports    | TO BE CONSTRUCTED |
+| **3c** | a system grounded in **your sources** | **Data & Domain Curation**: a reviewed corpus of Scripture, theology and teaching | TO BE CONSTRUCTED |
 
-Each specialist has been given a set of **best-practice guides** ("skills") to read before it drafts — for example, how funders like FCDO, USAID and Christian foundations expect proposals to be structured, the theological/audience framing to use with different stakeholders, or the data-protection rules for handling sensitive information. So you're not just getting generic text; you're getting drafts that follow the standards your ministry and sector expect.
+The full plan, with work items and "done when" criteria for each phase, is in [`docs/AI_ADOPTION_PHASES.md`](docs/AI_ADOPTION_PHASES.md).
+
+### Phase 1 — AI Tools _(building now)_
+
+For deacons and volunteers who are new to AI. Open **AI Tools** in the sidebar and every tool your church has installed is listed by name. Click one and use it. There's no agent to brief and nothing to configure.
+
+- Tools are either a **built-in page** (runs inside Light Church, in a locked-down sandbox) or an **external link** (opens in a new tab, with a reminder not to paste members' personal data).
+- Your administrator adds, replaces or removes tools on the **AI Tools** page.
+
+### Phase 2 — AI Volunteers _(to be constructed)_
+
+When your team is comfortable with tools, they can start briefing AI like a volunteer: "draft this", "research that", "remind me every Monday". Phase 2 uses the agents already built into Light Church, found under **AI Volunteers**: Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace and Game Studio. See [Meet your AI volunteers](#meet-your-ai-volunteers) below.
+
+### Phase 3 — Delegation, with governance and curation _(to be constructed)_
+
+When deacons want to hand over parts of ministry work, and eventually parts of pastoral care, the church also needs accountability and trusted sources. Phase 3 therefore has three parts, built in order:
+
+- **3a · Ministry Delegation.** A **Delegation Register** records which work is delegated to which agent, who is accountable, and which human checkpoint approves it. **WkFlow Generation** (formerly _Projector_) becomes a workflow generator: the agent drafts a ministry workflow, and a person approves it before it runs. **Pastoral Care** stays draft-only until 3b is live.
+- **3b · Governance, Assurance & Liability.** **Escalation & Override** sends deviations and pastoral red flags to a named person, who can override, pause or take over. Accountability is agreed in advance, and a one-click **assurance pack** covers the board, insurer or auditor. This builds on the existing Dashboard, Token Usage and Audit Logs.
+- **3c · Data & Domain Curation.** **Knowledge Curation** is a reviewed library of Bible datasets, theological reading, soul-care content and your own teaching, with sources and licences recorded. It includes a clear rule for anything said in the church's or a teacher's name: defer to a human, decline, or answer with a stated confidence.
+
+---
+
+## Meet your AI volunteers
+
+_(Phase 2)._ At the front desk is the **Ministry Coordinator**, the primary assistant. You tell it what you need in everyday words, and it hands the job to the right specialist, one at a time, then brings the result back to you.
+
+| Specialist               | Shown in the app as            | Ask them for…                                                                                                                |
+| ------------------------ | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| **Ministry Coordinator** | _Ministries_                   | Workplans, partner/church registers, activity trackers, weekly status notes                                                  |
+| **Stewardship**          | _Stewardship_                  | Proposals, supporter reports, log-frames, research into Christian foundations and faith-based grants                         |
+| **Kingdom Impact**       | _Kingdom Impact_               | Indicators beyond outputs (salvations, baptisms, discipleship depth), data-collection forms, dashboard summaries             |
+| **Proclamation**         | _Proclamation_                 | Newsletters, social posts, op-eds, advocacy and witness content                                                              |
+| **Mission Field**        | _Mission Field / Safeguarding_ | Logistics lists, trip risk registers, safeguarding incident write-ups _after_ a person has handled the situation             |
+| **Game Studio**          | _Game Studio_                  | Short, Scripture-rooted narrative games for VBS, youth and family devotion. Storyboard first, human-approved before building |
+| **Church Ministries**    | _via the Coordinator_          | Sermon prep, Sunday-school lessons, Bible studies, worship planning, prayer guides, church communications, church admin      |
+
+Each specialist reads a set of **best-practice guides** ("skills") before it drafts. These cover things like how funders expect proposals to be structured, the right audience framing, and the data-protection rules for sensitive information.
 
 ---
 
 ## Prayer requests
 
-Anyone on any connected channel — web, Telegram, WhatsApp — can submit a prayer request with a simple command:
+Anyone on a connected channel (web, Telegram or WhatsApp) can submit a prayer request:
 
 ```
 /prayer Please pray for our team's safety on the Nairobi mission trip next week.
 ```
 
-This doesn't call an AI agent — it's a direct, lightweight command that saves the request straight into your workspace. It shows up in the **Prayer Requests** dashboard with three simple stages: **new** → **praying** (a person has picked it up) → **answered**. Nothing here is drafted or interpreted by an assistant; it's just a fast, reliable way to capture requests so your prayer team doesn't lose track of them.
+No AI is involved. The request is saved straight to **Prayer Requests** and moves through three stages: **new** → **praying** (a person has picked it up) → **answered**.
 
 ---
 
-## Getting started in 4 steps
+## Getting started
 
-### 1. Open Light Church
+1. **Open Light Church.** Your administrator will give you a web address (e.g. `https://church.your-org.org`) or a Telegram bot name.
+2. **Sign in** with the email and password your administrator set up. On Telegram your account is linked for you.
+3. **Start with AI Tools.** Open **AI Tools** in the sidebar and try one. That's all Phase 1 asks of you.
+4. **When you're ready, brief a volunteer.** Open **Conversations**, choose the primary assistant, and ask in plain language:
 
-Your administrator will give you one of these:
-
-- **A web address** (for example `https://mission.your-org.org`) — open it in any browser, just like a normal website.
-- **A Telegram bot** — open Telegram, search for the bot name they gave you, and start a chat.
-
-### 2. Sign in
-
-Use the email and password your administrator set up for you. (On Telegram, your account is linked for you — just start chatting.)
-
-### 3. Say hello to the Ministry Coordinator
-
-In the web dashboard, open **Conversations** and choose the primary assistant. On Telegram, just send a message. A simple "Hi, what can you help me with?" is a fine way to start — or pick one of the quick-start prompts (Gospel Outreach, Stewardship Search, Ministry Proposal, Church Partnership, Kingdom Impact, Game Builder) on the conversations screen.
-
-### 4. Ask in plain English
-
-Describe what you need the way you'd ask a colleague. You don't need special commands or keywords. For example:
-
-> _"Find Christian foundations that fund water and sanitation work in West Africa."_
-> → The Stewardship agent researches funders and saves a shortlist for you to review.
-
+> _"Draft this Sunday's bulletin announcements from these notes."_
 > _"Design Kingdom Impact indicators for our discipleship program."_
-> → You get a ready-to-edit set of indicators that go beyond attendance counts, following M&E best practice.
-
-> _"Draft this month's newsletter using our recent outreach updates."_
-> → A first draft of the newsletter from Proclamation, written in accessible, dignity-preserving language.
-
-> _"Build a short game about the Good Samaritan for our VBS kids."_
-> → Game Studio drafts a storyboard first and asks you to approve it — it never builds before a human signs off on the story.
-
-> _"/prayer Please pray for the Nunez family as they finalize their adoption."_
-> → Saved instantly to Prayer Requests → _new_, ready for your prayer team.
+> _"Build a short game about the Good Samaritan for our VBS kids."_ → Game Studio drafts a storyboard and waits for your approval first.
 
 ---
 
 ## Where your work is saved
 
-The dashboard has a dedicated page for each area of ministry work: **Ministries**, **Stewardship**, **Kingdom Impact**, **Proclamation**, **Mission Field**, **Safeguarding**, and **Prayer Requests**. Anything a specialist drafts also lands as a file in a tidy set of workspace folders — for example `proposals/`, `reports/`, `mne/`, `comms/drafts/`, `field-ops/` and so on — so you can open it, edit it, and finish it your way from either the dashboard page or the conversation.
+Each area of ministry has its own dashboard page, and anything a specialist drafts lands as a file in your workspace folders (`proposals/`, `reports/`, `mne/`, `comms/drafts/`, `field-ops/`, …). Games and interactive tools built by agents appear in **WkFlow Generation**, where they run fully sandboxed.
 
-Games and interactive tools that Game Studio builds show up in **Projector**, a page where you can launch and preview them instantly — they run fully sandboxed with no network access, so nothing they do can reach outside the browser tab.
-
-Nothing in a "drafts" folder or on the Projector page has been sent or published anywhere. Sending — to a supporter, a mailing list, social media, or publishing a game for kids to play — is always a deliberate step **you** take.
+Nothing in a drafts folder, in WkFlow Generation or in AI Tools has been sent or published anywhere. Sending is always a deliberate step **you** take.
 
 ---
 
 ## Talk face-to-face (experimental)
 
-If your administrator has set it up, the **Talking Face** page gives you a life-like avatar of your assistant that speaks its replies aloud with lip-sync, instead of just showing text — either a 3D animated face, or (for admin staff who've uploaded a photo) a photo-realistic video avatar. It's an optional, experimental way to have the same conversation; everything else — drafts only, no invented facts, a human always finishes the work — still applies. Ask your administrator whether it's enabled for your organisation.
+If your administrator has set it up, **Talking Face** (under AI Volunteers) shows a speaking avatar of your assistant with lip-synced audio: either a 3D face or, for admin staff who've uploaded a photo, a photo-realistic video. The ground rules below still apply.
 
 ---
 
 ## The ground rules that keep you safe
 
-These rules are built into Light Church. Knowing them helps you trust what it gives you:
-
-1. **Drafts only — a human always sends.** Emails, supporter submissions, and social posts are prepared for you, never sent automatically.
-2. **Beneficiary and congregant privacy is protected.** Personal details of the people you serve are kept out of the assistants' memory. When incidents are written up, real names are replaced with pseudonyms; the key linking them is kept in an access-controlled folder.
-3. **Safeguarding comes first.** Mission Field will **not** handle a safeguarding disclosure or make first-contact decisions. A trained person deals with the situation; the assistant only helps _document_ it afterwards, and mandatory-reporting flags can't be quietly removed.
-4. **No invented facts or figures.** Missing data is flagged for you to fill in, not guessed.
-5. **Games are storyboard-gated.** Game Studio always designs the story first and waits for a human to approve it — theologically and for age-appropriateness — before building anything. Built games run with no network access and use no combat, fear or shame mechanics.
-6. **One specialist at a time.** The Ministry Coordinator routes each request to a single specialist — there's no uncontrolled chain of agents acting on their own.
-7. **Everything is logged.** Each action is recorded in a tamper-evident activity log, so there's always a clear trail of what was done.
-
----
+1. **Drafts only — a human always sends.** Emails, supporter submissions and social posts are prepared for you, never sent automatically.
+2. **Member and beneficiary privacy is protected.** Personal details are kept out of AI memory. Incident write-ups use pseudonyms, and the key that links them to real names is kept in an admin-only folder.
+3. **Safeguarding comes first.** Mission Field never handles a disclosure or makes a first-contact decision. A trained person does; the assistant only helps _document_ it afterwards, and mandatory-reporting flags can't be quietly removed.
+4. **No invented facts or figures.** Missing data is flagged, not guessed.
+5. **Games are storyboard-gated.** A human approves the story, both theologically and for age-appropriateness, before anything is built. Games have no network access and no combat, fear or shame mechanics.
+6. **One specialist at a time.** No uncontrolled chains of agents acting on their own.
+7. **AI Tools are sandboxed.** A tool page can't see your login, your data or the rest of the dashboard.
+8. **Everything is logged.** Every action is recorded in an append-only audit log.
 
 ## What Light Church will _not_ do
 
-So there are no surprises, Light Church deliberately **does not**:
+- Send emails, submit proposals or publish posts on its own.
+- Store or remember members' or beneficiaries' personal information.
+- Make safeguarding or pastoral-crisis _decisions_. That's always a person's job.
+- Invent statistics, quotes or results.
+- Publish a game or tool for children without a human approving it first.
+- Use a testimony or beneficiary story unless its source is marked as shareable.
 
-- Send emails, submit proposals, or publish posts on its own.
-- Store or remember beneficiaries' or congregants' personal information.
-- Make safeguarding or protection _decisions_ — that's always a person's job.
-- Invent statistics, quotes, or results to fill a gap.
-- Publish a game or interactive tool for children without a human approving the story first.
-- Act on a story without consent — beneficiary and testimony stories are only used when the source is marked as shareable.
-
----
-
-## Tips for getting great results
+## Tips for great results
 
 - **Be specific.** "Draft a 2-page concept note for a $50,000 discipleship and livelihoods project in rural Kenya" beats "write a proposal".
-- **Point to context.** Mention the program, the supporter, or the time period so the assistant uses the right material.
-- **Review every draft.** Treat it as a strong first draft from a capable colleague — your judgement, local knowledge, and discernment make it final.
-- **Fill in the `[FILL: …]` marks.** These are deliberate prompts where only you have the real number or detail.
-- **Ask follow-ups.** "Make it shorter", "use a more formal tone", or "add a risk section" all work in the same conversation.
-
----
+- **Point to context.** Name the program, supporter or time period.
+- **Review every draft.** Your judgment, local knowledge and discernment make it final.
+- **Fill in the `[FILL: …]` marks.** Only you have the real number or detail.
+- **Ask follow-ups.** "Shorter", "more formal" and "add a risk section" all work in the same conversation.
 
 ## Getting help
 
-- **Something looks wrong, or you're stuck?** Contact whoever set Light Church up for your organisation (your administrator or IT focal point).
-- **Want a new kind of assistant or skill?** Those can be added — pass the request to your administrator.
+Contact whoever set up Light Church for your church. They can also add new AI Tools, assistants or skills.
 
 ---
 
@@ -163,28 +160,30 @@ So there are no surprises, Light Church deliberately **does not**:
 
 ## For administrators (technical setup)
 
-> The section above is for everyday users. The rest of this document is for the person installing or maintaining Light Church on a server.
+> Everything above is for everyday users. What follows is for the person installing or maintaining Light Church.
 
-Light Church is a ministry configuration built on **Clawix**, a **self-hosted multi-agent AI orchestration platform**: every agent runs in its own isolated Docker container, with full audit logging, role-based access, token budgets, and encrypted secrets. It's a pnpm monorepo (`packages/api` — NestJS + Fastify; `packages/web` — Next.js dashboard; `packages/shared`). The underlying repository, package name, and Docker services are still named `clawix` — that's the platform layer; "Light Church" is the branding and configuration applied on top of it for this deployment.
+Light Church is a ministry configuration of **Clawixea**, a **self-hosted multi-agent AI orchestration platform**. Every agent runs in its own isolated Docker container, with audit logging, role-based access, token budgets and encrypted secrets. It's a pnpm monorepo: `packages/api` (NestJS + Fastify), `packages/web` (the Next.js dashboard) and `packages/shared`. The repository, package names, scripts and Docker services still use the `clawix` name, which is the platform layer.
 
-**Full guides:**
+**Guides:**
 
-- **Server / cloud deployment (DigitalOcean, domains, SSL):** see [`DO_deploy.md`](DO_deploy.md)
-- **Railway deployment (managed web/API + VPS agent containers):** see [`Railway_install.md`](Railway_install.md)
-- **Codebase architecture & developer commands:** see [`CLAUDE.md`](CLAUDE.md) and [`docs/`](docs/)
-- **Deferred engineering backlog (accepted risks, Phase 2 hardening items):** see [`docs/PHASE2.md`](docs/PHASE2.md)
+- **Development strategy (adoption phases 1 → 3c):** [`docs/AI_ADOPTION_PHASES.md`](docs/AI_ADOPTION_PHASES.md)
+- **DigitalOcean deployment (domains, SSL):** [`DO_deploy.md`](DO_deploy.md)
+- **Hetzner / VPS deployment:** [`docs/Hetzner.md`](docs/Hetzner.md), [`docs/DEPLOY_VPS.md`](docs/DEPLOY_VPS.md)
+- **Railway deployment (managed web/API + VPS agent containers):** [`Railway_install.md`](Railway_install.md)
+- **Codebase architecture and developer commands:** [`CLAUDE.md`](CLAUDE.md) and [`docs/`](docs/)
+- **Engineering hardening backlog:** [`docs/PHASE2.md`](docs/PHASE2.md). This is separate from adoption Phase 2.
 
 ### Install (first run)
 
 ```bash
-# Clone, then run the interactive installer — it generates .env
-# (secrets, DB password), builds the images, and starts the stack.
-git clone https://github.com/aibyml-ngo/clawix-ngo.git clawixngo
-cd clawixngo
+# Clone, then run the interactive installer. It generates .env
+# (secrets, DB password), builds the images and starts the stack.
+git clone https://github.com/HKKoho/light-church.git
+cd light-church
 pnpm run install:clawix
 ```
 
-There is also a one-step bootstrapper that clones _and_ installs: `./setup-clawix.sh` (interactive) or `./setup-clawix.sh --auto --provider anthropic --api-key sk-ant-xxx` (unattended). Use it for **first-time installs only** — never for updates.
+A one-step bootstrapper that clones _and_ installs also exists: `./setup-clawix.sh` (interactive) or `./setup-clawix.sh --auto --provider anthropic --api-key sk-ant-xxx` (unattended). Use it for **first-time installs only**, never for updates.
 
 ### Update / restart
 
@@ -194,7 +193,7 @@ pnpm run update:clawix -- --pull    # git pull --ff-only, then rebuild + restart
 pnpm run update:clawix -- --no-build # plain restart, reuse existing images
 ```
 
-Your `.env`, the `postgres_data` volume, and `redis_data` are preserved across updates.
+Your `.env`, the `postgres_data` volume and `redis_data` are kept across updates.
 
 ### Uninstall
 
@@ -202,6 +201,24 @@ Your `.env`, the `postgres_data` volume, and `redis_data` are preserved across u
 pnpm run uninstall:clawix            # remove containers/images/volumes, keep host data
 pnpm run uninstall:clawix -- --full  # also remove .env, ./data/, ./skills/custom/
 ```
+
+### Phase 1: managing AI Tools
+
+AI Tools are shared by the whole church. They live under `<WORKSPACE_BASE_PATH>/AITools/` (default `./data/AITools/`), one folder per tool, and the folder name is the name shown in the sidebar:
+
+```
+data/AITools/
+  Sermon Outline Helper/
+    index.html        # self-contained HTML tool, rendered in a sandboxed iframe
+    tool.json         # optional: { "description": "…" }
+  Bible Chat/
+    tool.json         # link tool: { "url": "https://…", "description": "…" }
+```
+
+- **Upload from the dashboard:** as super admin, open **AI Tools**, enter a tool name and choose one `.html` file (max 2 MB). Uploading an existing name replaces that tool.
+- **API:** `GET /api/v1/ai-tools`, `GET /api/v1/ai-tools/:name` (any signed-in user); `POST /api/v1/ai-tools` (multipart `name` + file) and `DELETE /api/v1/ai-tools/:name` (super admin only).
+- Tool pages run with `allow-scripts` but **without** `allow-same-origin`, so they can't read the dashboard session or call the API.
+- **Phase status** (which sidebar groups show TO BE CONSTRUCTED) is set in `packages/web/src/components/dashboard/adoption-phases.ts`.
 
 ### Seed the ministry configuration
 
@@ -249,13 +266,12 @@ pnpm run dev                         # API on :3001, dashboard on :3000
 
 ### Talking face avatar (optional)
 
-At `/talkingface` in the web dashboard, the primary assistant can be rendered as a speaking avatar with lip-synced audio instead of plain text. It is not linked from the sidebar nav yet — reachable only by direct URL — and is off by default in the sense that voice synthesis has no server to call unless one is configured.
+At `/talkingface` (sidebar → AI Volunteers → Talking Face), the primary assistant can appear as a speaking avatar with lip-synced audio.
 
-- **3D avatar** (default) — client-side, via `@met4citizen/talkinghead`; loads a `.glb` model from a CDN.
-- **Photo-realistic video** — driven by the SadTalker sidecar (`infra/docker/`); the mode toggle only appears for `super_admin` / `admin_staff` users who've uploaded an avatar photo on the page.
-- Both modes need speech audio from a **Piper TTS server**: set `TTS_PIPER_URL` in `.env` to point at one. No Piper service ships in `docker-compose.prod.yml` by default — you must stand one up yourself (a sidecar container exposing a `/synthesize` endpoint). Without it, the page loads but speaking fails with a clear `piper-tts` error; nothing else in the app is affected.
-- Backend: `packages/api/src/talkingface/` (WebSocket gateway at `/ws/talkingface`), `packages/api/src/tts/` (Piper client, `PiperTtsService`).
-- Frontend: `packages/web/src/app/(dashboard)/talkingface/`, components under `packages/web/src/components/dashboard/talkingface/`.
+- **3D avatar** (default): runs in the browser via `@met4citizen/talkinghead` and loads a `.glb` model from a CDN.
+- **Photo-realistic video**: driven by the SadTalker sidecar (`infra/docker/`). The mode toggle only appears for `super_admin` / `admin_staff` users who've uploaded an avatar photo.
+- Both modes need a **Piper TTS server**: set `TTS_PIPER_URL` in `.env`. None ships in `docker-compose.prod.yml`. Without one, the page loads but speaking fails with a clear `piper-tts` error.
+- Code: `packages/api/src/talkingface/` (WebSocket `/ws/talkingface`), `packages/api/src/tts/`, `packages/web/src/app/(dashboard)/talkingface/`.
 
 ---
 
@@ -274,7 +290,7 @@ Installed as the `ngo` Ministry Pack (**Settings → Ministry Packs**, or `scrip
 | `monitoring-evaluation` | Kingdom Impact               | Indicators, data-collection forms, period validation, dashboard summaries                                                     | Read, Write, Edit, Grep, Glob, Bash (read-only allowlist)        | mne, data-protection                                                           |
 | `communications`        | Proclamation                 | Newsletters, social posts, op-eds, advocacy briefs                                                                            | Read, Write, Edit, Grep, Glob                                    | ngo-comms, data-protection, gospel-mission                                     |
 | `field-operations`      | Mission Field / Safeguarding | Logistics lists, risk register, safeguarding incident records (post-triage only)                                              | Read, Write, Edit, Grep, Glob                                    | safeguarding, data-protection                                                  |
-| `game-studio`           | Projector (Game Builder)     | Short, Scripture-rooted narrative games for VBS/youth ministry, storyboard-first, human-approved before build                 | Read, Write, Edit, spawn `coder` sub-agent (build phase only)    | game-builder, gospel-mission                                                   |
+| `game-studio`           | Game Studio                  | Short, Scripture-rooted narrative games for VBS/youth ministry, storyboard-first, human-approved before build                 | Read, Write, Edit, spawn `coder` sub-agent (build phase only)    | game-builder, gospel-mission                                                   |
 | `pastoral-care`         | Pastoral Care                | AI-disclosed pastoral/spiritual support conversations — listening, prayer, Scripture; escalates crisis disclosures to a human | Read, Write (`pastoral-care/records/`, `pastoral-care/flagged/`) | pastoral-care                                                                  |
 | `finance-assistant`     | Finance                      | Ledger entries, budget-vs-actual reports, reconciliation prep, bookkeeping exports — drafts only                              | Read, Write, Edit                                                | finance-steward                                                                |
 | `evangelism-outreach`   | Outreach                     | Outreach campaign plans, gospel-proclamation content, church-planting briefs; never conditions aid on participation           | Read, Write, Edit                                                | gospel-mission                                                                 |
@@ -320,7 +336,7 @@ field-ops/  logistics/, risk/, assets/
 .clawix/    audit.log (append-only)
 ```
 
-Game Studio's output goes to `workspace/games/<slug>/` and `workspace/projector/<slug>/`, created on demand rather than pre-seeded.
+Game Studio's output goes to `workspace/games/<slug>/` and `workspace/projector/<slug>/` (shown on the **WkFlow Generation** page), created on demand rather than pre-seeded.
 
 - **7 reference skill files** (`donor-proposal`, `mne`, `safeguarding`, `data-protection`, `impact-report`, `grant-research`, `ngo-comms`) copied from `reference/` into `workspace/skills/`
 - `.clawix/audit.log` initialised (append-only)
@@ -341,7 +357,7 @@ Read-only reference packages — encoded best practice the relevant agent reads 
 | `ngo-comms/SKILL.md`         | `reference/…/skills/` | Proclamation, Ministries                                 | Accessible language standards; do-no-harm storytelling; dignity-preserving imagery; advocacy framing; status-note classification                                                                                                                                                                |
 | `game-builder/SKILL.md`      | `skills/builtin/`     | Game Studio                                              | Enforces STORYBOARD → APPROVE → BUILD → DELIVER; games render in a sandboxed, network-free iframe; permitted genres (puzzle, platformer, narrative, collector — no combat/arena); content rules (no fear/shame mechanics, theologically sound, age-appropriate, antagonists drawn with dignity) |
 | `gospel-mission/SKILL.md`    | `skills/builtin/`     | Game Studio (tone cross-check); available platform-wide  | Theological foundation (Great Commission, Great Commandment, stewardship); stakeholder messaging profiles for Christian foundations, church partners, individual supporters/intercessors, beneficiaries, and secular/institutional funders                                                      |
-| `projector-creator/SKILL.md` | `skills/builtin/`     | Any agent building a Projector tool                      | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the Projector page (Game Studio is one specialization of this)                                                                                                                                     |
+| `projector-creator/SKILL.md` | `skills/builtin/`     | Any agent building a WkFlow Generation item              | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the WkFlow Generation page (Game Studio is one specialization of this). Planned Phase 3a rename: `workflow-generator`                                                                              |
 
 ### Architecture docs
 
@@ -352,7 +368,7 @@ Read-only reference packages — encoded best practice the relevant agent reads 
 
 ### What's next
 
-Phases 2A–2C are shipped: the original NGO feature backlog, the Church Ministries agent/skill port, and Ministry Packs (the settings tab and pack-installer described above). The dashboard's Phase 2 roadmap card now tracks only what's left — **Phase 2D**: attendance/roll-call tracking and AI survey + QR registration, carried over from a feature audit of ChurchAIAdmin with no equivalent in this repo yet. See [`docs/PHASE2.md`](docs/PHASE2.md) for the separate engineering hardening backlog.
+Development now follows the adoption phases in [`docs/AI_ADOPTION_PHASES.md`](docs/AI_ADOPTION_PHASES.md): finish **Phase 1** (starter AI Tools, link-tool form, usage signal), then Phase 2 (AI Volunteers), then 3a → 3b → 3c. The sidebar's _Phase 2 Roadmap_ card is older and tracks the separate feature backlog (attendance/roll-call, AI survey + QR registration). See [`docs/PHASE2.md`](docs/PHASE2.md) for the engineering hardening backlog.
 
 ---
 
@@ -360,34 +376,35 @@ Phases 2A–2C are shipped: the original NGO feature backlog, the Church Ministr
 
 Light Church follows a **zero-trust architecture** for agent execution:
 
-| Threat                                | Mitigation                                                                                                                                   |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cross-user data access                | Workspaces only mounted into the owner's container                                                                                           |
-| Sub-agent privilege escalation        | Sub-agents get read-only curated context, never the full workspace                                                                           |
-| Memory poisoning                      | Agent context regenerated from the database each run                                                                                         |
-| Disk exhaustion                       | Per-user quota enforcement (default 500 MB)                                                                                                  |
-| Path traversal                        | All paths validated to stay under `data/org/`                                                                                                |
-| Secret leakage                        | API keys encrypted at rest (AES-256-GCM)                                                                                                     |
-| Untrusted code execution              | All agent code runs inside sandboxed containers, never on the host                                                                           |
-| Unreviewed content reaching a browser | Game Studio / Projector output renders in a sandboxed iframe with no network access, and never builds before a human approves the storyboard |
+| Threat                                | Mitigation                                                                                                                                           |
+| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cross-user data access                | Workspaces only mounted into the owner's container                                                                                                   |
+| Sub-agent privilege escalation        | Sub-agents get read-only curated context, never the full workspace                                                                                   |
+| Memory poisoning                      | Agent context regenerated from the database each run                                                                                                 |
+| Disk exhaustion                       | Per-user quota enforcement (default 500 MB)                                                                                                          |
+| Path traversal                        | Workspace and AI Tools paths validated to stay inside their root; tool names are single safe path segments                                           |
+| Secret leakage                        | API keys encrypted at rest (AES-256-GCM)                                                                                                             |
+| Untrusted code execution              | All agent code runs inside sandboxed containers, never on the host                                                                                   |
+| Unreviewed content reaching a browser | Game Studio / WkFlow Generation output renders in a sandboxed iframe with no network access, and never builds before a human approves the storyboard |
+| Uploaded AI Tool pages                | Only super admins can upload; pages render in an opaque-origin sandbox (no `allow-same-origin`), so they can't reach the session or the API          |
 
 ---
 
 ## Acknowledgments
 
-Light Church is a ministry configuration of Clawix, which builds on ideas from [nanoClaw](https://github.com/qwibitai/nanoclaw) (container-isolated agent execution) and [nanobot](https://github.com/HKUDS/nanobot) (multi-provider AI design patterns).
+Light Church is a ministry configuration of Clawixea, which builds on ideas from [nanoClaw](https://github.com/qwibitai/nanoclaw) (container-isolated agent execution) and [nanobot](https://github.com/HKUDS/nanobot) (multi-provider AI design patterns). The phased development strategy follows the _AIbyML AI Industry Positioning & Partnership Playbook_ (September 2026).
 
 ## License
 
 This project is **dual-licensed**:
 
-- **Core Clawix platform** — [MIT License](LICENSE). Free to use, modify, and distribute, including commercially.
-- **NGO/ministry-specific components** — [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only — but the PolyForm Noncommercial terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations, and governments, so **NGOs, ministries, and nonprofits may use them freely.**
+- **Core Clawixea platform:** [MIT License](LICENSE). Free to use, modify and distribute, including commercially.
+- **NGO/ministry-specific components:** [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only, but the terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations and governments, so **churches, ministries and nonprofits may use them freely.**
 
-See the [NOTICE](NOTICE) file for the exact list of paths covered by each license (it's still titled "Clawix for NGOs" — that's the legal/platform identity these paths are governed under, distinct from the "Light Church" branding applied in this deployment). The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own local `LICENSE` files.
+See the [NOTICE](NOTICE) file for the exact paths covered by each license. It's still titled "Clawixea for NGOs", which is the legal/platform identity those paths are governed under. The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own `LICENSE` files.
 
 ---
 
 <p align="center">
-  <sub>Built for missions and ministries that need AI agents they can actually trust.</sub>
+  <sub>Built for churches that want AI they can grow into — and actually trust.</sub>
 </p>

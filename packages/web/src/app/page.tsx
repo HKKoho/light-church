@@ -1,5 +1,6 @@
 import { SiteHeader } from '@/components/landing/site-header';
 import { HeroSection } from '@/components/landing/hero-section';
+import { WhySection } from '@/components/landing/why-section';
 import { PreviewSection } from '@/components/landing/preview-section';
 import { HowItWorksSection } from '@/components/landing/how-it-works-section';
 import { CapabilitiesSection } from '@/components/landing/capabilities-section';
@@ -13,8 +14,9 @@ export default function LandingPage() {
       <SiteHeader />
       <main className="flex-1">
         <HeroSection />
-        <PreviewSection />
+        <WhySection />
         <HowItWorksSection />
+        <PreviewSection />
         <CapabilitiesSection />
         <TrustSection />
         <CtaSection />

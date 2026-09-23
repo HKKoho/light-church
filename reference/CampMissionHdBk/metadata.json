@@ -1,0 +1,6 @@
+{
+  "name": "訪宣靈修與詩歌",
+  "description": "印尼訪宣八天靈修材料與29首訪宣手冊詩歌本，支援每日反思札記存檔、詩歌搜索與字體調整，為訪宣隊員提供安靜默想與敬拜工具。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

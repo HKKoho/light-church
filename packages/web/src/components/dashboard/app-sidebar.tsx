@@ -12,6 +12,7 @@ import {
   CalendarClock,
   ChevronRight,
   ChevronsUpDown,
+  ClipboardList,
   Coins,
   CreditCard,
   FileCheck,
@@ -23,8 +24,8 @@ import {
   HeartHandshake,
   Megaphone,
   Languages,
+  Library,
   MapPin,
-  MonitorPlay,
   LogOut,
   MessageSquare,
   Moon,
@@ -34,6 +35,8 @@ import {
   ScrollText,
   Settings2,
   ShieldAlert,
+  Siren,
+  Sparkles,
   Sun,
   Target,
   User,
@@ -41,7 +44,10 @@ import {
   UsersRound,
   Video,
   Wallet,
+  Wand2,
+  Workflow,
   Wrench,
+  ExternalLink,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import anime from 'animejs';
@@ -49,6 +55,13 @@ import { EASING } from '@/lib/anime';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { useGovernanceModel } from '@/hooks/use-governance-model';
 import { Phase2RoadmapCard } from '@/components/dashboard/phase2-roadmap-card';
+import { useAiTools } from '@/hooks/use-ai-tools';
+import {
+  SidebarNavGroup,
+  navButtonClass,
+  type SidebarLink,
+} from '@/components/dashboard/sidebar-nav-group';
+import { ADOPTION_PHASES } from '@/components/dashboard/adoption-phases';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -56,7 +69,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -81,15 +93,28 @@ export interface NavItem {
   readonly adminOnly?: boolean;
 }
 
-const platformItems: readonly NavItem[] = [
+// Phase 2 — AI as a Worker / Volunteer (Tier 2b): the built-in agents.
+const phase2Items: readonly NavItem[] = [
   { key: 'conversations', icon: MessageSquare, href: '/conversations' },
-  { key: 'talkingFace', icon: Video, href: '/talkingface' },
-  { key: 'workspace', icon: FolderOpen, href: '/workspace' },
-  { key: 'projector', icon: MonitorPlay, href: '/projector' },
-  { key: 'gameStudio', icon: Gamepad2, href: '/game-studio' },
-  { key: 'skills', icon: Wrench, href: '/skills' },
   { key: 'agents', icon: Bot, href: '/agents' },
+  { key: 'talkingFace', icon: Video, href: '/talkingface' },
+  { key: 'skills', icon: Wrench, href: '/skills' },
   { key: 'tasks', icon: CalendarClock, href: '/tasks' },
+  { key: 'workspace', icon: FolderOpen, href: '/workspace' },
+  { key: 'gameStudio', icon: Gamepad2, href: '/game-studio' },
+];
+
+// Phase 3a — delegated ministry & pastoral care (Tier 2a: defined, monitored
+// workflows). `/projector` keeps its route; it's presented as WkFlow Generation.
+const phase3aItems: readonly NavItem[] = [
+  { key: 'delegation', icon: ClipboardList, href: '/delegation' },
+  { key: 'wkflowGeneration', icon: Workflow, href: '/projector' },
+  { key: 'pastoralCare', icon: HeartHandshake, href: '/ngo/pastoral-care' },
+];
+
+// Phase 3c — data & domain curation.
+export const phase3cItems: readonly NavItem[] = [
+  { key: 'curation', icon: Library, href: '/curation' },
 ];
 
 export const ngoItems: readonly NavItem[] = [
@@ -114,14 +139,19 @@ export const ngoItems: readonly NavItem[] = [
 // leader needs one-click daily access rather than the header ministries dropdown.
 const CARE_ITEM_KEYS = ['prayer', 'pastoralCare', 'scripture', 'outreach'] as const;
 const ngoItemsByKey = new Map(ngoItems.map((item) => [item.key, item]));
-const careItems: readonly NavItem[] = CARE_ITEM_KEYS.map((key) => ngoItemsByKey.get(key)).filter(
-  (item): item is NavItem => item !== undefined,
+// While Phase 3a has its own sidebar group, don't list its items twice.
+const phase3aKeys = new Set(
+  ADOPTION_PHASES['3a'].inSidebar ? phase3aItems.map((item) => item.key) : [],
 );
+const careItems: readonly NavItem[] = CARE_ITEM_KEYS.filter((key) => !phase3aKeys.has(key))
+  .map((key) => ngoItemsByKey.get(key))
+  .filter((item): item is NavItem => item !== undefined);
 
-const governanceItems: readonly NavItem[] = [
+export const governanceItems: readonly NavItem[] = [
   { key: 'dashboard', href: '/dashboard', icon: BookOpen },
   { key: 'tokenUsage', href: '/governance/tokens', icon: Coins },
   { key: 'auditLogs', href: '/governance/audit', icon: ScrollText },
+  { key: 'escalations', href: '/governance/escalations', icon: Siren },
 ];
 
 const settingsItems: readonly NavItem[] = [
@@ -136,14 +166,23 @@ const settingsItems: readonly NavItem[] = [
 const messages = {
   en: {
     brandTagline: 'Gospel Mission AI',
-    groupWorkspace: 'Work with Agents',
+    groupAiTools: 'AI Tools',
+    groupWorkspace: 'AI Volunteers',
+    groupDelegation: 'Ministry Delegation',
     groupCare: 'Care & Discipleship',
-    groupGovernance: 'Governance',
+    groupGovernance: 'Governance, Assurance & Liability',
+    groupAdmin: 'Administration',
+    groupCuration: 'Data & Domain Curation',
+    toBeConstructed: 'TO BE CONSTRUCTED',
     nav: {
       conversations: 'Conversations',
       talkingFace: 'Talking Face',
       workspace: 'Workspace',
-      projector: 'Projector',
+      allAiTools: 'All AI Tools',
+      delegation: 'Delegation Register',
+      wkflowGeneration: 'WkFlow Generation',
+      escalations: 'Escalation & Override',
+      curation: 'Knowledge Curation',
       gameStudio: 'Game Studio',
       skills: 'Skills',
       agents: 'Agents',
@@ -185,14 +224,23 @@ const messages = {
   },
   'zh-TW': {
     brandTagline: '福音宣教 AI',
-    groupWorkspace: '與代理協作',
+    groupAiTools: 'AI 工具',
+    groupWorkspace: 'AI 同工',
+    groupDelegation: '事工委派',
     groupCare: '關懷與門徒訓練',
-    groupGovernance: '治理',
+    groupGovernance: '治理、保證與責任',
+    groupAdmin: '系統管理',
+    groupCuration: '資料與領域知識整理',
+    toBeConstructed: '建構中',
     nav: {
       conversations: '對話',
       talkingFace: '會說話的頭像',
       workspace: '工作區',
-      projector: '投影台',
+      allAiTools: '所有 AI 工具',
+      delegation: '委派登記',
+      wkflowGeneration: '工作流程生成',
+      escalations: '升級與覆核',
+      curation: '知識整理',
       gameStudio: '遊戲工坊',
       skills: '技能',
       agents: '代理',
@@ -234,9 +282,14 @@ const messages = {
   },
 } satisfies Messages<{
   brandTagline: string;
+  groupAiTools: string;
   groupWorkspace: string;
+  groupDelegation: string;
   groupCare: string;
   groupGovernance: string;
+  groupAdmin: string;
+  groupCuration: string;
+  toBeConstructed: string;
   nav: Record<string, string>;
   lightMode: string;
   darkMode: string;
@@ -250,11 +303,6 @@ const messages = {
   userFallback: string;
 }>;
 
-// 2px left stripe on hover/active — matches the lift-and-stripe vocabulary used
-// across Memory, Groups, and Skills cards.
-const navButtonClass =
-  'transition-[transform,background-color,box-shadow] duration-150 hover:translate-x-0.5 hover:shadow-[inset_2px_0_0_0_hsl(var(--sidebar-primary)/0.6)] data-[active=true]:shadow-[inset_2px_0_0_0_hsl(var(--sidebar-primary))]';
-
 export function AppSidebar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -263,6 +311,7 @@ export function AppSidebar() {
   const { lang, toggleLang } = useLanguage();
   const t = useT(messages);
   const { governanceModel } = useGovernanceModel();
+  const { tools: aiTools } = useAiTools();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -288,9 +337,23 @@ export function AppSidebar() {
   const isDark = mounted && resolvedTheme === 'dark';
 
   const isActive = (href: string) => {
-    if (href === '/') return pathname === '/';
+    if (href === '/' || href === '/ai-tools') return pathname === href;
     return pathname.startsWith(href);
   };
+
+  const toLinks = (items: readonly NavItem[]): SidebarLink[] =>
+    items.map((item) => ({ ...item, label: t.nav[item.key as keyof typeof t.nav] }));
+
+  // Phase 1: one sidebar entry per tool in the shared AITools directory.
+  const aiToolLinks: SidebarLink[] = [
+    { key: 'allAiTools', href: '/ai-tools', label: t.nav.allAiTools, icon: Sparkles },
+    ...aiTools.map((tool) => ({
+      key: `ai-tool:${tool.name}`,
+      href: `/ai-tools/${encodeURIComponent(tool.name)}`,
+      label: tool.name,
+      icon: tool.kind === 'link' ? ExternalLink : Wand2,
+    })),
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -310,76 +373,60 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-            {t.groupWorkspace}
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            {platformItems.map((item) => (
-              <SidebarMenuItem key={item.key}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={isActive(item.href)}
-                  tooltip={t.nav[item.key as keyof typeof t.nav]}
-                  className={navButtonClass}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{t.nav[item.key as keyof typeof t.nav]}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
-        </SidebarGroup>
+        <SidebarNavGroup
+          label={t.groupAiTools}
+          phase="1"
+          toBeConstructedLabel={t.toBeConstructed}
+          links={aiToolLinks}
+          isActive={isActive}
+        />
+
+        <SidebarNavGroup
+          label={t.groupWorkspace}
+          phase="2"
+          toBeConstructedLabel={t.toBeConstructed}
+          links={toLinks(phase2Items)}
+          isActive={isActive}
+        />
 
         {governanceModel === 'decentralized' && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-              {t.groupCare}
-            </SidebarGroupLabel>
-            <SidebarMenu>
-              {careItems.map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.href)}
-                    tooltip={t.nav[item.key as keyof typeof t.nav]}
-                    className={navButtonClass}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{t.nav[item.key as keyof typeof t.nav]}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroup>
+          <SidebarNavGroup
+            label={t.groupCare}
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(careItems)}
+            isActive={isActive}
+          />
         )}
 
-        <SidebarGroup>
-          <SidebarGroupLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
-            {t.groupGovernance}
-          </SidebarGroupLabel>
-          <SidebarMenu>
-            {governanceItems
-              .filter((item) => !item.adminOnly || user?.role === 'super_admin')
-              .map((item) => (
-                <SidebarMenuItem key={item.key}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={isActive(item.href)}
-                    tooltip={t.nav[item.key as keyof typeof t.nav]}
-                    className={navButtonClass}
-                  >
-                    <Link href={item.href}>
-                      <item.icon />
-                      <span>{t.nav[item.key as keyof typeof t.nav]}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+        {ADOPTION_PHASES['3a'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupDelegation}
+            phase="3a"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(phase3aItems)}
+            isActive={isActive}
+          />
+        )}
+
+        {ADOPTION_PHASES['3b'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupGovernance}
+            phase="3b"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(
+              governanceItems.filter((item) => !item.adminOnly || user?.role === 'super_admin'),
+            )}
+            isActive={isActive}
+          />
+        )}
+
+        {user?.role === 'super_admin' && (
+          <SidebarNavGroup
+            label={t.groupAdmin}
+            toBeConstructedLabel={t.toBeConstructed}
+            links={[]}
+            isActive={isActive}
+          >
             <Collapsible
               defaultOpen={pathname.startsWith('/settings')}
               className="group/collapsible"
@@ -394,42 +441,50 @@ export function AppSidebar() {
                 }
               }}
             >
-              {user?.role === 'super_admin' && (
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      isActive={pathname.startsWith('/settings')}
-                      tooltip={t.nav.settings}
-                      className={navButtonClass}
-                    >
-                      <Settings2 />
-                      <span>{t.nav.settings}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {settingsItems.map((item) => (
-                        <SidebarMenuSubItem key={item.key}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={isActive(item.href)}
-                            className="transition-all duration-150 hover:translate-x-0.5"
-                          >
-                            <Link href={item.href}>
-                              <item.icon />
-                              <span>{t.nav[item.key as keyof typeof t.nav]}</span>
-                            </Link>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              )}
+              <SidebarMenuItem>
+                <CollapsibleTrigger asChild>
+                  <SidebarMenuButton
+                    isActive={pathname.startsWith('/settings')}
+                    tooltip={t.nav.settings}
+                    className={navButtonClass}
+                  >
+                    <Settings2 />
+                    <span>{t.nav.settings}</span>
+                    <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                  </SidebarMenuButton>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <SidebarMenuSub>
+                    {settingsItems.map((item) => (
+                      <SidebarMenuSubItem key={item.key}>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={isActive(item.href)}
+                          className="transition-all duration-150 hover:translate-x-0.5"
+                        >
+                          <Link href={item.href}>
+                            <item.icon />
+                            <span>{t.nav[item.key as keyof typeof t.nav]}</span>
+                          </Link>
+                        </SidebarMenuSubButton>
+                      </SidebarMenuSubItem>
+                    ))}
+                  </SidebarMenuSub>
+                </CollapsibleContent>
+              </SidebarMenuItem>
             </Collapsible>
-          </SidebarMenu>
-        </SidebarGroup>
+          </SidebarNavGroup>
+        )}
+
+        {ADOPTION_PHASES['3c'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupCuration}
+            phase="3c"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(phase3cItems)}
+            isActive={isActive}
+          />
+        )}
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <Phase2RoadmapCard />

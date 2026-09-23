@@ -2,7 +2,7 @@
 
 ## What is a Provider?
 
-A **Provider** in Clawix is a configured connection to an AI language model service (such as Anthropic, OpenAI, or Z.AI Coding). Each provider entry stores the credentials and endpoint settings that agents use when they execute AI tasks. At runtime, the Clawix Core Engine resolves the correct API key and base URL from the active provider record, decrypts the credential, and instantiates the appropriate LLM client—all transparently, without agents needing to handle secrets directly.
+A **Provider** in Clawixea is a configured connection to an AI language model service (such as Anthropic, OpenAI, or Z.AI Coding). Each provider entry stores the credentials and endpoint settings that agents use when they execute AI tasks. At runtime, the Clawixea Core Engine resolves the correct API key and base URL from the active provider record, decrypts the credential, and instantiates the appropriate LLM client—all transparently, without agents needing to handle secrets directly.
 
 Providers are managed exclusively by organization administrators via **Settings → Providers** (path: `/settings/providers`).
 
@@ -40,7 +40,7 @@ Configuring more than one provider gives your organization several concrete adva
 
 ## Built-in Provider Types
 
-Clawix ships with first-class support for five provider types. A `custom` type is also available for OpenAI-compatible endpoints.
+Clawixea ships with first-class support for five provider types. A `custom` type is also available for OpenAI-compatible endpoints.
 
 ### Anthropic
 
@@ -200,7 +200,7 @@ The default provider is indicated by a **★ Default** badge in the table.
 
 ## Provider Resolution Order (Runtime)
 
-When an agent runs, Clawix resolves the provider in this order:
+When an agent runs, Clawixea resolves the provider in this order:
 
 1. **Database ProviderConfig** — if a record exists for the agent's `provider` field and `isEnabled = true`, the stored (decrypted) API key and base URL are used. Results are cached for 60 seconds.
 2. **Environment variable fallback** — if no enabled database record exists, the corresponding env var (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `ZAI_CODING_API_KEY`) is used.
@@ -219,7 +219,7 @@ This lets you restrict certain policy tiers to approved providers (e.g., a "Basi
 
 ## Environment-Based Seeding
 
-On first startup (when the `ProviderConfig` table is empty), Clawix automatically seeds provider records from environment variables:
+On first startup (when the `ProviderConfig` table is empty), Clawixea automatically seeds provider records from environment variables:
 
 | Env Var              | Provider seeded |
 | -------------------- | --------------- |

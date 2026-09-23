@@ -1,10 +1,10 @@
-# SMEAdm — Porting the Finance & HR Specialist Agents to Another Clawix App
+# SMEAdm — Porting the Finance & HR Specialist Agents to Another Clawixea App
 
-This is a step-by-step configuration guide for taking just the **Finance** (`finance-assistant` / FELIX) and **HR** (`human-resource` / HANA) specialist agents out of this SME setup and standing them up in a different Clawix deployment, without pulling in the other four SME specialists (operations, admin, marketing, sales).
+This is a step-by-step configuration guide for taking just the **Finance** (`finance-assistant` / FELIX) and **HR** (`human-resource` / HANA) specialist agents out of this SME setup and standing them up in a different Clawixea deployment, without pulling in the other four SME specialists (operations, admin, marketing, sales).
 
 ## 1. What actually exists today
 
-Clawix previously carried **two parallel definitions** of the Finance/HR specialists; only one was ever wired into the running engine.
+Clawixea previously carried **two parallel definitions** of the Finance/HR specialists; only one was ever wired into the running engine.
 
 | Layer                                                                                     | Location                                                                                                                                                                         | Wired into the engine?                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

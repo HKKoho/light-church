@@ -1,6 +1,6 @@
-# Clawix Documentation
+# Clawixea Documentation
 
-Clawix is an open-source, self-hosted multi-agent AI orchestration platform for a single organization. It lets you securely run Claude- and OpenAI-powered agents in isolated containers, coordinate agent swarms, and govern usage with token tracking and audit logs.
+Clawixea is an open-source, self-hosted multi-agent AI orchestration platform for a single organization. It lets you securely run Claude- and OpenAI-powered agents in isolated containers, coordinate agent swarms, and govern usage with token tracking and audit logs.
 
 ---
 

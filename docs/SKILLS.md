@@ -53,7 +53,7 @@ Each skill card displays the skill **name**, **description** excerpt, and the **
 
 ```
 skills/
-└── builtin/                   # Shipped with Clawix — git-tracked, read-only
+└── builtin/                   # Shipped with Clawixea — git-tracked, read-only
     ├── skill-creator/
     │   ├── SKILL.md
     │   └── scripts/
@@ -326,7 +326,7 @@ Level 3: references/ and scripts/        → agent reads specific files as neede
 | `skill-creator`     | Guides agents through creating and packaging new skills       |
 | `projector-creator` | Creates polished, sandboxed HTML tools for the Projector page |
 
-Built-in skills live in `skills/builtin/` (git-tracked). They are updated when Clawix updates. A user can override a built-in skill by creating a custom skill with the same directory name.
+Built-in skills live in `skills/builtin/` (git-tracked). They are updated when Clawixea updates. A user can override a built-in skill by creating a custom skill with the same directory name.
 
 ---
 

@@ -45,3 +45,12 @@ data/
 
 # Custom skills (runtime data, per-user)
 skills/custom/
+
+# Reference apps: keep media (likely copyrighted recordings) and real
+# Firebase config local — this repo is public.
+reference/**/*.mp3
+reference/**/*.mp4
+reference/**/*.wav
+reference/**/*.m4a
+reference/**/*.mov
+reference/**/firebase-applet-config.json

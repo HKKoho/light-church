@@ -1,77 +1,81 @@
 'use client';
 
-import { FileSearch, BookOpen, Server, ShieldCheck, MessageCircle, Users } from 'lucide-react';
+import { Bot, HandHeart, Languages, Server, Wand2, Workflow } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useT, type Messages } from '@/lib/i18n';
+import { isOnLanding, type AdoptionPhaseId } from '@/components/dashboard/adoption-phases';
 
 const messages = {
   en: {
-    title: 'Built for the mission field',
-    subtitle: 'Everything a gospel-centred ministry needs to run lean and stay faithful.',
+    title: 'Built to serve the church',
+    subtitle:
+      'For churches and Christian organisations that want less paperwork and more ministry.',
     features: [
       {
-        title: 'Five ministry specialist helper agents',
-        body: 'Ministry Coordinator, Stewardship, Kingdom Impact, Proclamation, and Mission Field helper agents, each scoped to its own workspace folders and refusal patterns.',
+        title: 'AI Tools directory',
+        body: 'A shelf of ready-made AI tools chosen by your church — each opens with one click, runs in a locked-down sandbox and needs no training.',
       },
       {
-        title: 'Document intake & OCR',
-        body: 'Drop in scanned receipts, supporter letters, or field notes — helper agents extract and file them automatically.',
+        title: 'Helper agents for church work',
+        body: 'Built-in helpers for sermon prep, Sunday school, Bible study, worship planning, church admin, communications and stewardship — plus mission and NGO specialists.',
       },
       {
-        title: 'Learns your conventions',
-        body: "Helper agents pick up your organisation's templates, terminology, and reporting style over time.",
+        phase: '3a',
+        title: 'Workflow generation',
+        body: 'Turn routine ministry work — rotas, event logistics, follow-ups — into clear, reviewable workflows with a named person at every checkpoint.',
       },
       {
-        title: 'Self-hosted Docker infrastructure',
-        body: 'Every helper agent runs in its own isolated container on infrastructure you control — no data leaves your servers.',
+        title: 'Prayer requests, captured simply',
+        body: 'Anyone can send /prayer from the web, Telegram or WhatsApp. Requests move from new → praying → answered, with no AI in between.',
       },
       {
-        title: 'Role-based access & audit logging',
-        body: 'Fine-grained permissions and an append-only audit log of every action taken.',
+        title: 'Self-hosted and private',
+        body: 'Runs on infrastructure your church controls. Members’ personal details are kept out of AI memory, and nothing leaves your servers.',
       },
       {
-        title: 'Multi-channel delivery',
-        body: 'Reach your team and partners over the web dashboard, Telegram, or WhatsApp.',
+        title: 'Bilingual from day one',
+        body: 'The whole dashboard works in English and 繁體中文, for congregations that worship in more than one language.',
       },
     ],
   },
   'zh-TW': {
-    title: '為宣教工場打造',
-    subtitle: '一個以福音為中心的事工，精簡運作、忠心管理所需的一切。',
+    title: '為服事教會而設',
+    subtitle: '為希望少些文書、多些事工的教會與基督教機構而設。',
     features: [
       {
-        title: '五位事工專屬小幫手代理',
-        body: '事工協調員、財務管理、國度成效、宣揚福音與宣教工場小幫手代理，各自僅限存取自己的工作區資料夾與拒絕準則。',
+        title: 'AI 工具目錄',
+        body: '由教會挑選的一系列現成 AI 工具——一按即開、在受保護的沙箱中執行，無需任何訓練。',
       },
       {
-        title: '文件擷取與 OCR',
-        body: '上傳收據、捐助者信件或現場筆記的掃描檔 — 小幫手代理會自動擷取並歸檔。',
+        title: '服事教會的小幫手代理',
+        body: '內建講道預備、主日學、查經、崇拜籌劃、教會行政、傳訊與財務管理等小幫手，另有宣教及 NGO 專責代理。',
       },
       {
-        title: '學習您的慣例',
-        body: '小幫手代理會逐漸熟悉您機構的範本、用語與報告風格。',
+        phase: '3a',
+        title: '工作流程生成',
+        body: '把排班、活動統籌、跟進等例行事工，轉化為清楚、可審閱的工作流程，每個檢查點都有具名負責人。',
       },
       {
-        title: '自架 Docker 基礎設施',
-        body: '每個小幫手代理皆於您掌控的基礎設施上以獨立容器執行 — 資料不會外流。',
+        title: '簡單收集代禱事項',
+        body: '任何人都可透過網頁、Telegram 或 WhatsApp 發送 /prayer。代禱事項由「新」→「代禱中」→「已蒙應允」，全程不經 AI。',
       },
       {
-        title: '角色權限與稽核記錄',
-        body: '細緻的權限控管，以及每個操作皆留下的唯讀稽核記錄。',
+        title: '自行架設，保障私隱',
+        body: '在教會自己掌控的基礎設施上運行。會友個人資料不會進入 AI 記憶，資料亦不會離開你的伺服器。',
       },
       {
-        title: '多管道傳遞',
-        body: '透過網頁儀表板、Telegram 或 WhatsApp 與您的團隊及夥伴聯繫。',
+        title: '一開始就支援雙語',
+        body: '整個儀表板支援英文與繁體中文，適合以多於一種語言崇拜的會眾。',
       },
     ],
   },
 } satisfies Messages<{
   title: string;
   subtitle: string;
-  features: { title: string; body: string }[];
+  features: { phase?: AdoptionPhaseId; title: string; body: string }[];
 }>;
 
-const ICONS = [Users, FileSearch, BookOpen, Server, ShieldCheck, MessageCircle];
+const ICONS = [Wand2, Bot, Workflow, HandHeart, Server, Languages];
 
 export function CapabilitiesSection() {
   const t = useT(messages);
@@ -84,7 +88,8 @@ export function CapabilitiesSection() {
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {t.features.map((feature, i) => {
-          const Icon = ICONS[i] ?? Users;
+          if (!isOnLanding(feature.phase)) return null;
+          const Icon = ICONS[i] ?? Wand2;
           return (
             <Card key={feature.title}>
               <CardContent className="flex flex-col gap-3 p-5">

@@ -5,12 +5,12 @@ import { useT, type Messages } from '@/lib/i18n';
 const messages = {
   en: {
     copyright: '© 2026 AIbyML.com SG Ltd',
-    tagline: 'agentic operations for gospel-centred ministry teams',
+    tagline: 'AI that carries the admin, so your church can be with its people',
     verse: '"Go therefore and make disciples of all nations." — Matthew 28:19',
   },
   'zh-TW': {
     copyright: '© 2026 AIbyML.com SG Ltd',
-    tagline: '為以福音為中心的事工團隊打造的代理化營運平台',
+    tagline: '由 AI 分擔行政，讓教會能與人同在',
     verse: '「所以，你們要去，使萬民作我的門徒。」— 馬太福音 28:19',
   },
 } satisfies Messages<{

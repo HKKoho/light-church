@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+@layer utilities {
+  .bulletin-font {
+    font-family: 'Noto Serif TC', Georgia, serif;
+  }
+
+  .paper-shadow {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  .rule-border {
+    border-left: 3px solid #1e293b;
+  }
+}
+
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+.rich-text-field {
+  white-space: pre-line;
+}
+.rich-text-field:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+@media print {
+  body {
+    background: white !important;
+  }
+  aside, header, .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  /* Once its children (aside/header/.no-print) are hidden, this shell would
+     otherwise still hold its explicit h-screen (100vh) height, leaving a
+     blank page before the portaled FullBulletinPrintDocument content — see
+     that component's comment for how a Playwright PDF render caught this. */
+  .admin-shell {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .bulletin-paper {
+    box-shadow: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    padding: 1.5rem !important;
+  }
+  .print-page-break {
+    break-after: page;
+  }
+  .print-page-break:last-child {
+    break-after: auto;
+  }
+}

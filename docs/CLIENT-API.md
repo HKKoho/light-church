@@ -1,6 +1,6 @@
 # Headless Client API
 
-This is a minimal integration guide for a third-party client talking to Clawix
+This is a minimal integration guide for a third-party client talking to Clawixea
 over HTTP + WebSocket, without using the bundled web dashboard. It requires a
 user account with `role: client` (`UserRole.client` in `schema.prisma`) —
 other roles can open the chat socket but will get `403 Forbidden` on the

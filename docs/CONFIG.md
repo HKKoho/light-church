@@ -1,6 +1,6 @@
 # Configuration Reference
 
-A single-page reference for every configurable area in Clawix. Each section shows the UI, lists the key fields, and links to the dedicated guide for full detail.
+A single-page reference for every configurable area in Clawixea. Each section shows the UI, lists the key fields, and links to the dedicated guide for full detail.
 
 All settings pages are under **Settings** in the left sidebar and are accessible only to users with the **Admin** role.
 
@@ -86,7 +86,7 @@ Policies are assigned per user in **Settings → Users**. Select a user → edit
 **Path:** Settings → Channels (`/settings/channels`)  
 **Full guide:** _(this section — channels have no separate guide yet)_
 
-A **Channel** is a configured integration that allows external messaging platforms to communicate with Clawix agents. When a message arrives on a connected channel, it is routed to the primary agent assigned to that user and a conversation session is created.
+A **Channel** is a configured integration that allows external messaging platforms to communicate with Clawixea agents. When a message arrives on a connected channel, it is routed to the primary agent assigned to that user and a conversation session is created.
 
 ![Channels page — Telegram Bot and Web Dashboard, both connected](./assets/channels-overview.png)
 
@@ -121,7 +121,7 @@ Click **+ Add Channel** in the top-right corner. Select the channel type first �
 | **Type**      | `Telegram`                                                                    |
 | **Name**      | Display name for this channel entry                                           |
 | **Bot Token** | Token from [@BotFather](https://t.me/BotFather) — format: `123456:ABC-DEF...` |
-| **Mode**      | `Polling` (Clawix polls Telegram) or `Webhook` (Telegram pushes to your URL)  |
+| **Mode**      | `Polling` (Clawixea polls Telegram) or `Webhook` (Telegram pushes to your URL)  |
 
 > Use **Polling** for local development. Use **Webhook** in production (requires a publicly reachable HTTPS URL set in `TELEGRAM_WEBHOOK_URL`).
 
@@ -211,7 +211,7 @@ Click **⋯** → **Edit**. API Key field: leave blank to keep the existing key;
 **Path:** Agents (`/agents/user-agents`)  
 **Full guide:** [AGENTS.md](./AGENTS.md)
 
-**Agents** are the AI workers in Clawix. Two roles exist:
+**Agents** are the AI workers in Clawixea. Two roles exist:
 
 - **Primary** (`role: primary`) — the user-facing conversational agent. One per user. Stateful, loads history, has access to the spawn tool.
 - **Worker / Sub-agent** (`role: worker`) — a specialised, stateless agent spawned by the primary to handle parallel sub-tasks. Multiple per user.
