@@ -101,10 +101,17 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
   clear "not yet enabled" reply from the tool shim until the AI stage below.
 - Defaults live in `ai-tools/`; install with `node scripts/seed-ai-tools.mjs`.
 
-**Next (needs the engine):** Sunday Service Bulletin's AI analysis — route its
-`/api/analyze-bulletins` call through the Light Church API, store the uploaded
-PDFs server-side (files under the data directory, records in Postgres), and run
-the analysis via the engine — and `reference/GetinBible` (Gemini/OpenAI/Google TTS
+**Bulletin archive (done):** past-bulletin PDFs uploaded in the tool are
+archived in Postgres (`BulletinArchive`: file bytes, church, name, size,
+sha256, uploader; deduplicated per church). The tool's `/api/analyze-bulletins`
+call is forwarded by the dashboard (`lib/ai-tool-server-routes.ts`) to
+`POST /api/v1/bulletin-archive`. The archive never appears in the weekly
+editor; staff can list metadata via `GET /api/v1/bulletin-archive`.
+
+**Next (needs the engine):** Sunday Service Bulletin's AI analysis — read the
+archived PDFs (reuse the RAGplan Option B PDF→text/OCR converter) and draft next
+week's bulletin through `engine/providers/*`, with `[FILL]` for what only a
+person knows — and `reference/GetinBible` (Gemini/OpenAI/Google TTS
 keys in the browser + its own Supabase). Their AI calls must move behind a
 Light Church engine endpoint — no provider keys in tool pages, and all LLM
 calls through `engine/providers/*` for token accounting — and GetinBible needs
