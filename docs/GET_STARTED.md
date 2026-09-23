@@ -1,6 +1,6 @@
 # Clawixea
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-PolyForm%20Noncommercial%20%2B%20Christian%20Ministry%20Grant-blue.svg)](../LICENSE)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](package.json)
 [![TypeScript](https://img.shields.io/badge/typescript-5.7-blue)](package.json)
 
@@ -353,7 +353,7 @@ Clawixea is inspired by and builds upon ideas from:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the PolyForm Noncommercial License 1.0.0 plus the Christian Ministry Grant — see [LICENSE](../LICENSE), [LICENSE-CHURCH](../LICENSE-CHURCH) and [NOTICE](../NOTICE) for details.
 
 ---
 

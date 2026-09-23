@@ -403,12 +403,15 @@ Light Church is a ministry configuration of Clawixea, which builds on ideas from
 
 ## License
 
-This project is **dual-licensed**:
+The whole repository is covered by **two licences, applied together**. There is no MIT-licensed core.
 
-- **Core Clawixea platform:** [MIT License](LICENSE). Free to use, modify and distribute, excluding commercially.
-- **NGO/ministry-specific components:** [PolyForm Noncommercial License 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0). Noncommercial use only, but the terms expressly permit charities, educational institutions, public research/health/safety bodies, environmental organizations and governments, so **churches, ministries and nonprofits may use them freely.**
+- **[PolyForm Noncommercial License 1.0.0](LICENSE)** covers the entire codebase. You may use, copy, modify and distribute it for any **noncommercial** purpose. Charities, educational institutions, public research, safety and health bodies, environmental organisations and government institutions may use it whatever their funding source. **Commercial use** needs a separate commercial licence from the maintainers. That includes selling the software, offering it as a paid SaaS, or using it to generate direct revenue.
+- **[Christian Ministry Grant](LICENSE-CHURCH)** is an extra, royalty-free permission for Christian organisations: churches, denominations, mission societies, Christian schools and seminaries, and Christian healthcare, social-care and charitable bodies. They may use, self-host and adapt the whole platform for their ministry, including work involving tithes, offerings, tuition or donations, provided that:
+  - it isn't resold or offered to outside parties as a standalone commercial product or SaaS;
+  - the copyright and grant notices are kept;
+  - the organisation's primary purpose remains Christian ministry.
 
-See the [NOTICE](NOTICE) file for the exact paths covered by each license. It's still titled "Clawixea for NGOs", which is the legal/platform identity those paths are governed under. The ministry-specific directories (`reference/Clawix SKILL and Agent/`, `skills/ARIA/`) also carry their own `LICENSE` files.
+See [NOTICE](NOTICE) for the full scope. Where a directory has its own `LICENSE` file (for example `reference/Clawix SKILL and Agent/` and `skills/ARIA/`), that file governs that directory. Third-party dependencies keep their own licences. Neither licence is OSI-approved open source. If you're unsure whether your organisation qualifies, contact the maintainers.
 
 ---
 
