@@ -4,28 +4,49 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import { useT, type Messages } from '@/lib/i18n';
-import { ngoItems, type NavItem } from '@/components/dashboard/app-sidebar';
+import { useAuth } from '@/components/auth-provider';
+import {
+  governanceItems,
+  ngoItems,
+  phase3cItems,
+  type NavItem,
+} from '@/components/dashboard/app-sidebar';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
 interface MinistryCategory {
   readonly key: string;
   readonly itemKeys: readonly string[];
+  /** Rendered after a divider — e.g. Phase 3b governance items. */
+  readonly extraItemKeys?: readonly string[];
 }
 
 const categories: readonly MinistryCategory[] = [
-  { key: 'bibleMinistries', itemKeys: ['comms', 'scripture', 'fieldOps', 'outreach', 'programs'] },
+  {
+    key: 'bibleMinistries',
+    itemKeys: ['comms', 'scripture', 'fieldOps', 'outreach', 'programs'],
+    // Phase 3c (Data & Domain Curation) — moved here from the sidebar.
+    extraItemKeys: ['curation'],
+  },
   { key: 'careGovernance', itemKeys: ['mne', 'pastoralCare', 'prayer', 'incidents'] },
-  { key: 'financeStewardship', itemKeys: ['donors', 'finance', 'consent'] },
+  {
+    key: 'financeStewardship',
+    itemKeys: ['donors', 'finance', 'consent'],
+    // Phase 3b (Governance, Assurance & Liability) — moved here from the sidebar.
+    extraItemKeys: ['dashboard', 'tokenUsage', 'auditLogs', 'escalations'],
+  },
 ];
 
-const itemsByKey = new Map<string, NavItem>(ngoItems.map((item) => [item.key, item]));
+const itemsByKey = new Map<string, NavItem>(
+  [...ngoItems, ...governanceItems, ...phase3cItems].map((item) => [item.key, item]),
+);
 
 const messages = {
   en: {
@@ -47,6 +68,11 @@ const messages = {
       scripture: 'Scripture & Literacy',
       consent: 'Consent Records',
       pastoralCare: 'Pastoral Care',
+      dashboard: 'Dashboard',
+      tokenUsage: 'Token Usage',
+      auditLogs: 'Audit Logs',
+      escalations: 'Escalation & Override',
+      curation: 'Knowledge Curation',
     },
   },
   'zh-TW': {
@@ -68,6 +94,11 @@ const messages = {
       scripture: '聖經與識字',
       consent: '同意紀錄',
       pastoralCare: '牧養關懷',
+      dashboard: '儀表板',
+      tokenUsage: 'Token 用量',
+      auditLogs: '稽核日誌',
+      escalations: '升級與覆核',
+      curation: '知識整理',
     },
   },
 } satisfies Messages<{
@@ -78,16 +109,21 @@ const messages = {
 export function MinistriesNav({ className }: { className?: string }) {
   const pathname = usePathname();
   const t = useT(messages);
+  const { user } = useAuth();
 
   const isActive = (href: string) => pathname.startsWith(href);
 
   return (
     <nav className={cn('flex items-center gap-1', className)}>
       {categories.map((category) => {
-        const items = category.itemKeys
-          .map((key) => itemsByKey.get(key))
-          .filter((item): item is NavItem => item !== undefined);
-        const categoryActive = items.some((item) => isActive(item.href));
+        const resolve = (keys: readonly string[]) =>
+          keys
+            .map((key) => itemsByKey.get(key))
+            .filter((item): item is NavItem => item !== undefined)
+            .filter((item) => !item.adminOnly || user?.role === 'super_admin');
+        const items = resolve(category.itemKeys);
+        const extraItems = resolve(category.extraItemKeys ?? []);
+        const categoryActive = [...items, ...extraItems].some((item) => isActive(item.href));
 
         return (
           <DropdownMenu key={category.key}>
@@ -104,6 +140,15 @@ export function MinistriesNav({ className }: { className?: string }) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {items.map((item) => (
+                <DropdownMenuItem key={item.key} asChild>
+                  <Link href={item.href}>
+                    <item.icon />
+                    {t.nav[item.key as keyof typeof t.nav]}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+              {extraItems.length > 0 && <DropdownMenuSeparator />}
+              {extraItems.map((item) => (
                 <DropdownMenuItem key={item.key} asChild>
                   <Link href={item.href}>
                     <item.icon />

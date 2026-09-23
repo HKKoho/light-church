@@ -61,6 +61,7 @@ import {
   navButtonClass,
   type SidebarLink,
 } from '@/components/dashboard/sidebar-nav-group';
+import { ADOPTION_PHASES } from '@/components/dashboard/adoption-phases';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -112,7 +113,9 @@ const phase3aItems: readonly NavItem[] = [
 ];
 
 // Phase 3c — data & domain curation.
-const phase3cItems: readonly NavItem[] = [{ key: 'curation', icon: Library, href: '/curation' }];
+export const phase3cItems: readonly NavItem[] = [
+  { key: 'curation', icon: Library, href: '/curation' },
+];
 
 export const ngoItems: readonly NavItem[] = [
   { key: 'programs', href: '/ngo/programs', icon: Target },
@@ -136,12 +139,15 @@ export const ngoItems: readonly NavItem[] = [
 // leader needs one-click daily access rather than the header ministries dropdown.
 const CARE_ITEM_KEYS = ['prayer', 'pastoralCare', 'scripture', 'outreach'] as const;
 const ngoItemsByKey = new Map(ngoItems.map((item) => [item.key, item]));
-const phase3aKeys = new Set(phase3aItems.map((item) => item.key));
+// While Phase 3a has its own sidebar group, don't list its items twice.
+const phase3aKeys = new Set(
+  ADOPTION_PHASES['3a'].inSidebar ? phase3aItems.map((item) => item.key) : [],
+);
 const careItems: readonly NavItem[] = CARE_ITEM_KEYS.filter((key) => !phase3aKeys.has(key))
   .map((key) => ngoItemsByKey.get(key))
   .filter((item): item is NavItem => item !== undefined);
 
-const governanceItems: readonly NavItem[] = [
+export const governanceItems: readonly NavItem[] = [
   { key: 'dashboard', href: '/dashboard', icon: BookOpen },
   { key: 'tokenUsage', href: '/governance/tokens', icon: Coins },
   { key: 'auditLogs', href: '/governance/audit', icon: ScrollText },
@@ -165,6 +171,7 @@ const messages = {
     groupDelegation: 'Ministry Delegation',
     groupCare: 'Care & Discipleship',
     groupGovernance: 'Governance, Assurance & Liability',
+    groupAdmin: 'Administration',
     groupCuration: 'Data & Domain Curation',
     toBeConstructed: 'TO BE CONSTRUCTED',
     nav: {
@@ -222,6 +229,7 @@ const messages = {
     groupDelegation: '事工委派',
     groupCare: '關懷與門徒訓練',
     groupGovernance: '治理、保證與責任',
+    groupAdmin: '系統管理',
     groupCuration: '資料與領域知識整理',
     toBeConstructed: '建構中',
     nav: {
@@ -279,6 +287,7 @@ const messages = {
   groupDelegation: string;
   groupCare: string;
   groupGovernance: string;
+  groupAdmin: string;
   groupCuration: string;
   toBeConstructed: string;
   nav: Record<string, string>;
@@ -389,38 +398,49 @@ export function AppSidebar() {
           />
         )}
 
-        <SidebarNavGroup
-          label={t.groupDelegation}
-          phase="3a"
-          toBeConstructedLabel={t.toBeConstructed}
-          links={toLinks(phase3aItems)}
-          isActive={isActive}
-        />
+        {ADOPTION_PHASES['3a'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupDelegation}
+            phase="3a"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(phase3aItems)}
+            isActive={isActive}
+          />
+        )}
 
-        <SidebarNavGroup
-          label={t.groupGovernance}
-          phase="3b"
-          toBeConstructedLabel={t.toBeConstructed}
-          links={toLinks(
-            governanceItems.filter((item) => !item.adminOnly || user?.role === 'super_admin'),
-          )}
-          isActive={isActive}
-        >
-          <Collapsible
-            defaultOpen={pathname.startsWith('/settings')}
-            className="group/collapsible"
-            onOpenChange={(open) => {
-              if (open) {
-                requestAnimationFrame(() => {
-                  const el = document.querySelector(
-                    '.group\\/collapsible [data-sidebar="menu-sub"]',
-                  );
-                  if (el) animateSubItems(el as HTMLElement);
-                });
-              }
-            }}
+        {ADOPTION_PHASES['3b'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupGovernance}
+            phase="3b"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(
+              governanceItems.filter((item) => !item.adminOnly || user?.role === 'super_admin'),
+            )}
+            isActive={isActive}
+          />
+        )}
+
+        {user?.role === 'super_admin' && (
+          <SidebarNavGroup
+            label={t.groupAdmin}
+            toBeConstructedLabel={t.toBeConstructed}
+            links={[]}
+            isActive={isActive}
           >
-            {user?.role === 'super_admin' && (
+            <Collapsible
+              defaultOpen={pathname.startsWith('/settings')}
+              className="group/collapsible"
+              onOpenChange={(open) => {
+                if (open) {
+                  requestAnimationFrame(() => {
+                    const el = document.querySelector(
+                      '.group\\/collapsible [data-sidebar="menu-sub"]',
+                    );
+                    if (el) animateSubItems(el as HTMLElement);
+                  });
+                }
+              }}
+            >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton
@@ -452,17 +472,19 @@ export function AppSidebar() {
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
-            )}
-          </Collapsible>
-        </SidebarNavGroup>
+            </Collapsible>
+          </SidebarNavGroup>
+        )}
 
-        <SidebarNavGroup
-          label={t.groupCuration}
-          phase="3c"
-          toBeConstructedLabel={t.toBeConstructed}
-          links={toLinks(phase3cItems)}
-          isActive={isActive}
-        />
+        {ADOPTION_PHASES['3c'].inSidebar && (
+          <SidebarNavGroup
+            label={t.groupCuration}
+            phase="3c"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(phase3cItems)}
+            isActive={isActive}
+          />
+        )}
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
           <Phase2RoadmapCard />
