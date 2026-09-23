@@ -139,6 +139,7 @@ export {
   MAX_AI_TOOL_STORAGE_BYTES,
   type AiToolStorageInput,
   type AiToolDetail,
+  type AiToolDisplayName,
   type AiToolKind,
   type AiToolSummary,
 } from './ai-tools.schema.js';

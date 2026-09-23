@@ -12,10 +12,20 @@ export const aiToolNameSchema = z
 
 export type AiToolKind = 'html' | 'link';
 
+/** Optional per-language text from tool.json (display name or description). */
+export interface AiToolDisplayName {
+  readonly en: string | null;
+  readonly 'zh-TW': string | null;
+}
+
 export interface AiToolSummary {
+  /** Folder name under AITools/ — the tool's stable id in URLs and storage. */
   readonly name: string;
+  readonly displayName: AiToolDisplayName | null;
   readonly kind: AiToolKind;
+  /** Plain description, or the English one when tool.json gives both languages. */
   readonly description: string | null;
+  readonly descriptions: AiToolDisplayName | null;
   /** External URL — present only for `link` tools. */
   readonly url: string | null;
 }

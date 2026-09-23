@@ -122,7 +122,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
           {/* Upload */}
           <section>
             <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest block mb-2">
-              上載過去三個禮拜的主日崇拜週刊 PDF
+              上載過去兩個禮拜的主日崇拜週刊 PDF
             </label>
 
             <div
@@ -141,7 +141,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart }) => {
             >
               <CloudUpload className="w-7 h-7 text-slate-400" />
               <p className="text-sm font-semibold text-slate-700">
-                上載過去三個禮拜的主日崇拜週刊 PDF
+                上載過去兩個禮拜的主日崇拜週刊 PDF
               </p>
               <p className="text-[11px] text-slate-400">
                 拖放 PDF 檔案至此，或按此選擇檔案 — 系統將學習格式規律，供智能編輯本週程序表

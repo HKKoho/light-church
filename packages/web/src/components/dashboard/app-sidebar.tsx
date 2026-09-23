@@ -35,7 +35,6 @@ import {
   Settings2,
   ShieldAlert,
   Siren,
-  Sparkles,
   Sun,
   Target,
   User,
@@ -43,10 +42,8 @@ import {
   UsersRound,
   Video,
   Wallet,
-  Wand2,
   Workflow,
   Wrench,
-  ExternalLink,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import anime from 'animejs';
@@ -54,14 +51,13 @@ import { EASING } from '@/lib/anime';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { useGovernanceModel } from '@/hooks/use-governance-model';
 import { Phase2RoadmapCard } from '@/components/dashboard/phase2-roadmap-card';
-import { useAiTools } from '@/hooks/use-ai-tools';
 import {
   SidebarNavGroup,
   navButtonClass,
   type SidebarLink,
 } from '@/components/dashboard/sidebar-nav-group';
 import { ADOPTION_PHASES } from '@/components/dashboard/adoption-phases';
-import { BUILT_IN_AI_TOOLS } from '@/components/dashboard/built-in-ai-tools';
+import { AiToolsNavItem } from '@/components/dashboard/ai-tools-nav-item';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -177,8 +173,6 @@ const messages = {
       conversations: 'Conversations',
       talkingFace: 'Talking Face',
       workspace: 'Workspace',
-      allAiTools: 'All AI Tools',
-      gameBuilder: 'Game Builder',
       delegation: 'Delegation Register',
       wkflowGeneration: 'WkFlow Generation',
       escalations: 'Escalation & Override',
@@ -235,8 +229,6 @@ const messages = {
       conversations: '對話',
       talkingFace: '會說話的頭像',
       workspace: '工作區',
-      allAiTools: '所有 AI 工具',
-      gameBuilder: '遊戲工坊',
       delegation: '委派登記',
       wkflowGeneration: '工作流程生成',
       escalations: '升級與覆核',
@@ -310,7 +302,6 @@ export function AppSidebar() {
   const { lang, toggleLang } = useLanguage();
   const t = useT(messages);
   const { governanceModel } = useGovernanceModel();
-  const { tools: aiTools } = useAiTools();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setMounted(true);
@@ -336,24 +327,12 @@ export function AppSidebar() {
   const isDark = mounted && resolvedTheme === 'dark';
 
   const isActive = (href: string) => {
-    if (href === '/' || href === '/ai-tools') return pathname === href;
+    if (href === '/') return pathname === '/';
     return pathname.startsWith(href);
   };
 
   const toLinks = (items: readonly NavItem[]): SidebarLink[] =>
     items.map((item) => ({ ...item, label: t.nav[item.key as keyof typeof t.nav] }));
-
-  // Phase 1: one sidebar entry per tool in the shared AITools directory.
-  const aiToolLinks: SidebarLink[] = [
-    { key: 'allAiTools', href: '/ai-tools', label: t.nav.allAiTools, icon: Sparkles },
-    ...BUILT_IN_AI_TOOLS.map((tool) => ({ ...tool, label: t.nav[tool.key] ?? tool.key })),
-    ...aiTools.map((tool) => ({
-      key: `ai-tool:${tool.name}`,
-      href: `/ai-tools/${encodeURIComponent(tool.name)}`,
-      label: tool.name,
-      icon: tool.kind === 'link' ? ExternalLink : Wand2,
-    })),
-  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -377,9 +356,11 @@ export function AppSidebar() {
           label={t.groupAiTools}
           phase="1"
           toBeConstructedLabel={t.toBeConstructed}
-          links={aiToolLinks}
+          links={[]}
           isActive={isActive}
-        />
+        >
+          <AiToolsNavItem />
+        </SidebarNavGroup>
 
         <SidebarNavGroup
           label={t.groupWorkspace}

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+  TOOL_SERVER_UNAVAILABLE,
   TOOL_STORAGE_MESSAGE,
   buildToolSrcDoc,
   isToolStorageMessage,
@@ -60,6 +61,27 @@ describe('storage shim at runtime', () => {
       { type: TOOL_STORAGE_MESSAGE, data: { roll: '{"members":[1,2]}' } },
       '*',
     );
+  });
+});
+
+describe('fetch guard at runtime', () => {
+  const originalFetch = window.fetch;
+  afterEach(() => {
+    window.fetch = originalFetch;
+  });
+
+  it('answers relative-URL fetches with a 503 explaining server features are off', async () => {
+    const passthrough = vi.fn(async () => new Response('ok'));
+    window.fetch = passthrough as unknown as typeof fetch;
+    new Function(extractShim(buildToolSrcDoc('<head></head>', {})))();
+
+    const res = await window.fetch('/api/analyze-bulletins', { method: 'POST' });
+    expect(res.status).toBe(503);
+    expect(((await res.json()) as { error: string }).error).toBe(TOOL_SERVER_UNAVAILABLE);
+    expect(passthrough).not.toHaveBeenCalled();
+
+    await window.fetch('https://fonts.googleapis.com/css2');
+    expect(passthrough).toHaveBeenCalledTimes(1);
   });
 });
 

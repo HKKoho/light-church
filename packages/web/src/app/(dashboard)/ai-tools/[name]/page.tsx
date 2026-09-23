@@ -9,11 +9,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authFetch } from '@/lib/auth';
 import { buildToolSrcDoc, isToolStorageMessage } from '@/lib/ai-tool-storage-bridge';
-import { useT, type Messages } from '@/lib/i18n';
+import { useLanguage, useT, type Messages } from '@/lib/i18n';
+import { aiToolDescription, aiToolLabel } from '@/hooks/use-ai-tools';
 
 const messages = {
   en: {
-    back: 'All AI Tools',
+    back: 'AI Tools',
     loadError: (name: string) => `Failed to load "${name}"`,
     openExternal: 'Open in a new tab',
     externalHint:
@@ -23,7 +24,7 @@ const messages = {
     storageUnavailable: 'Saved data could not be loaded, so changes in this tool will not be kept',
   },
   'zh-TW': {
-    back: '所有 AI 工具',
+    back: 'AI 工具',
     loadError: (name: string) => `無法載入「${name}」`,
     openExternal: '在新分頁開啟',
     externalHint: '此工具由 Light Church 以外的服務提供，請勿貼上會友個人資料。',
@@ -47,6 +48,7 @@ const SAVE_DEBOUNCE_MS = 500;
 
 export default function AiToolViewerPage() {
   const t = useT(messages);
+  const { lang } = useLanguage();
   const { name: rawName } = useParams<{ name: string }>();
   const name = decodeURIComponent(rawName);
   const [tool, setTool] = useState<AiToolDetail | null>(null);
@@ -140,7 +142,7 @@ export default function AiToolViewerPage() {
             {t.back}
           </Link>
         </Button>
-        <h1 className="truncate text-lg font-semibold">{name}</h1>
+        <h1 className="truncate text-lg font-semibold">{tool ? aiToolLabel(tool, lang) : name}</h1>
         {saveState !== 'idle' && (
           <span
             className={
@@ -169,8 +171,10 @@ export default function AiToolViewerPage() {
       ) : tool.kind === 'link' && tool.url ? (
         <Card className="max-w-xl">
           <CardHeader>
-            <CardTitle className="text-base">{tool.name}</CardTitle>
-            {tool.description && <CardDescription>{tool.description}</CardDescription>}
+            <CardTitle className="text-base">{aiToolLabel(tool, lang)}</CardTitle>
+            {aiToolDescription(tool, lang) && (
+              <CardDescription>{aiToolDescription(tool, lang)}</CardDescription>
+            )}
             <CardDescription className="text-amber-600 dark:text-amber-400">
               {t.externalHint}
             </CardDescription>
@@ -190,7 +194,7 @@ export default function AiToolViewerPage() {
           srcDoc={srcDoc ?? ''}
           sandbox="allow-scripts allow-forms allow-modals allow-downloads allow-popups"
           className="w-full flex-1 rounded-lg border bg-background"
-          title={tool.name}
+          title={aiToolLabel(tool, lang)}
         />
       )}
     </div>

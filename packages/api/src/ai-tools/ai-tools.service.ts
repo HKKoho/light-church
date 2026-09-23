@@ -5,7 +5,7 @@ import * as fs from 'fs/promises';
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { z } from 'zod';
 import { aiToolNameSchema, aiToolStorageSchema, createLogger } from '@clawix/shared';
-import type { AiToolDetail, AiToolSummary } from '@clawix/shared';
+import type { AiToolDetail, AiToolDisplayName, AiToolSummary } from '@clawix/shared';
 
 import { ScopedFs } from '../workspace/scoped-fs.js';
 
@@ -17,7 +17,22 @@ const HTML_EXTENSIONS = new Set(['.html', '.htm']);
 // Optional per-tool metadata. A tool folder with only a `tool.json` carrying a
 // `url` is an external link tool (e.g. a vetted third-party AI app).
 const toolMetaSchema = z.object({
-  description: z.string().max(500).optional(),
+  displayName: z
+    .object({
+      en: z.string().trim().min(1).max(64).optional(),
+      'zh-TW': z.string().trim().min(1).max(64).optional(),
+    })
+    .optional(),
+  // A plain string, or { en, 'zh-TW' } for per-language descriptions.
+  description: z
+    .union([
+      z.string().max(500),
+      z.object({
+        en: z.string().max(500).optional(),
+        'zh-TW': z.string().max(500).optional(),
+      }),
+    ])
+    .optional(),
   url: z
     .string()
     .url()
@@ -64,6 +79,24 @@ export class AiToolsService {
     return result.data;
   }
 
+  private static toDisplayName(meta: ToolMeta): AiToolDisplayName | null {
+    const en = meta.displayName?.en ?? null;
+    const zh = meta.displayName?.['zh-TW'] ?? null;
+    return en || zh ? { en, 'zh-TW': zh } : null;
+  }
+
+  private static toDescriptions(meta: ToolMeta): {
+    description: string | null;
+    descriptions: AiToolDisplayName | null;
+  } {
+    const d = meta.description;
+    if (d === undefined) return { description: null, descriptions: null };
+    if (typeof d === 'string') return { description: d, descriptions: null };
+    const en = d.en ?? null;
+    const zh = d['zh-TW'] ?? null;
+    return { description: en ?? zh, descriptions: en || zh ? { en, 'zh-TW': zh } : null };
+  }
+
   private async readMeta(sfs: ScopedFs, name: string): Promise<ToolMeta> {
     const metaPath = `/${name}/tool.json`;
     if (!(await sfs.exists(metaPath))) return {};
@@ -80,12 +113,13 @@ export class AiToolsService {
 
   private async summarize(sfs: ScopedFs, name: string): Promise<AiToolSummary | null> {
     const meta = await this.readMeta(sfs, name);
-    const description = meta.description ?? null;
+    const { description, descriptions } = AiToolsService.toDescriptions(meta);
+    const displayName = AiToolsService.toDisplayName(meta);
     if (await sfs.exists(`/${name}/index.html`)) {
-      return { name, kind: 'html', description, url: null };
+      return { name, displayName, kind: 'html', description, descriptions, url: null };
     }
     if (meta.url) {
-      return { name, kind: 'link', description, url: meta.url };
+      return { name, displayName, kind: 'link', description, descriptions, url: meta.url };
     }
     return null;
   }
@@ -126,7 +160,13 @@ export class AiToolsService {
     await sfs.writeFile(`/${name}/index.html`, data);
     logger.info({ name, size: data.length }, 'Uploaded AI tool');
     const meta = await this.readMeta(sfs, name);
-    return { name, kind: 'html', description: meta.description ?? null, url: null };
+    return {
+      name,
+      displayName: AiToolsService.toDisplayName(meta),
+      kind: 'html',
+      ...AiToolsService.toDescriptions(meta),
+      url: null,
+    };
   }
 
   async getStorage(rawName: string, userId: string): Promise<Record<string, string>> {

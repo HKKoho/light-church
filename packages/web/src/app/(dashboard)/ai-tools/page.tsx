@@ -21,8 +21,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authFetch, getAccessToken } from '@/lib/auth';
-import { useT, type Messages } from '@/lib/i18n';
-import { AI_TOOLS_CHANGED_EVENT, useAiTools } from '@/hooks/use-ai-tools';
+import { useLanguage, useT, type Messages } from '@/lib/i18n';
+import {
+  AI_TOOLS_CHANGED_EVENT,
+  aiToolDescription,
+  aiToolLabel,
+  useAiTools,
+} from '@/hooks/use-ai-tools';
 import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from '@/components/dashboard/built-in-ai-tools';
 
 const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
@@ -202,6 +207,7 @@ function UploadCard() {
 
 export default function AiToolsPage() {
   const t = useT(messages);
+  const { lang } = useLanguage();
   const { user } = useAuth();
   const isAdmin = user?.role === 'super_admin';
   const { tools, error, isLoading } = useAiTools();
@@ -263,11 +269,11 @@ export default function AiToolsPage() {
                   ) : (
                     <Wand2 className="size-4 shrink-0 text-muted-foreground" />
                   )}
-                  <span className="truncate">{tool.name}</span>
+                  <span className="truncate">{aiToolLabel(tool, lang)}</span>
                 </CardTitle>
-                {tool.description && (
+                {aiToolDescription(tool, lang) && (
                   <CardDescription className="line-clamp-2 text-xs">
-                    {tool.description}
+                    {aiToolDescription(tool, lang)}
                   </CardDescription>
                 )}
               </CardHeader>
@@ -283,14 +289,16 @@ export default function AiToolsPage() {
                         size="sm"
                         variant="ghost"
                         className="ml-auto text-muted-foreground hover:text-destructive"
-                        aria-label={`${t.remove} ${tool.name}`}
+                        aria-label={`${t.remove} ${aiToolLabel(tool, lang)}`}
                       >
                         <Trash2 className="size-4" />
                       </Button>
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle>{t.removeConfirmTitle(tool.name)}</AlertDialogTitle>
+                        <AlertDialogTitle>
+                          {t.removeConfirmTitle(aiToolLabel(tool, lang))}
+                        </AlertDialogTitle>
                         <AlertDialogDescription>{t.removeConfirmBody}</AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>

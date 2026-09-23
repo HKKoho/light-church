@@ -8,9 +8,18 @@
  * in-memory Storage stand-in, pre-filled with the user's saved snapshot. Every
  * localStorage change is posted to the parent, which persists it through
  * `PUT /api/v1/ai-tools/:name/storage`. sessionStorage is in-memory only.
+ *
+ * Tools have no server of their own here, so fetches to relative URLs (e.g. a
+ * bundled app's `/api/analyze-bulletins`) get a clear 503 JSON reply instead of
+ * a cryptic network error. Server-side features such as AI calls will be wired
+ * through the Light Church engine in a later phase.
  */
 
 export const TOOL_STORAGE_MESSAGE = 'light-church:ai-tool-storage';
+
+export const TOOL_SERVER_UNAVAILABLE =
+  '此工具的伺服器功能（例如 AI 分析）尚未在光教會啟用。 ' +
+  "This tool's server features (such as AI analysis) are not yet enabled in Light Church.";
 
 export interface ToolStorageMessage {
   readonly type: typeof TOOL_STORAGE_MESSAGE;
@@ -60,6 +69,18 @@ function shimScript(snapshot: Record<string, string>): string {
     Object.defineProperty(window, 'sessionStorage', { value: makeStorage({}, false), configurable: true });
   } catch (e) {}
   addEventListener('pagehide', function () { if (timer) flush(); });
+  var realFetch = window.fetch;
+  if (realFetch) {
+    window.fetch = function (input, init) {
+      if (typeof input === 'string' && !/^(https?:|data:|blob:)/i.test(input)) {
+        return Promise.resolve(new Response(
+          JSON.stringify({ error: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)}, message: ${JSON.stringify(TOOL_SERVER_UNAVAILABLE)} }),
+          { status: 503, headers: { 'Content-Type': 'application/json' } }
+        ));
+      }
+      return realFetch.call(window, input, init);
+    };
+  }
 })();</script>`;
 }
 

@@ -49,16 +49,40 @@ describe('AiToolsService', () => {
     await writeTool('bad-link', { 'tool.json': JSON.stringify({ url: 'javascript:alert(1)' }) });
 
     await expect(service.list()).resolves.toEqual([
-      { name: 'Bible Chat', kind: 'link', description: null, url: 'https://example.org' },
-      { name: 'Sermon Helper', kind: 'html', description: 'Outlines', url: null },
+      { name: 'Bible Chat', displayName: null, kind: 'link', description: null, descriptions: null, url: 'https://example.org' },
+      { name: 'Sermon Helper', displayName: null, kind: 'html', description: 'Outlines', descriptions: null, url: null },
     ]);
   });
 
   it('keeps an html tool visible when its tool.json is malformed', async () => {
     await writeTool('講道助手', { 'index.html': '<p/>', 'tool.json': '{not json' });
     await expect(service.list()).resolves.toEqual([
-      { name: '講道助手', kind: 'html', description: null, url: null },
+      { name: '講道助手', displayName: null, kind: 'html', description: null, descriptions: null, url: null },
     ]);
+  });
+
+  it('reads per-language display names from tool.json', async () => {
+    await writeTool('roll-call', {
+      'index.html': '<p/>',
+      'tool.json': JSON.stringify({ displayName: { en: 'Roll Call', 'zh-TW': '點名' } }),
+    });
+    await writeTool('en-only', {
+      'index.html': '<p/>',
+      'tool.json': JSON.stringify({ displayName: { en: 'English Only' } }),
+    });
+    const [enOnly, rollCall] = await service.list();
+    expect(rollCall?.displayName).toEqual({ en: 'Roll Call', 'zh-TW': '點名' });
+    expect(enOnly?.displayName).toEqual({ en: 'English Only', 'zh-TW': null });
+  });
+
+  it('reads per-language descriptions, using English as the plain fallback', async () => {
+    await writeTool('bulletin', {
+      'index.html': '<p/>',
+      'tool.json': JSON.stringify({ description: { en: 'Edit the bulletin', 'zh-TW': '編輯週刊' } }),
+    });
+    const [tool] = await service.list();
+    expect(tool?.description).toBe('Edit the bulletin');
+    expect(tool?.descriptions).toEqual({ en: 'Edit the bulletin', 'zh-TW': '編輯週刊' });
   });
 
   it('returns the html for a tool', async () => {
@@ -73,7 +97,14 @@ describe('AiToolsService', () => {
 
   it('uploads an html file as <name>/index.html', async () => {
     const tool = await service.upload('Prayer Board', 'board.html', Buffer.from('<p>x</p>'));
-    expect(tool).toEqual({ name: 'Prayer Board', kind: 'html', description: null, url: null });
+    expect(tool).toEqual({
+      name: 'Prayer Board',
+      displayName: null,
+      kind: 'html',
+      description: null,
+      descriptions: null,
+      url: null,
+    });
     await expect(
       fs.readFile(path.join(toolsDir, 'Prayer Board', 'index.html'), 'utf-8'),
     ).resolves.toBe('<p>x</p>');
