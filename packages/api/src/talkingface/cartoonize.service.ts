@@ -12,7 +12,12 @@ const GENERATE_TIMEOUT_MS = 30_000;
  * original TensorFlow AnimeGANv2 repo — docs/self2talkface.md documents the
  * deviation.
  */
-export const CARTOON_STYLES = ['face_paint_v2', 'face_paint_v1', 'celeba_distill', 'paprika'] as const;
+export const CARTOON_STYLES = [
+  'face_paint_v2',
+  'face_paint_v1',
+  'celeba_distill',
+  'paprika',
+] as const;
 export type CartoonStyle = (typeof CARTOON_STYLES)[number];
 
 export function isCartoonStyle(value: unknown): value is CartoonStyle {
@@ -40,17 +45,20 @@ export interface CartoonizeResult {
  */
 @Injectable()
 export class CartoonizeService {
-  private readonly baseUrl: string;
-
-  constructor(@Inject(ConfigService) configService: ConfigService) {
-    this.baseUrl = configService.getOrThrow<string>('CARTOONIZE_URL');
-  }
+  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
   /**
    * Converts a source photo into a cartoon/anime-style portrait.
    * The caller is responsible for ensuring the image and style are valid.
    */
   async generate(imageBuffer: Buffer, style: CartoonStyle): Promise<CartoonizeResult> {
+    // Read lazily (like SADTALKER_URL / TTS_PIPER_URL) so an unconfigured
+    // sidecar only fails cartoon requests instead of stopping the API booting.
+    const baseUrl = this.configService.get<string>('CARTOONIZE_URL');
+    if (!baseUrl) {
+      throw new ExternalServiceError('cartoonize', 'CARTOONIZE_URL is not configured');
+    }
+
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), GENERATE_TIMEOUT_MS);
 
@@ -63,7 +71,7 @@ export class CartoonizeService {
       );
       form.append('style', style);
 
-      const response = await fetch(`${this.baseUrl}/generate`, {
+      const response = await fetch(`${baseUrl}/generate`, {
         method: 'POST',
         body: form,
         signal: controller.signal,

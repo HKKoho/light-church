@@ -17,8 +17,8 @@ import type { ConfigService } from '@nestjs/config';
 
 import { CartoonizeService, isCartoonStyle } from '../cartoonize.service.js';
 
-function makeConfigService(url = 'http://cartoonize.test'): ConfigService {
-  return { getOrThrow: () => url } as unknown as ConfigService;
+function makeConfigService(url: string | null = 'http://cartoonize.test'): ConfigService {
+  return { get: () => url ?? undefined } as unknown as ConfigService;
 }
 
 afterEach(() => {
@@ -68,9 +68,7 @@ describe('CartoonizeService', () => {
     );
 
     const service = new CartoonizeService(makeConfigService());
-    await expect(service.generate(Buffer.from('x'), 'paprika')).rejects.toThrow(
-      /sidecar exploded/,
-    );
+    await expect(service.generate(Buffer.from('x'), 'paprika')).rejects.toThrow(/sidecar exploded/);
   });
 
   it('wraps a network failure in ExternalServiceError', async () => {
@@ -78,5 +76,14 @@ describe('CartoonizeService', () => {
 
     const service = new CartoonizeService(makeConfigService());
     await expect(service.generate(Buffer.from('x'), 'paprika')).rejects.toThrow(/ECONNREFUSED/);
+  });
+});
+
+describe('CartoonizeService without CARTOONIZE_URL', () => {
+  it('constructs fine and only fails the cartoon request', async () => {
+    const service = new CartoonizeService(makeConfigService(null));
+    await expect(service.generate(Buffer.from('x'), 'paprika')).rejects.toThrow(
+      /CARTOONIZE_URL is not configured/,
+    );
   });
 });
