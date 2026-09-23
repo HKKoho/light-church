@@ -54,3 +54,6 @@ reference/**/*.wav
 reference/**/*.m4a
 reference/**/*.mov
 reference/**/firebase-applet-config.json
+
+# Database dumps taken by setup-clawix.sh before deleting volumes
+backups/

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ─────────────────────────────────────────────────────────────────────────────
-# setup-clawix.sh — Clone and install Clawix from scratch
+# setup-clawix.sh — Clone and install Light Church (Clawix platform) from scratch
 #
 # INTERACTIVE (default):
 #   ./setup-clawix.sh
@@ -14,17 +14,23 @@
 #   --provider  NAME        anthropic | openai | gemini | zai-coding | kimi-code
 #   --api-key   KEY         API key for the chosen provider
 #   --model     MODEL       Override default model for the provider
-#   --dir       PATH        Where to clone (default: ~/clawixngo)
-#   --mode      dev|prod    Deployment mode (default: dev)
+#   --dir       PATH        Where to clone (default: ~/light-church)
+#   --mode      dev|prod    Deployment mode (default: dev). --auto supports dev
+#                           only; run without --auto for a production install.
 #   --telegram  TOKEN       Telegram bot token (optional, autonomous only)
-#   --clean                 Force-remove all Clawix Docker resources before install
+#   --clean                 Force-remove all Clawix Docker resources before install,
+#                           INCLUDING the database volumes (a pg_dump backup is
+#                           saved to ./backups/ first). Without --clean, --auto
+#                           removes containers/networks but always keeps volumes.
 #   --skip-clean            Never prompt about or remove existing Docker resources
 #   --help                  Show this message
 # ─────────────────────────────────────────────────────────────────────────────
 set -euo pipefail
 
-REPO_URL="https://github.com/aibyml-ngo/clawix-ngo.git"
-DEFAULT_DIR="$HOME/clawixngo"
+# The clone directory name becomes the Docker Compose project name, so keep it
+# "light-church" — the resource checks below look for the light-church_ prefix.
+REPO_URL="https://github.com/HKKoho/light-church.git"
+DEFAULT_DIR="$HOME/light-church"
 
 # ── colours ───────────────────────────────────────────────────────────────────
 bold()  { printf '\033[1m%s\033[0m' "$*"; }
@@ -105,8 +111,21 @@ if $AUTO && [[ -z "$API_KEY" ]]; then
   fi
 fi
 
+# ── validate --mode ──────────────────────────────────────────────────────────
+if [[ "$DEPLOY_MODE" != "dev" && "$DEPLOY_MODE" != "prod" ]]; then
+  fail "Invalid --mode: $DEPLOY_MODE (use dev or prod)."
+  exit 1
+fi
+
 # ── validate autonomous requirements ─────────────────────────────────────────
 if $AUTO; then
+  # Autonomous mode writes a development .env and starts docker-compose.dev.yml.
+  # A production install needs a public host, CORS origins and an admin account,
+  # which the interactive installer asks for — never silently install dev.
+  if [[ "$DEPLOY_MODE" == "prod" ]]; then
+    fail "--auto supports --mode dev only. For production, run ./setup-clawix.sh without --auto and choose production."
+    exit 1
+  fi
   if [[ -z "$PROVIDER" ]]; then
     fail "Autonomous mode requires --provider (or set ANTHROPIC_API_KEY / OPENAI_API_KEY in env)."
     exit 1
@@ -216,10 +235,10 @@ if ! $SKIP_CLEAN; then
   AGENT_CONTAINERS=$(docker ps -a --format '{{.Names}}\t{{.Status}}\t{{.Image}}' \
     | grep 'clawix-agent' | grep -vE '^lightchurch-' || true)
 
-  # Images: clawix-agent:latest, clawix-api:latest, clawix-web:latest — these
-  # tags are shared across sibling checkouts (not project-scoped), so we can't
-  # safely offer to remove them here; left undetected rather than risk
-  # deleting an image another project's running containers still reference.
+  # Images: lightchurch-api:latest and lightchurch-web:latest are project-scoped;
+  # clawix-agent:latest is still shared across sibling checkouts, so we don't
+  # offer to remove images here rather than risk deleting one another project's
+  # running containers still reference.
   EXISTING_IMAGES=""
 
   # Volumes prefixed light-church_ (the Compose project-name prefix for this
@@ -313,6 +332,35 @@ if ! $SKIP_CLEAN; then
     if $DO_CLEAN; then
       echo
 
+      # Decide about volumes FIRST: they hold the database, and a backup needs the
+      # postgres container still running. --auto never deletes them (a routine
+      # unattended re-install must not wipe data) unless --clean is given too.
+      REMOVE_VOLUMES=false
+      if [[ -n "$EXISTING_VOLUMES" ]]; then
+        if $FORCE_CLEAN; then
+          REMOVE_VOLUMES=true
+        elif ! $AUTO; then
+          printf "\n  $(red 'Volumes hold the database (users, conversations, settings, archives).')\n"
+          printf "  They are kept unless you type %s: " "$(bold delete)"
+          read -r VOL_ANSWER
+          [[ "$(lower "$VOL_ANSWER")" == "delete" ]] && REMOVE_VOLUMES=true
+        fi
+      fi
+
+      if $REMOVE_VOLUMES && docker ps --format '{{.Names}}' | grep -qx 'lightchurch-postgres'; then
+        BACKUP_FILE="backups/db-$(date +%Y%m%d-%H%M%S).sql.gz"
+        mkdir -p backups
+        info "Backing up the database to $BACKUP_FILE ..."
+        if docker exec lightchurch-postgres pg_dump -U "${POSTGRES_USER:-clawix}" "${POSTGRES_DB:-clawix}" \
+            | gzip > "$BACKUP_FILE" && [[ -s "$BACKUP_FILE" ]]; then
+          ok "Database backed up to $BACKUP_FILE"
+        else
+          fail "Database backup failed — volumes will NOT be deleted."
+          rm -f "$BACKUP_FILE"
+          REMOVE_VOLUMES=false
+        fi
+      fi
+
       # Stop and remove named + agent containers
       ALL_CONTAINERS=$(printf '%s\n%s' "$EXISTING_CONTAINERS" "$AGENT_CONTAINERS" \
         | awk -F'\t' '{print $1}' | grep -v '^$' || true)
@@ -331,20 +379,8 @@ if ! $SKIP_CLEAN; then
         done <<< "$EXISTING_IMAGES"
       fi
 
-      # Remove volumes — ask again in interactive mode (destructive)
+      # Remove volumes (decided — and backed up — before containers were removed)
       if [[ -n "$EXISTING_VOLUMES" ]]; then
-        REMOVE_VOLUMES=false
-        if $AUTO || $FORCE_CLEAN; then
-          REMOVE_VOLUMES=true
-        else
-          printf "\n  $(red 'Volumes contain database data and will be permanently deleted.')\n"
-          printf "  Delete volumes too? (y/N): "
-          read -r VOL_ANSWER
-          if [[ "$(lower "$VOL_ANSWER")" == "y" || "$(lower "$VOL_ANSWER")" == "yes" ]]; then
-            REMOVE_VOLUMES=true
-          fi
-        fi
-
         if $REMOVE_VOLUMES; then
           info "Removing volumes..."
           while read -r vol; do
@@ -405,6 +441,8 @@ if ! $AUTO; then
   node scripts/seed-ngo-agents.mjs && ok "NGO agents seeded" || warn "NGO agent seed failed — run manually: node scripts/seed-ngo-agents.mjs"
   info "Running NGO workspace + skills setup..."
   node scripts/setup-ngo.mjs && ok "NGO workspace and skills seeded" || warn "NGO setup failed — run manually: node scripts/setup-ngo.mjs"
+  info "Installing default AI Tools..."
+  node scripts/seed-ai-tools.mjs && ok "AI Tools installed" || warn "AI Tools seed failed — run manually: node scripts/seed-ai-tools.mjs"
   exit 0
 fi
 
@@ -477,7 +515,7 @@ DEADLINE=$(( $(date +%s) + 180 ))
 until curl -sf http://localhost:3011/health &>/dev/null; do
   if [[ $(date +%s) -ge $DEADLINE ]]; then
     fail "API did not become healthy within 3 minutes."
-    info "Check logs: docker compose -f docker-compose.dev.yml logs api"
+    info "Check logs: docker compose -f docker-compose.dev.yml logs api-server"
     exit 1
   fi
   sleep 3
@@ -489,6 +527,8 @@ info "Running NGO agent seed..."
 node scripts/seed-ngo-agents.mjs && ok "NGO agents seeded" || warn "NGO agent seed failed — run manually: node scripts/seed-ngo-agents.mjs"
 info "Running NGO workspace + skills setup..."
 node scripts/setup-ngo.mjs && ok "NGO workspace and skills seeded" || warn "NGO setup failed — run manually: node scripts/setup-ngo.mjs"
+info "Installing default AI Tools..."
+node scripts/seed-ai-tools.mjs && ok "AI Tools installed" || warn "AI Tools seed failed — run manually: node scripts/seed-ai-tools.mjs"
 
 echo
 echo "$(bold "$(green '=== Installation complete ===')")"
@@ -496,9 +536,9 @@ echo
 echo "  $(bold 'Dashboard:')  $(cyan 'http://localhost:3010')"
 echo "  $(bold 'API:')        $(cyan 'http://localhost:3011')"
 echo
-echo "  $(bold 'Log in with:')"
-echo "    Email:    ${INITIAL_ADMIN_EMAIL:-aibyml.ngo@gmail.com}"
-echo "    Password: (as set in INITIAL_ADMIN_PASSWORD in your .env)"
+echo "  $(bold 'Log in with') (development seed):"
+echo "    Email:    admin@clawix.test"
+echo "    Password: the DEFAULT_PASSWORD value in your .env — change it before any real use"
 echo
 echo "  $(bold 'Useful commands') (run from $TARGET_DIR):"
 echo "    $(dim 'pnpm run docker:dev')                                 start the stack"
