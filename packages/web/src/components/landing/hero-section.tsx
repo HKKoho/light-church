@@ -8,26 +8,26 @@ import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    headline: 'Your gospel mission, carried by a team of helper agents.',
+    headline: 'Your gospel mission, assisted by a team of helper agents & AI tools',
     subheadline:
-      "Tell your ministry's specialist helper agents what's needed in plain English. They draft stewardship letters, discipleship reports, and Kingdom Impact data — self-hosted, source-traced, and always reviewed by a human before anything is sent.",
+      'Light Church takes on the rosters, bulletins, minutes and reports — one small, trusted help at a time — so pastors, deacons and ministry teams can spend their hours where Jesus spent His: with people.',
     openDashboard: 'Open the dashboard',
-    seeHowItWorks: 'See how it works',
+    seeHowItWorks: 'See the path',
     tags: [
-      'ministry reports',
-      'stewardship updates',
-      'Kingdom Impact tracking',
-      'discipleship data',
+      'less admin',
+      'more time with people',
+      'start with AI tools',
+      'human-approved',
       'self-hosted',
     ],
   },
   'zh-TW': {
-    headline: '讓一支小幫手代理團隊，承擔你的福音使命。',
+    headline: '讓一支小幫手和AI工具協助團隊，令你更投身福音使命。',
     subheadline:
-      '用平實的語言告訴事工的專屬小幫手代理你需要什麼。他們會草擬財務報告、門徒訓練報告與國度成效資料 — 全部自架伺服器、可追溯來源，且在發出前永遠經過人員審閱。',
+      '光教會替你分擔排班、週刊、會議記錄與報告等行政工作——一步一步、一次一個可信任的幫助——讓牧者、執事與事工團隊把時間用在耶穌所看重的地方：與人同在。',
     openDashboard: '進入儀表板',
-    seeHowItWorks: '了解運作方式',
-    tags: ['事工報告', '財務管理更新', '國度成效追蹤', '門徒訓練資料', '自架伺服器'],
+    seeHowItWorks: '了解發展路徑',
+    tags: ['減輕行政', '多些時間與人同在', '從 AI 工具開始', '人員把關', '自架伺服器'],
   },
 } satisfies Messages<{
   headline: string;

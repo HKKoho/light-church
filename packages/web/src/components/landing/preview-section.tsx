@@ -7,32 +7,32 @@ import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    eyebrow: 'A glimpse into the workspace',
+    eyebrow: 'A glimpse into a week with Light Church',
     sessions: [
-      { title: 'Q2 Ministry Report', agent: 'Ministry Coordinator', status: 'drafted' },
-      { title: 'Foundation Stewardship Update', agent: 'Stewardship', status: 'in review' },
-      { title: 'Nairobi Mission Field Review', agent: 'Mission Field', status: 'drafted' },
-      { title: 'Outreach Budget Variance — Aug', agent: 'Stewardship', status: 'flagged' },
-      { title: 'Discipleship Intake — New Believers', agent: 'Kingdom Impact', status: 'drafted' },
+      { title: 'Sunday Bulletin — 5 Oct', agent: 'AI Tool · Bulletin Writer', status: 'drafted' },
+      { title: 'October Volunteer Rota', agent: 'Church Admin helper', status: 'in review' },
+      { title: 'Deacons’ Meeting Minutes', agent: 'Church Admin helper', status: 'drafted' },
+      { title: 'Newcomer Follow-up List', agent: 'Ministry Coordinator', status: 'needs a person' },
+      { title: 'Prayer List for Wednesday', agent: 'AI Tool · Prayer List', status: 'drafted' },
     ],
-    responseLabel: 'Kingdom Impact Helper Agent · Q2 Ministry Report (draft)',
+    responseLabel: 'Church Admin Helper Agent · October Volunteer Rota (draft)',
     responseBody:
-      '42 new discipleship groups launched this quarter (see mne/processed/2026-q2.md). Scripture engagement among participants rose from 61% to 78%. Two groups now report being self-sustaining without missionary staff present — early fruit of the multiplication model described in the Q1 proposal (see proposals/foundation-grace-q1.md).',
-    responseFooter: 'Awaiting human review before this is sent to the foundation.',
+      'Rota drafted for 3 Sunday services and 2 midweek meetings from volunteers/availability.md. Two slots are still open and marked [FILL] — no one has been assigned without asking. Last month this rota took about 3 hours by hand; those hours are now free for the Thursday hospital visits on your calendar.',
+    responseFooter: 'Awaiting a deacon’s review before anything is sent to volunteers.',
   },
   'zh-TW': {
-    eyebrow: '工作區一覽',
+    eyebrow: '與光教會同行的一週',
     sessions: [
-      { title: 'Q2 事工報告', agent: '事工協調員', status: '已草擬' },
-      { title: '基金會財務更新', agent: '財務管理', status: '審閱中' },
-      { title: '奈洛比宣教工場考察', agent: '宣教工場', status: '已草擬' },
-      { title: '外展預算差異 — 8月', agent: '財務管理', status: '已標示' },
-      { title: '門徒訓練名冊 — 新信徒', agent: '國度成效', status: '已草擬' },
+      { title: '主日週刊 — 10月5日', agent: 'AI 工具 · 週刊撰寫', status: '已草擬' },
+      { title: '十月同工排班表', agent: '教會行政小幫手', status: '審閱中' },
+      { title: '執事會會議記錄', agent: '教會行政小幫手', status: '已草擬' },
+      { title: '新朋友跟進名單', agent: '事工協調員', status: '需要人跟進' },
+      { title: '週三禱告會代禱事項', agent: 'AI 工具 · 代禱清單', status: '已草擬' },
     ],
-    responseLabel: '國度成效小幫手代理 · Q2 事工報告（草稿）',
+    responseLabel: '教會行政小幫手代理 · 十月同工排班表（草稿）',
     responseBody:
-      '本季新成立 42 個門徒訓練小組（見 mne/processed/2026-q2.md）。參與者的聖經閱讀比例由 61% 提升至 78%。其中兩組已能在無宣教士常駐的情況下自行運作 — 正是 Q1 提案中倍增模式的初步成果（見 proposals/foundation-grace-q1.md）。',
-    responseFooter: '尚待人員審閱，方可發送給基金會。',
+      '已根據 volunteers/availability.md 為三堂主日崇拜及兩個週間聚會草擬排班。尚有兩個崗位未填，已標示 [FILL]——未經詢問不會替任何人排班。上月這份排班人手處理約需三小時；這些時間現在可以留給你行事曆上週四的醫院探訪。',
+    responseFooter: '尚待執事審閱，方可發送給同工。',
   },
 } satisfies Messages<{
   eyebrow: string;
@@ -43,7 +43,8 @@ const messages = {
 }>;
 
 function statusVariant(status: string) {
-  if (status === 'flagged' || status === '已標示') return 'destructive' as const;
+  // A hand-off to a person is the goal, not an error — highlight it, don't alarm.
+  if (status === 'needs a person' || status === '需要人跟進') return 'default' as const;
   if (status === 'in review' || status === '審閱中') return 'outline' as const;
   return 'secondary' as const;
 }

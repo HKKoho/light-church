@@ -7,14 +7,14 @@ import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
   en: {
-    title: 'Ready to put your first helper agent to work for the mission?',
+    title: 'Start with one AI tool this week — and give the hours back to your people.',
     openDashboard: 'Open the dashboard',
-    seeHowItWorks: 'See how it works',
+    seeHowItWorks: 'See the path',
   },
   'zh-TW': {
-    title: '準備好讓第一位小幫手代理為使命效力了嗎？',
+    title: '這星期先從一個 AI 工具開始——把時間交還給你所牧養的人。',
     openDashboard: '進入儀表板',
-    seeHowItWorks: '了解運作方式',
+    seeHowItWorks: '了解發展路徑',
   },
 } satisfies Messages<{
   title: string;

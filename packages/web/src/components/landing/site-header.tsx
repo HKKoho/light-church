@@ -8,7 +8,8 @@ import { useLanguage, useT, type Messages } from '@/lib/i18n';
 const messages = {
   en: {
     brand: 'Light Church',
-    howItWorks: 'How it works',
+    why: 'Why',
+    howItWorks: 'The path',
     capabilities: 'Capabilities',
     trust: 'Faithfulness',
     signIn: 'Sign in',
@@ -16,7 +17,8 @@ const messages = {
   },
   'zh-TW': {
     brand: '光教會',
-    howItWorks: '運作方式',
+    why: '理念',
+    howItWorks: '發展路徑',
     capabilities: '功能',
     trust: '忠心管理',
     signIn: '登入',
@@ -24,6 +26,7 @@ const messages = {
   },
 } satisfies Messages<{
   brand: string;
+  why: string;
   howItWorks: string;
   capabilities: string;
   trust: string;
@@ -46,6 +49,9 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
+          <a href="#why" className="hover:text-foreground">
+            {t.why}
+          </a>
           <a href="#how-it-works" className="hover:text-foreground">
             {t.howItWorks}
           </a>
