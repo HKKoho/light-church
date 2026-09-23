@@ -21,6 +21,7 @@ import { randomBytes } from 'node:crypto';
 import { stdin, stdout } from 'node:process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -133,12 +134,26 @@ async function main() {
   }
   const deployMode = mode === '1' ? 'production' : 'development';
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  // Prod binds loopback-only 3001/3000 (see docker-compose.prod.yml + Hetzner_deploy.md
-  // Step 5 — Caddy proxies these). Dev keeps the legacy 3011/3010 mapping to avoid
+  // Prod binds loopback-only 3001/3000 by default (see docker-compose.prod.yml +
+  // Hetzner_deploy.md Step 5 — Caddy proxies these), movable with
+  // LIGHTCHURCH_API_PORT / LIGHTCHURCH_WEB_PORT. Dev keeps 3011/3010 to avoid
   // colliding with sibling Clawix checkouts' containers on a shared host.
-  const apiPort = deployMode === 'production' ? 3001 : 3011;
-  const webPort = deployMode === 'production' ? 3000 : 3010;
+  const ports = stackPorts(deployMode, ENV_FILE);
+  const apiPort = ports.api;
+  const webPort = ports.web;
   ok(`${deployMode} — ${composeFile.replace(ROOT + '/', '')}`);
+
+  // Fail fast — before .env prompts, image builds or replacing any container.
+  step('Pre-flight checks');
+  const problems = stackPreflight({ root: ROOT, composeFile, deployMode, ports });
+  if (problems.length > 0) {
+    for (const p of problems) fail(p);
+    info('Nothing was changed. Fix the above and re-run this script.');
+    process.exit(1);
+  }
+  ok(
+    `Ports free: web ${webPort}, API ${apiPort}, Postgres ${ports.postgres}, Redis ${ports.redis}`,
+  );
 
   // Short-circuit if .env exists: we don't re-prompt or overwrite secrets.
   const envExists = existsSync(ENV_FILE);

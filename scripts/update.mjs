@@ -21,6 +21,7 @@ import { execSync, spawnSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -100,11 +101,11 @@ async function main() {
     deployMode = 'production';
   }
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  // Prod binds loopback-only 3001/3000 (see docker-compose.prod.yml + Hetzner_deploy.md
-  // Step 5 — Caddy proxies these). Dev keeps the legacy 3011/3010 mapping to avoid
-  // colliding with sibling Clawix checkouts' containers on a shared host.
-  const apiPort = deployMode === 'production' ? 3001 : 3011;
-  const webPort = deployMode === 'production' ? 3000 : 3010;
+  // Prod binds loopback-only 3001/3000 by default (movable with LIGHTCHURCH_API_PORT /
+  // LIGHTCHURCH_WEB_PORT); dev keeps 3011/3010. See scripts/lib/stack-preflight.mjs.
+  const ports = stackPorts(deployMode, ENV_FILE);
+  const apiPort = ports.api;
+  const webPort = ports.web;
 
   console.log(`\n${bold('=== Clawix Updater ===')} (${deployMode})\n`);
 
@@ -113,6 +114,15 @@ async function main() {
     runVisible('git pull --ff-only');
     ok('Pulled');
   }
+
+  step('Pre-flight checks');
+  const problems = stackPreflight({ root: ROOT, composeFile, deployMode, ports });
+  if (problems.length > 0) {
+    for (const p of problems) fail(p);
+    warn('Nothing was restarted. Fix the above and re-run.');
+    process.exit(1);
+  }
+  ok('No conflicts');
 
   step('Restarting stack');
   const buildFlag = flags.build ? '--build' : '';
