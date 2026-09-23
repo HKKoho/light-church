@@ -11,6 +11,9 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    // Only source tests — Vitest 4 no longer skips dist/ by default, so a local
+    // build would otherwise run compiled *.spec.js copies as well.
+    include: ['src/**/*.{test,spec}.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

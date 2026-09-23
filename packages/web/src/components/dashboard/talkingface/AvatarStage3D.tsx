@@ -23,8 +23,8 @@ export interface AvatarStageHandle {
   speakTestPhrase: () => void;
   /**
    * Speaks real TTS audio. Visemes are deliberately omitted — TalkingHead's
-   * built-in `lipsync-en` module (loaded via `lipsyncModules: ['en']` below)
-   * derives them from `words`/`wtimes`/`wdurations` alone.
+   * `lipsync-en` processor (registered below) derives them from
+   * `words`/`wtimes`/`wdurations` alone.
    */
   speak: (params: SpeakParams) => void;
 }
@@ -52,15 +52,24 @@ export const AvatarStage3D = forwardRef<AvatarStageHandle, AvatarStage3DProps>(
       void (async () => {
         if (!containerRef.current) return;
         try {
-          const { TalkingHead } = await import('@met4citizen/talkinghead');
+          // TalkingHead loads lip-sync modules with `import('./lipsync-' + lang +
+          // '.mjs')`, a runtime path webpack can't bundle ("Cannot find module
+          // './lipsync-en.mjs'"). Import the English processor by a static path
+          // instead and register it ourselves.
+          const [{ TalkingHead }, { LipsyncEn }] = await Promise.all([
+            import('@met4citizen/talkinghead'),
+            import('@met4citizen/talkinghead/modules/lipsync-en.mjs'),
+          ]);
           if (disposed || !containerRef.current) return;
 
           const head = new TalkingHead(containerRef.current, {
             ttsEndpoint: '', // no built-in TTS — audio is generated server-side (Piper) and pushed via speakAudio()
-            lipsyncModules: ['en'],
+            lipsyncModules: [], // registered manually below
             cameraView: 'head',
             avatarMood: 'neutral',
           });
+
+          head.lipsync['en'] = new LipsyncEn();
 
           await head.showAvatar({
             url: DEMO_AVATAR_URL,

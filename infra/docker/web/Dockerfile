@@ -1,5 +1,5 @@
 # Clawix Web Dashboard — production build
-# Build: docker build -t clawix-web:latest -f infra/docker/web/Dockerfile .
+# Build: docker build -t lightchurch-web:latest -f infra/docker/web/Dockerfile .
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build

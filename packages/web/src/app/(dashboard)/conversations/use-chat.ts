@@ -6,6 +6,7 @@ import type { ToolCallRequest, ToolProgressMode } from '@clawix/shared';
 import { resolveToolProgressMode } from '@clawix/shared';
 
 import { authFetch, getAccessToken } from '@/lib/auth';
+import { resolveWsBase } from '@/lib/ws-url';
 import { uuidv4 } from '@/lib/utils';
 
 /**
@@ -219,12 +220,7 @@ export function useChat() {
       wsRef.current = null;
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    // Use `||` (not `??`) so an empty-string env var also falls back to the default —
-    // e.g. `${NEXT_PUBLIC_WS_URL:-}` in compose bakes "" into the build, which would
-    // otherwise produce an invalid relative WebSocket URL.
-    const wsBase =
-      process.env['NEXT_PUBLIC_WS_URL'] || `${protocol}//${window.location.hostname}:3001`;
+    const wsBase = resolveWsBase();
     const wsUrl = `${wsBase}/ws/chat?token=${token}`;
     const ws = new WebSocket(wsUrl);
 

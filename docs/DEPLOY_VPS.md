@@ -92,7 +92,7 @@ takes effect before continuing.
 ## 4. Clone and run the installer
 
 ```bash
-git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+git clone https://github.com/HKKoho/light-church.git lightchurch
 cd lightchurch
 pnpm run install:clawix
 ```
@@ -169,7 +169,7 @@ node scripts/update.mjs -- --pull
 docker compose -f docker-compose.prod.yml logs -f
 
 # Back up the database (cron this — e.g. daily via crontab -e)
-docker exec clawix-postgres pg_dump -U clawix clawix | gzip > ~/backups/db-$(date +%F).sql.gz
+docker exec lightchurch-postgres pg_dump -U clawix clawix | gzip > ~/backups/db-$(date +%F).sql.gz
 
 # Back up workspace data (prayer requests, incidents, pastoral-care records, etc.)
 tar czf ~/backups/data-$(date +%F).tar.gz ./data

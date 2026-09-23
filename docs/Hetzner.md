@@ -118,7 +118,7 @@ Put this app in its own directory, separate from `$GRACEMISSION_DIR`:
 
 ```bash
 cd ~
-git clone https://github.com/aibyml-ngo/clawix-ngo.git lightchurch
+git clone https://github.com/HKKoho/light-church.git lightchurch
 cd lightchurch
 pnpm run install:clawix
 ```
@@ -131,42 +131,60 @@ Answer the installer prompts as in `Hetzner_deploy.md` Step 4, using:
 | Public host or IP | `<new-domain>` (no `https://`, no port) |
 | Use HTTPS?        | `y`                                     |
 
-This builds `clawix-agent:latest` and starts the stack via
-`docker-compose.prod.yml`, listening on `3002` (web) / `3003` (API) same as
-before — since `gracemission` is stopped, these ports are free.
+The stack publishes on the server's **loopback** interface only — web on
+`127.0.0.1:3000`, API on `127.0.0.1:3001` — and Caddy (Step 5) serves them
+publicly on 443. The installer's pre-flight check stops before building
+anything if those ports are still taken (for example by gracemission, if Step 3
+didn't stop it). If something else on this box must keep 3000/3001, set other
+ports first — e.g. `LIGHTCHURCH_WEB_PORT=3002 LIGHTCHURCH_API_PORT=3003 pnpm run
+install:clawix` — and use them in the Caddyfile below; the installer saves them
+to `.env` so updates keep them.
+
+The installer bakes `https://<new-domain>:<port>` URLs into the build. Because
+Caddy serves the API on its own subdomain without a port, follow
+`Hetzner_deploy.md` (right after its Caddy step) to set `NEXT_PUBLIC_API_URL` /
+`NEXT_PUBLIC_WS_URL` to `https://api.<new-domain>` / `wss://api.<new-domain>`
+and `CORS_ALLOWED_ORIGINS` to `https://<new-domain>` in `.env`, then rebuild:
+`pnpm run update:clawix`.
 
 ---
 
 ## Step 5 — Repoint the reverse proxy to the new domain
 
-If **Caddy** (edit `/etc/caddy/Caddyfile`): remove or comment out the blocks
-for gracemission's old domain, add blocks for the new one:
+Add an `api.<new-domain>` DNS record pointing at this server (same as the root
+record). Then, with **Caddy** (`/etc/caddy/Caddyfile`), remove or comment out
+gracemission's blocks and add:
 
 ```caddyfile
-<new-domain>:3002 {
-	reverse_proxy localhost:3002
+<new-domain> {
+	reverse_proxy localhost:3000
 }
 
-<new-domain>:3003 {
-	reverse_proxy localhost:3003
+api.<new-domain> {
+	reverse_proxy localhost:3001
 }
 ```
+
+Do **not** use a block like `<new-domain>:3000 { reverse_proxy localhost:3000 }` —
+Caddy would try to bind the same host port the container already uses
+(`bind: address already in use`).
 
 ```bash
 sudo systemctl reload caddy
 ```
 
-If **nginx**, the equivalent is swapping the `server_name` / upstream in
-whichever `sites-enabled` file pointed at gracemission, then
+If **nginx**, the equivalent is two `server` blocks (`server_name <new-domain>`
+→ `proxy_pass http://127.0.0.1:3000`, `server_name api.<new-domain>` →
+`http://127.0.0.1:3001`, with WebSocket upgrade headers on the API), then
 `sudo nginx -t && sudo systemctl reload nginx`.
 
-Firewall (`ufw`) — confirm the ports this app needs are open (80 for ACME, plus
-3002/3003 if you keep the port-suffixed URLs as in `Hetzner_deploy.md`):
+Firewall (`ufw`) — only 80 (ACME) and 443 need to be open; the app ports stay
+on loopback:
 
 ```bash
 sudo ufw status
-sudo ufw allow 3002/tcp
-sudo ufw allow 3003/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
 ```
 
 ---
@@ -174,12 +192,12 @@ sudo ufw allow 3003/tcp
 ## Step 6 — Verify the new deployment
 
 ```bash
-curl https://<new-domain>:3003/health
+curl https://api.<new-domain>/health
 ```
 
-Open `https://<new-domain>:3002` in a browser, log in with the admin
-credentials from Step 4, and confirm the WebSocket shows "connected" (green
-dot) under `/conversations`.
+Open `https://<new-domain>` in a browser, log in with the admin credentials
+from Step 4, and confirm the WebSocket shows "connected" (green dot) under
+`/conversations`.
 
 ---
 

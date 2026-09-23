@@ -1,5 +1,5 @@
 # Clawix API Server — production build
-# Build: docker build -t clawix-api:latest -f infra/docker/api/Dockerfile .
+# Build: docker build -t lightchurch-api:latest -f infra/docker/api/Dockerfile .
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Stage 1: Build

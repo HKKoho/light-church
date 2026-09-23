@@ -6,8 +6,10 @@ subdomains. The installer generates all secrets, builds the images, starts the
 stack, and waits for the API to go healthy — you don't edit `docker-compose`
 files by hand.
 
-> **Naming:** the production containers are `clawix-postgres`, `clawix-redis`,
-> `clawix-api`, and `clawix-web`. The repo clones into `clawixngo`.
+> **Naming:** the production containers are `lightchurch-postgres`,
+> `lightchurch-redis`, `lightchurch-api`, `lightchurch-web` and
+> `lightchurch-browser`; the API and web images are `lightchurch-api:latest` and
+> `lightchurch-web:latest`. The repo clones into `light-church`.
 
 ---
 
@@ -78,8 +80,8 @@ docker --version && node --version && pnpm --version
 ## Step 4 — Clone and Run the Installer
 
 ```bash
-git clone https://github.com/aibyml-ngo/clawix-ngo.git /opt/clawixngo
-cd /opt/clawixngo
+git clone https://github.com/HKKoho/light-church.git /opt/light-church
+cd /opt/light-church
 
 pnpm run install:clawix
 ```
@@ -115,7 +117,7 @@ When it prints **"Installation complete"**, the stack is running on `localhost:3
 The installer bakes `NEXT_PUBLIC_API_URL` / `NEXT_PUBLIC_WS_URL` into the web image using the host you entered **plus the internal ports** (`:3000` / `:3001`). Because this guide serves the API on its own clean subdomain through Nginx (no ports in the URL), update those three lines in `.env`:
 
 ```bash
-nano /opt/clawixngo/.env
+nano /opt/light-church/.env
 ```
 
 ```env
@@ -127,7 +129,7 @@ CORS_ALLOWED_ORIGINS=https://clawix.aibyml.com
 These values are compiled into the Next.js bundle at **build time**, so rebuild the web image to pick them up:
 
 ```bash
-cd /opt/clawixngo
+cd /opt/light-church
 pnpm run update:clawix
 ```
 
@@ -208,7 +210,7 @@ systemctl enable docker
 ```bash
 reboot
 # …reconnect…
-docker compose -f /opt/clawixngo/docker-compose.prod.yml ps
+docker compose -f /opt/light-church/docker-compose.prod.yml ps
 ```
 
 ---
@@ -218,7 +220,7 @@ docker compose -f /opt/clawixngo/docker-compose.prod.yml ps
 From the droplet, pull the latest code and rebuild in one command:
 
 ```bash
-cd /opt/clawixngo
+cd /opt/light-church
 pnpm run update:clawix -- --pull
 ```
 
@@ -256,10 +258,10 @@ pnpm run docker:prod:logs
 docker compose -f docker-compose.prod.yml ps
 
 # Database shell
-docker exec -it clawix-postgres psql -U clawix -d clawix
+docker exec -it lightchurch-postgres psql -U clawix -d clawix
 
 # Database backup
-docker exec clawix-postgres pg_dump -U clawix clawix > backup.sql
+docker exec lightchurch-postgres pg_dump -U clawix clawix > backup.sql
 ```
 
 ---
@@ -267,7 +269,7 @@ docker exec clawix-postgres pg_dump -U clawix clawix > backup.sql
 ## Uninstall
 
 ```bash
-cd /opt/clawixngo
+cd /opt/light-church
 pnpm run uninstall:clawix            # remove containers/images/volumes, keep .env + data
 pnpm run uninstall:clawix -- --full  # also remove .env, ./data/, ./skills/custom/
 ```
@@ -281,7 +283,7 @@ pnpm run uninstall:clawix -- --full  # also remove .env, ./data/, ./skills/custo
 - Postgres data persists in the `postgres_data` Docker volume. Back it up with the `pg_dump` command above.
 - If the API ever fails to connect to Postgres after a manual change, re-sync the password:
   ```bash
-  docker exec clawix-postgres psql -U clawix -d clawix \
+  docker exec lightchurch-postgres psql -U clawix -d clawix \
     -c "ALTER USER clawix WITH PASSWORD '<your POSTGRES_PASSWORD from .env>';"
   ```
 

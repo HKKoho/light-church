@@ -136,7 +136,8 @@ The installer is interactive. Answer the prompts like this:
 
 This step also builds the `clawix-agent:latest` Docker image and starts
 everything via `docker-compose.prod.yml`. First run takes a few minutes —
-the installer waits for `http://localhost:3003/health` to go green.
+the installer waits for `http://localhost:3001/health` to go green (or your
+`LIGHTCHURCH_API_PORT`, if you set one).
 
 ---
 

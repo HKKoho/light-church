@@ -49,6 +49,20 @@ same way SadTalker was: a small Python HTTP sidecar + a thin NestJS client.
 Both ship pretrained weights, run on CPU or GPU, and take a single image in /
 single image out — no video, no audio, no training required.
 
+> **Status: implemented**, via the PyTorch port
+> [bryandlee/animegan2-pytorch](https://github.com/bryandlee/animegan2-pytorch)
+> rather than the original TensorFlow AnimeGANv2 repo — it's a single-file
+> `torch.hub` model, same architecture family, and drops cleanly next to the
+> already-PyTorch SadTalker sidecar with no extra TensorFlow runtime. Its
+> pretrained checkpoints are named `face_paint_v2` (default), `face_paint_v1`,
+> `celeba_distill`, `paprika` — not the Hayao/Shinkai labels in the table
+> above, which are style names from the original TF repo this doesn't use.
+> `infra/docker/cartoonize/` (sidecar), `packages/api/src/talkingface/cartoonize.service.ts`
+> (HTTP client), a `POST /:photoId/cartoonize` route on
+> `talkingface-avatar.controller.ts`, and a style-picker + "Cartoonize"
+> action on the talking-face page are all in place. White-box-Cartoonization
+> was not added — AnimeGANv2 alone was judged sufficient for v1.
+
 ### Sidecar service — `infra/docker/cartoonize/`
 
 Mirrors `infra/docker/sadtalker/` exactly:

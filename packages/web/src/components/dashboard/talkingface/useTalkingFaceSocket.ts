@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import { getAccessToken } from '@/lib/auth';
+import { resolveWsBase } from '@/lib/ws-url';
 
 export interface SpeakChunk {
   text: string;
@@ -54,10 +55,7 @@ export function useTalkingFaceSocket({ onChunk, onDone, onError }: UseTalkingFac
       throw new Error('Not authenticated');
     }
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsBase =
-      process.env['NEXT_PUBLIC_WS_URL'] || `${protocol}//${window.location.hostname}:3001`;
-    const ws = new WebSocket(`${wsBase}/ws/talkingface?token=${token}`);
+    const ws = new WebSocket(`${resolveWsBase()}/ws/talkingface?token=${token}`);
 
     ws.onmessage = (event: MessageEvent<string>) => {
       let message: ServerMessage;

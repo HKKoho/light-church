@@ -75,7 +75,7 @@ services:
       SKILLS_CUSTOM_DIR: /app/skills/custom
       SKILLS_CUSTOM_HOST_DIR: ${CLAWIX_HOST_SKILLS_DIR:-${PWD}/skills/custom}
     command: >
-      sh -c "apt-get update && apt-get install -y --no-install-recommends docker.io && rm -rf /var/lib/apt/lists/* &&
+      sh -c "apt-get update && apt-get install -y --no-install-recommends docker.io procps && rm -rf /var/lib/apt/lists/* &&
              cp /app/pnpm-lock.yaml.host /app/pnpm-lock.yaml &&
              corepack enable &&
              pnpm install --frozen-lockfile &&
@@ -163,6 +163,9 @@ services:
       HOST: '0.0.0.0'
       NODE_ENV: development
       NEXT_PUBLIC_API_URL: http://localhost:3011
+      # Must match the API port above — otherwise the chat/talking-face sockets
+      # fall back to :3001, which other local projects may occupy.
+      NEXT_PUBLIC_WS_URL: ws://localhost:3011
     command: >
       sh -c "cp /app/pnpm-lock.yaml.host /app/pnpm-lock.yaml &&
              corepack enable &&

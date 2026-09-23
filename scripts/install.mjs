@@ -21,6 +21,7 @@ import { randomBytes } from 'node:crypto';
 import { stdin, stdout } from 'node:process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { readDotEnv, stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, '..');
@@ -133,15 +134,46 @@ async function main() {
   }
   const deployMode = mode === '1' ? 'production' : 'development';
   const composeFile = deployMode === 'production' ? COMPOSE_PROD : COMPOSE_DEV;
-  // Prod binds loopback-only 3001/3000 (see docker-compose.prod.yml + Hetzner_deploy.md
-  // Step 5 — Caddy proxies these). Dev keeps the legacy 3011/3010 mapping to avoid
+  // Prod binds loopback-only 3001/3000 by default (see docker-compose.prod.yml +
+  // Hetzner_deploy.md Step 5 — Caddy proxies these), movable with
+  // LIGHTCHURCH_API_PORT / LIGHTCHURCH_WEB_PORT. Dev keeps 3011/3010 to avoid
   // colliding with sibling Clawix checkouts' containers on a shared host.
-  const apiPort = deployMode === 'production' ? 3001 : 3011;
-  const webPort = deployMode === 'production' ? 3000 : 3010;
+  const ports = stackPorts(deployMode, ENV_FILE);
+  const apiPort = ports.api;
+  const webPort = ports.web;
   ok(`${deployMode} — ${composeFile.replace(ROOT + '/', '')}`);
+
+  // Fail fast — before .env prompts, image builds or replacing any container.
+  step('Pre-flight checks');
+  const problems = stackPreflight({ root: ROOT, composeFile, deployMode, ports });
+  if (problems.length > 0) {
+    for (const p of problems) fail(p);
+    info('Nothing was changed. Fix the above and re-run this script.');
+    process.exit(1);
+  }
+  ok(
+    `Ports free: web ${webPort}, API ${apiPort}, Postgres ${ports.postgres}, Redis ${ports.redis}`,
+  );
 
   // Short-circuit if .env exists: we don't re-prompt or overwrite secrets.
   const envExists = existsSync(ENV_FILE);
+  // An existing .env is reused as-is, so it must be for the chosen mode — a dev
+  // .env in a production install bakes localhost dev URLs/CORS into the build.
+  const envMode = envExists ? readDotEnv(ENV_FILE).CLAWIX_DEPLOY_MODE : undefined;
+  if (envMode && envMode !== deployMode) {
+    fail(
+      `.env is configured for ${envMode} (CLAWIX_DEPLOY_MODE=${envMode}), but you chose ${deployMode}. ` +
+        `It would be reused unchanged, with the wrong URLs, CORS origins and mode.`,
+    );
+    info(
+      deployMode === 'production'
+        ? 'Production normally runs on a server (docs/Hetzner.md, docs/DEPLOY_VPS.md). To install it here, ' +
+            'move .env aside (e.g. mv .env .env.dev) and re-run so the installer asks for production settings.'
+        : 'Move the production .env aside (e.g. mv .env .env.prod) and re-run for a development setup.',
+    );
+    info('Nothing was changed.');
+    process.exit(1);
+  }
   if (envExists) {
     warn('.env already exists — keeping existing secrets and configuration.');
     info(`To reconfigure from scratch, delete ${ENV_FILE} and re-run this script.`);
@@ -484,6 +516,9 @@ async function main() {
       env = upsertEnvLine(env, 'CORS_ALLOWED_ORIGINS', answers.corsOrigins);
       env = upsertEnvLine(env, 'NEXT_PUBLIC_API_URL', answers.apiUrl);
       env = upsertEnvLine(env, 'NEXT_PUBLIC_WS_URL', answers.wsUrl);
+      // Persist the host ports so docker compose and update.mjs keep using them.
+      env = upsertEnvLine(env, 'LIGHTCHURCH_WEB_PORT', String(webPort));
+      env = upsertEnvLine(env, 'LIGHTCHURCH_API_PORT', String(apiPort));
       env = upsertEnvLine(env, 'INITIAL_ADMIN_EMAIL', answers.adminEmail);
       env = upsertEnvLine(env, 'INITIAL_ADMIN_PASSWORD', answers.adminPassword);
       env = upsertEnvLine(env, 'INITIAL_ADMIN_NAME', answers.adminName);

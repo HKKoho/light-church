@@ -59,6 +59,8 @@ declare module '@met4citizen/talkinghead' {
 
   export class TalkingHead {
     constructor(container: HTMLElement, options?: TalkingHeadOptions);
+    /** Lip-sync processors by language code (e.g. `en`). */
+    lipsync: Record<string, unknown>;
     showAvatar(
       avatar: ShowAvatarOptions,
       onprogress?: ((progress: number) => void) | null,
@@ -67,6 +69,14 @@ declare module '@met4citizen/talkinghead' {
     start(): void;
     stop(): void;
     dispose(): void;
+  }
+}
+
+declare module '@met4citizen/talkinghead/modules/lipsync-en.mjs' {
+  /** English lip-sync processor; registered on `TalkingHead.lipsync.en`. */
+  export class LipsyncEn {
+    preProcessText(s: string): string;
+    wordsToVisemes(w: string): unknown;
   }
 }
 

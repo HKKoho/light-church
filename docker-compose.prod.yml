@@ -43,14 +43,17 @@ services:
     build:
       context: .
       dockerfile: infra/docker/api/Dockerfile
-    image: clawix-api:latest
+    # Project-scoped tag: other Clawix checkouts on the same host use
+    # clawix-api:latest, and a shared tag would swap their code for ours.
+    image: lightchurch-api:latest
     container_name: lightchurch-api
     restart: unless-stopped
     dns:
       - 8.8.8.8
       - 1.1.1.1
     ports:
-      - '127.0.0.1:3001:3003'
+      # Host port movable with LIGHTCHURCH_API_PORT (scripts read the same var).
+      - '127.0.0.1:${LIGHTCHURCH_API_PORT:-3001}:3003'
     env_file: .env
     environment:
       NODE_ENV: production
@@ -80,6 +83,9 @@ services:
       # WhatsApp Baileys auth state — written under the persistent /data mount
       # so the QR pairing survives container restarts.
       WHATSAPP_AUTH_DIR: /data/whatsapp-auth
+      # Talking Face sidecars — optional; leave the cartoonize service
+      # commented out below and this URL unset if you don't need it.
+      CARTOONIZE_URL: ${CARTOONIZE_URL:-http://cartoonize:7861}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data
@@ -128,6 +134,31 @@ services:
       - clawix-browser-egress
       - clawix-browser-net
 
+  # Optional: selfie -> cartoon/anime portrait for the talking-face pipeline
+  # (docs/self2talkface.md). Not started by default — uncomment to enable,
+  # and set CARTOONIZE_URL=http://cartoonize:7861 above if you change the
+  # default. Build once (~tens of MB of model weights, unlike sadtalker):
+  #   docker compose -f docker-compose.prod.yml build cartoonize
+  # cartoonize:
+  #   build:
+  #     context: .
+  #     dockerfile: infra/docker/cartoonize/Dockerfile
+  #   image: clawix-cartoonize:latest
+  #   container_name: lightchurch-cartoonize
+  #   restart: unless-stopped
+  #   environment:
+  #     CARTOONIZE_DEVICE: cpu # or cuda
+  #   networks:
+  #     - default
+  #   # GPU (uncomment if using a CUDA build):
+  #   # deploy:
+  #   #   resources:
+  #   #     reservations:
+  #   #       devices:
+  #   #         - driver: nvidia
+  #   #           count: 1
+  #   #           capabilities: [gpu]
+
   web:
     build:
       context: .
@@ -135,11 +166,12 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
         NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL}
-    image: clawix-web:latest
+    image: lightchurch-web:latest
     container_name: lightchurch-web
     restart: unless-stopped
     ports:
-      - '127.0.0.1:3000:3000'
+      # Host port movable with LIGHTCHURCH_WEB_PORT.
+      - '127.0.0.1:${LIGHTCHURCH_WEB_PORT:-3000}:3000'
     environment:
       NODE_ENV: production
     depends_on:
