@@ -18,6 +18,9 @@ import {
   Pencil,
   Move,
   Trash2,
+  MonitorPlay,
+  FolderOpen,
+  Play,
 } from 'lucide-react';
 import {
   Table,
@@ -58,7 +61,10 @@ const messages = {
       daysAgo: (n: number) => `${n}d ago`,
     },
     unsavedChanges: 'Unsaved changes',
+    projector: 'Projector',
     actions: {
+      play: 'Play',
+      openFolder: 'Open folder',
       download: 'Download',
       rename: 'Rename',
       moveTo: 'Move to...',
@@ -82,7 +88,10 @@ const messages = {
       daysAgo: (n: number) => `${n} 天前`,
     },
     unsavedChanges: '未儲存的變更',
+    projector: '投影',
     actions: {
+      play: '播放',
+      openFolder: '開啟資料夾',
       download: '下載',
       rename: '重新命名',
       moveTo: '移動至...',
@@ -106,7 +115,10 @@ const messages = {
     daysAgo: (n: number) => string;
   };
   unsavedChanges: string;
+  projector: string;
   actions: {
+    play: string;
+    openFolder: string;
     download: string;
     rename: string;
     moveTo: string;
@@ -119,6 +131,8 @@ interface FileListProps {
   readonly selectedPath: string | null;
   readonly onNavigate: (path: string) => void;
   readonly onSelectFile: (entry: FileEntry) => void;
+  /** Plays a projector folder (agent-built micro-tool or game) instead of opening it. */
+  readonly onPlayProjector?: (entry: FileEntry) => void;
   readonly onDownload?: (entry: FileEntry) => void;
   readonly onRename?: (entry: FileEntry, newName: string) => void;
   readonly onMove?: (entry: FileEntry) => void;
@@ -164,6 +178,7 @@ export function FileList({
   selectedPath,
   onNavigate,
   onSelectFile,
+  onPlayProjector,
   onDownload,
   onRename,
   onMove,
@@ -212,13 +227,15 @@ export function FileList({
 
   const handleRowClick = useCallback(
     (entry: FileEntry) => {
-      if (entry.isDirectory) {
+      if (entry.isProjector && onPlayProjector) {
+        onPlayProjector(entry);
+      } else if (entry.isDirectory) {
         onNavigate(entry.path);
       } else {
         onSelectFile(entry);
       }
     },
-    [onNavigate, onSelectFile],
+    [onNavigate, onSelectFile, onPlayProjector],
   );
 
   const startRename = useCallback((entry: FileEntry) => {
@@ -290,7 +307,7 @@ export function FileList({
         </TableHeader>
         <TableBody data-animate="workspace-rows">
           {sorted.map((entry) => {
-            const Icon = FILE_ICONS[entry.type];
+            const Icon = entry.isProjector ? MonitorPlay : FILE_ICONS[entry.type];
             const isSelected = entry.path === selectedPath;
             return (
               <TableRow
@@ -325,10 +342,19 @@ export function FileList({
                       <Icon
                         className={cn(
                           'size-4 shrink-0',
-                          entry.isDirectory ? 'text-amber-500' : 'text-muted-foreground',
+                          entry.isProjector
+                            ? 'text-primary'
+                            : entry.isDirectory
+                              ? 'text-amber-500'
+                              : 'text-muted-foreground',
                         )}
                       />
                       <span className="truncate">{entry.name}</span>
+                      {entry.isProjector && (
+                        <span className="shrink-0 rounded-full border border-primary/40 bg-primary/10 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          {t.projector}
+                        </span>
+                      )}
                       {editingDirty && editingPath === entry.path && (
                         <span className="text-amber-500 text-xs" title={t.unsavedChanges}>
                           ●
@@ -361,6 +387,19 @@ export function FileList({
                         e.stopPropagation();
                       }}
                     >
+                      {entry.isProjector && (
+                        <>
+                          <DropdownMenuItem onSelect={() => onPlayProjector?.(entry)}>
+                            <Play className="mr-2 size-4" />
+                            {t.actions.play}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => onNavigate(entry.path)}>
+                            <FolderOpen className="mr-2 size-4" />
+                            {t.actions.openFolder}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                        </>
+                      )}
                       {!entry.isDirectory && (
                         <DropdownMenuItem onSelect={() => onDownload?.(entry)}>
                           <Download className="mr-2 size-4" />

@@ -10,29 +10,30 @@ const messages = {
     title: 'Game Studio',
     subtitle: 'storyboard · approve · build',
     description:
-      'Build short, Scripture-rooted narrative games for VBS and youth ministry through a storyboard-first, human-approved pipeline. Spawn the game-studio agent from a conversation — it drafts a storyboard for your review, and only builds after you approve it. Finished games play on the Projector page.',
+      'Build short, Scripture-rooted narrative games for VBS and youth ministry through a storyboard-first, human-approved pipeline. Spawn the game-studio agent from a conversation — it drafts a storyboard for your review, and only builds after you approve it. Finished games play right in your Workspace.',
     step1: 'Ask for a game',
     step1Body:
       'In a conversation, describe the passage, audience, and length — or use the built-in "Game Builder" suggestion.',
     step2: 'Review the storyboard',
     step2Body:
       'The agent drafts a scene-by-scene storyboard first. Nothing gets built until you approve it.',
-    step3: 'Play it on Projector',
+    step3: 'Play it in Workspace',
     step3Body:
-      'Once approved, the agent builds the game and it appears on your Projector page, ready to play.',
+      'Once approved, the agent builds the game. It appears in your Workspace under projector/, marked Projector — click it to play.',
     cta: 'Start a conversation',
   },
   'zh-TW': {
     title: '遊戲工坊',
     subtitle: '故事板 · 核准 · 製作',
     description:
-      '透過故事板優先、經人核准的流程，為暑期聖經班與青少年事工製作短篇聖經主題敘事遊戲。在對話中啟動 game-studio 代理——它會先產出故事板供您審閱，核准後才開始製作。完成的遊戲會顯示在投影台頁面上供遊玩。',
+      '透過故事板優先、經人核准的流程，為暑期聖經班與青少年事工製作短篇聖經主題敘事遊戲。在對話中啟動 game-studio 代理——它會先產出故事板供您審閱，核准後才開始製作。完成的遊戲可直接在工作區中遊玩。',
     step1: '提出遊戲需求',
     step1Body: '在對話中描述經文段落、對象與長度——或直接使用內建的「遊戲工坊」建議。',
     step2: '審閱故事板',
     step2Body: '代理會先產出逐場景的故事板。在您核准之前不會開始製作。',
-    step3: '於投影台遊玩',
-    step3Body: '核准後，代理會製作遊戲，完成後會顯示在投影台頁面上，即可遊玩。',
+    step3: '於工作區遊玩',
+    step3Body:
+      '核准後，代理會製作遊戲，完成後會出現在工作區的 projector/ 資料夾中並標示為「投影」——點擊即可遊玩。',
     cta: '開始對話',
   },
 } satisfies Messages<{

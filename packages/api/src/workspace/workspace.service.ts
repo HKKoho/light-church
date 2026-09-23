@@ -117,6 +117,9 @@ export class WorkspaceService {
     return { fs: new ScopedFs(localPath), basePath: localPath };
   }
 
+  // Agent-built micro-tools and games live at /projector/<name>/index.html.
+  private static readonly PROJECTOR_DIR = '/projector';
+
   private static readonly ADMIN_ONLY_PATHS = [
     '/incidents/keys',
     '/pastoral-care/keys',
@@ -206,6 +209,8 @@ export class WorkspaceService {
     }
 
     const dirents = await sfs.readdir(dirPath);
+    const inProjectorDir =
+      '/' + path.relative(basePath, resolved) === WorkspaceService.PROJECTOR_DIR;
 
     const entries: FileEntry[] = await Promise.all(
       dirents.map(async (dirent) => {
@@ -230,6 +235,11 @@ export class WorkspaceService {
           modifiedAt,
           isDirectory,
           type: isDirectory ? ('directory' as const) : WorkspaceService.detectFileType(dirent.name),
+          ...(isDirectory &&
+          inProjectorDir &&
+          (await sfs.exists(`${entryRelative}/index.html`))
+            ? { isProjector: true }
+            : {}),
         };
       }),
     );

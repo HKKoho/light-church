@@ -8,7 +8,7 @@ tags: [meta, tooling, projector]
 
 # Projector Creator
 
-Projectors are interactive tools that appear in the user's Projector page where they can be launched instantly.
+Projectors are interactive tools that appear in the user's Workspace, under `projector/`, marked **Projector** — one click launches them.
 Good examples: calculators, converters, image editors, data visualizers, form builders, timers.
 
 **Sandbox constraints:** Projectors run in a sandboxed iframe with NO network access — they CANNOT use `fetch()` or any API calls.
@@ -43,7 +43,7 @@ spawn(agent_name="coder", prompt="FIRST: read_file(\"/skills/builtin/projector-c
 spawn(agent_name="coder", prompt="read_file /workspace/projector/<NAME>/index.html. Verify: (1) ends with </html>. (2) No empty functions or // STUB or // TODO. (3) All buttons and sliders have working handlers. (4) No syntax errors. Fix any issues with edit_file.")
 ```
 
-**Then report:** "Your projector **<name>** is ready! It allows you to <what it does>. Find it on your Projector page."
+**Then report:** "Your projector **<name>** is ready! It allows you to <what it does>. Find it in your Workspace under `projector/<name>` and click it to play."
 
 **For modifications:** spawn one coder: "FIRST: read_file /workspace/projector/<NAME>/index.html and write_file a backup to /workspace/projector/<NAME>/index.backup.html. THEN: edit_file to apply <changes>. Verify after."
 
@@ -418,4 +418,4 @@ Projector tools run inside a modal iframe. The tool MUST fill the available spac
 ## When Describing to User
 
 NEVER say "HTML tool" or mention implementation. Say:
-"Your new projector **<name>** is ready! It allows you to <what it does>. You can find it on your Projector page."
+"Your new projector **<name>** is ready! It allows you to <what it does>. You can find it in your Workspace under `projector/<name>` — click it to play."

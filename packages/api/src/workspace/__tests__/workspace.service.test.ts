@@ -136,6 +136,35 @@ describe('WorkspaceService', () => {
       expect(third?.type).toBe('markdown');
     });
 
+    it('flags /projector/<name> folders with an index.html as playable projectors', async () => {
+      mockScopedFs.stat.mockResolvedValue({ isDirectory: () => true, size: 0, mtime: new Date() });
+      mockScopedFs.readdir.mockResolvedValue([
+        { name: 'good-samaritan', isDirectory: () => true },
+        { name: 'notes', isDirectory: () => true },
+        { name: 'readme.md', isDirectory: () => false },
+      ]);
+      mockScopedFs.exists.mockImplementation(
+        async (p: string) => p === '/projector/good-samaritan/index.html',
+      );
+
+      const result = await service.listDirectory(userId, '/projector');
+      const byName = Object.fromEntries(result.entries.map((e) => [e.name, e]));
+
+      expect(byName['good-samaritan']?.isProjector).toBe(true);
+      expect(byName['good-samaritan']?.isDirectory).toBe(true);
+      expect(byName['notes']?.isProjector).toBeUndefined();
+      expect(byName['readme.md']?.isProjector).toBeUndefined();
+    });
+
+    it('does not flag folders outside /projector, even with an index.html', async () => {
+      mockScopedFs.stat.mockResolvedValue({ isDirectory: () => true, size: 0, mtime: new Date() });
+      mockScopedFs.readdir.mockResolvedValue([{ name: 'site', isDirectory: () => true }]);
+      mockScopedFs.exists.mockResolvedValue(true);
+
+      const result = await service.listDirectory(userId, '/games');
+      expect(result.entries[0]?.isProjector).toBeUndefined();
+    });
+
     it('should throw NotFoundException for non-existent directory', async () => {
       mockScopedFs.stat.mockRejectedValue(new Error('ENOENT'));
 
