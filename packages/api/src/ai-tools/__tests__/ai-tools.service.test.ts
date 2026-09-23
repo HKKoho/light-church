@@ -49,15 +49,36 @@ describe('AiToolsService', () => {
     await writeTool('bad-link', { 'tool.json': JSON.stringify({ url: 'javascript:alert(1)' }) });
 
     await expect(service.list()).resolves.toEqual([
-      { name: 'Bible Chat', displayName: null, kind: 'link', description: null, descriptions: null, url: 'https://example.org' },
-      { name: 'Sermon Helper', displayName: null, kind: 'html', description: 'Outlines', descriptions: null, url: null },
+      {
+        name: 'Bible Chat',
+        displayName: null,
+        kind: 'link',
+        description: null,
+        descriptions: null,
+        url: 'https://example.org',
+      },
+      {
+        name: 'Sermon Helper',
+        displayName: null,
+        kind: 'html',
+        description: 'Outlines',
+        descriptions: null,
+        url: null,
+      },
     ]);
   });
 
   it('keeps an html tool visible when its tool.json is malformed', async () => {
     await writeTool('講道助手', { 'index.html': '<p/>', 'tool.json': '{not json' });
     await expect(service.list()).resolves.toEqual([
-      { name: '講道助手', displayName: null, kind: 'html', description: null, descriptions: null, url: null },
+      {
+        name: '講道助手',
+        displayName: null,
+        kind: 'html',
+        description: null,
+        descriptions: null,
+        url: null,
+      },
     ]);
   });
 
@@ -78,7 +99,9 @@ describe('AiToolsService', () => {
   it('reads per-language descriptions, using English as the plain fallback', async () => {
     await writeTool('bulletin', {
       'index.html': '<p/>',
-      'tool.json': JSON.stringify({ description: { en: 'Edit the bulletin', 'zh-TW': '編輯週刊' } }),
+      'tool.json': JSON.stringify({
+        description: { en: 'Edit the bulletin', 'zh-TW': '編輯週刊' },
+      }),
     });
     const [tool] = await service.list();
     expect(tool?.description).toBe('Edit the bulletin');

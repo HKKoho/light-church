@@ -116,12 +116,12 @@ Click **+ Add Channel** in the top-right corner. Select the channel type first �
 
 ![Add Channel dialog — Telegram type with Bot Token and Mode fields](./assets/channels-add-telegram.png)
 
-| Field         | Description                                                                   |
-| ------------- | ----------------------------------------------------------------------------- |
-| **Type**      | `Telegram`                                                                    |
-| **Name**      | Display name for this channel entry                                           |
-| **Bot Token** | Token from [@BotFather](https://t.me/BotFather) — format: `123456:ABC-DEF...` |
-| **Mode**      | `Polling` (Clawixea polls Telegram) or `Webhook` (Telegram pushes to your URL)  |
+| Field         | Description                                                                    |
+| ------------- | ------------------------------------------------------------------------------ |
+| **Type**      | `Telegram`                                                                     |
+| **Name**      | Display name for this channel entry                                            |
+| **Bot Token** | Token from [@BotFather](https://t.me/BotFather) — format: `123456:ABC-DEF...`  |
+| **Mode**      | `Polling` (Clawixea polls Telegram) or `Webhook` (Telegram pushes to your URL) |
 
 > Use **Polling** for local development. Use **Webhook** in production (requires a publicly reachable HTTPS URL set in `TELEGRAM_WEBHOOK_URL`).
 

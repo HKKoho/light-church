@@ -19,7 +19,10 @@ import * as path from 'path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { createConvertDocumentTool } from '../tools/document-conversion.js';
-import { PdfTooLargeError, type PdfExtractionService } from '../tools/document-reading/pdf-extraction.service.js';
+import {
+  PdfTooLargeError,
+  type PdfExtractionService,
+} from '../tools/document-reading/pdf-extraction.service.js';
 
 function makePdfExtraction(overrides: Partial<PdfExtractionService> = {}): PdfExtractionService {
   return {
@@ -133,7 +136,10 @@ describe('createConvertDocumentTool', () => {
     await fs.writeFile(sourcePath, 'fake-pdf-bytes');
     // Ensure the .md sibling is written strictly after the source's mtime.
     await new Promise((resolve) => setTimeout(resolve, 10));
-    await fs.writeFile(path.join(workspaceDir, 'sermon-prep.pdf.md'), '## Page 1\n\nalready converted');
+    await fs.writeFile(
+      path.join(workspaceDir, 'sermon-prep.pdf.md'),
+      '## Page 1\n\nalready converted',
+    );
 
     const pdfExtraction = makePdfExtraction();
     const tool = createConvertDocumentTool(workspaceDir, pdfExtraction);

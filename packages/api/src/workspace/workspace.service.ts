@@ -235,9 +235,7 @@ export class WorkspaceService {
           modifiedAt,
           isDirectory,
           type: isDirectory ? ('directory' as const) : WorkspaceService.detectFileType(dirent.name),
-          ...(isDirectory &&
-          inProjectorDir &&
-          (await sfs.exists(`${entryRelative}/index.html`))
+          ...(isDirectory && inProjectorDir && (await sfs.exists(`${entryRelative}/index.html`))
             ? { isProjector: true }
             : {}),
         };

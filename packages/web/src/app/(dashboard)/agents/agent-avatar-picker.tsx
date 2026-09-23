@@ -29,13 +29,7 @@ export function agentAvatarUrl(photoId: string): string {
  * Use this instead of a plain <img src={agentAvatarUrl(...)}> — the endpoint
  * only accepts a bearer token, which a bare <img> tag can never send.
  */
-export function AgentAvatarImage({
-  photoId,
-  className,
-}: {
-  photoId: string;
-  className?: string;
-}) {
+export function AgentAvatarImage({ photoId, className }: { photoId: string; className?: string }) {
   const url = useAuthedImageUrl(agentAvatarUrl(photoId));
   if (!url) return <div className={className} />;
   return <img src={url} alt="" className={className} />;
@@ -89,27 +83,30 @@ export function AgentAvatarPicker({
       });
   }, [isAdmin]);
 
-  const handleUpload = useCallback(async (file: File) => {
-    setUploading(true);
-    try {
-      const token = await ensureAccessToken();
-      const form = new FormData();
-      form.append('file', file);
-      const res = await fetch(`${API_BASE}/api/v1/talkingface/avatar/upload`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token ?? ''}` },
-        body: form,
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const item = (await res.json()) as AvatarListItem;
-      setAvatars((prev) => [item, ...prev]);
-      onChange(item.photoId);
-    } catch {
-      /* upload failed — admin can retry */
-    } finally {
-      setUploading(false);
-    }
-  }, [onChange]);
+  const handleUpload = useCallback(
+    async (file: File) => {
+      setUploading(true);
+      try {
+        const token = await ensureAccessToken();
+        const form = new FormData();
+        form.append('file', file);
+        const res = await fetch(`${API_BASE}/api/v1/talkingface/avatar/upload`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token ?? ''}` },
+          body: form,
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const item = (await res.json()) as AvatarListItem;
+        setAvatars((prev) => [item, ...prev]);
+        onChange(item.photoId);
+      } catch {
+        /* upload failed — admin can retry */
+      } finally {
+        setUploading(false);
+      }
+    },
+    [onChange],
+  );
 
   if (!isAdmin) {
     // Always echo the existing value back as a hidden field, even though this

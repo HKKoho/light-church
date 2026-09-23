@@ -83,7 +83,9 @@ describe('PdfExtractionService', () => {
     });
     mockGetScreenshot.mockResolvedValue({
       total: 1,
-      pages: [{ pageNumber: 1, dataUrl: 'data:image/png;base64,xyz', width: 100, height: 100, scale: 2 }],
+      pages: [
+        { pageNumber: 1, dataUrl: 'data:image/png;base64,xyz', width: 100, height: 100, scale: 2 },
+      ],
     });
     mockRecognize.mockResolvedValue({ data: { text: 'Recovered via OCR' } });
 
@@ -109,7 +111,15 @@ describe('PdfExtractionService', () => {
     mockGetScreenshot.mockImplementation(({ partial }: { partial: number[] }) =>
       Promise.resolve({
         total: 1,
-        pages: [{ pageNumber: partial[0], dataUrl: 'data:image/png;base64,xyz', width: 1, height: 1, scale: 2 }],
+        pages: [
+          {
+            pageNumber: partial[0],
+            dataUrl: 'data:image/png;base64,xyz',
+            width: 1,
+            height: 1,
+            scale: 2,
+          },
+        ],
       }),
     );
     mockRecognize.mockResolvedValue({ data: { text: 'ocr text' } });
@@ -151,7 +161,9 @@ describe('PdfExtractionService', () => {
     mockGetText.mockResolvedValue({ total: 1, pages: [{ num: 1, text: '' }] });
     mockGetScreenshot.mockResolvedValue({
       total: 1,
-      pages: [{ pageNumber: 1, dataUrl: 'data:image/png;base64,xyz', width: 1, height: 1, scale: 2 }],
+      pages: [
+        { pageNumber: 1, dataUrl: 'data:image/png;base64,xyz', width: 1, height: 1, scale: 2 },
+      ],
     });
     mockRecognize.mockResolvedValue({ data: { text: 'ocr text' } });
 

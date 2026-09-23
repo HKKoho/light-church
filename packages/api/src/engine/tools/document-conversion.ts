@@ -19,7 +19,10 @@ import { createLogger } from '@clawix/shared';
 import { ScopedFs } from '../../workspace/scoped-fs.js';
 import type { Tool, ToolResult } from '../tool.js';
 import { extractDocx } from './document-reading/docx-extraction.js';
-import { PdfTooLargeError, type PdfExtractionService } from './document-reading/pdf-extraction.service.js';
+import {
+  PdfTooLargeError,
+  type PdfExtractionService,
+} from './document-reading/pdf-extraction.service.js';
 import { validateContainerPath } from './file-io.js';
 
 const logger = createLogger('engine:tools:document-conversion');
@@ -116,7 +119,9 @@ export function createConvertDocumentTool(
             notes.push(`${result.ocrPagesUsed} page(s) recovered via OCR`);
           }
           if (result.unextractedPages > 0) {
-            notes.push(`${result.unextractedPages} page(s) could not be read — marked [UNEXTRACTED]`);
+            notes.push(
+              `${result.unextractedPages} page(s) could not be read — marked [UNEXTRACTED]`,
+            );
           }
           return ok(
             `Converted ${result.pageCount} page(s) to ${WORKSPACE_ROOT}${markdownRelativePath}` +

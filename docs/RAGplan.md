@@ -300,8 +300,8 @@ Still:
 
 This follows the existing skill contract exactly (`SkillLoaderService`
 requires `name` + `description` frontmatter under `MAX_SKILL_DESCRIPTION_LENGTH`)
-and gives the agent the *behavioral* rule (cite, don't invent, surface
-conflicts) while the *access* rule (which sources exist at all) stays
+and gives the agent the _behavioral_ rule (cite, don't invent, surface
+conflicts) while the _access_ rule (which sources exist at all) stays
 enforced in SQL, not prompt text — belt and suspenders, but the SQL filter
 is the one that actually can't be bypassed by a clever user message.
 
@@ -323,7 +323,7 @@ is the one that actually can't be bypassed by a clever user message.
   question the pastor/admin needs to actually answer per source, not
   something this plan can wave away. Put a copyright-acknowledgment checkbox
   on the upload form and record it on `ReadingSource` (`copyrightConfirmed:
-  Boolean`, `copyrightNote: String?`) so there's a record of who attested to
+Boolean`, `copyrightNote: String?`) so there's a record of who attested to
   what.
 - **Doctrinal responsibility stays human.** `doctrineTags` and the
   approve/reject decision are set by a person, logged (`reviewedById`,
@@ -349,14 +349,14 @@ is the one that actually can't be bypassed by a clever user message.
   transitions; admin-only guard; delete cascades + audit log entry.
 - `engine/tools/__tests__/theology-library.test.ts` — mocked Prisma
   `$queryRaw`, asserts the `doctrineTags` filter is applied and `status =
-  'approved'` is never omitted from the query (this is the one test that
+'approved'` is never omitted from the query (this is the one test that
   actually protects the doctrinal-filter invariant — treat it as
   load-bearing, not boilerplate).
 
 ## Option A rollout order
 
 1. `pgvector/pgvector:pg16` image swap + migration (`CREATE EXTENSION
-   vector`, `ReadingSource`/`ReadingChunk` tables, ANN index). Deployable and
+vector`, `ReadingSource`/`ReadingChunk` tables, ANN index). Deployable and
    verifiable with no application code yet.
 2. Ingestion module (upload, extraction, chunking, embedding) + admin review
    endpoints, no retrieval tool wired up yet — lets an admin start curating a
@@ -463,10 +463,10 @@ per-page text-layer extraction via `pdf-parse`. The OCR fallback for
 scanned/image-only pages (which the user has specifically asked for) needs
 an actual OCR engine, which today's codebase has none of:
 
-| Option | Notes |
-|---|---|
-| **Tesseract.js** (recommended default) | Pure JS/WASM, runs in the API process with no external service or GPU — same "no new sidecar" shape as everything else in this plan except SadTalker/Piper. Good enough accuracy for clean scans of printed text; struggles with poor scans, unusual fonts, or non-Latin scripts beyond what its trained language packs cover. |
-| External OCR API (e.g. a cloud vision/OCR service) | Higher accuracy, handles harder scans, but adds a network dependency and a per-page cost — a bigger decision (data leaves the self-hosted boundary) that deserves its own sign-off given `docs/SECURITY.md`'s self-hosted posture, not something to default into silently. |
+| Option                                             | Notes                                                                                                                                                                                                                                                                                                                          |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Tesseract.js** (recommended default)             | Pure JS/WASM, runs in the API process with no external service or GPU — same "no new sidecar" shape as everything else in this plan except SadTalker/Piper. Good enough accuracy for clean scans of printed text; struggles with poor scans, unusual fonts, or non-Latin scripts beyond what its trained language packs cover. |
+| External OCR API (e.g. a cloud vision/OCR service) | Higher accuracy, handles harder scans, but adds a network dependency and a per-page cost — a bigger decision (data leaves the self-hosted boundary) that deserves its own sign-off given `docs/SECURITY.md`'s self-hosted posture, not something to default into silently.                                                     |
 
 Default to Tesseract.js; note the external-API option in `docs/PROVIDERS.md`
 as a future upgrade path if scan quality turns out to be the bottleneck in
@@ -536,7 +536,7 @@ corpus or doctrinal exposure to gate against.
 ```markdown
 ---
 name: read-document
-description: "Use when the user uploads or references a PDF or DOCX file in their workspace and asks you to read, summarize, explain, or answer questions about it. Call convert_document_to_markdown, then read_file on the resulting path, then respond. Skip conversion if a current .md sibling is already present."
+description: 'Use when the user uploads or references a PDF or DOCX file in their workspace and asks you to read, summarize, explain, or answer questions about it. Call convert_document_to_markdown, then read_file on the resulting path, then respond. Skip conversion if a current .md sibling is already present.'
 pack: church
 ---
 

@@ -3,4 +3,8 @@ dist
 coverage
 .next
 references
+# Imported reference apps keep their own formatting
+reference
+# Built, minified AI Tool bundles (see scripts/build-ai-tool-bundle.mjs)
+ai-tools/**/index.html
 pnpm-lock.yaml
