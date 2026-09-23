@@ -91,7 +91,7 @@ model User {
   telegramId   String?    @unique
   whatsappJid  String?    @unique
 
-  policy                  Policy            @relation(fields: [policyId], references: [id])
+  policy                  Policy              @relation(fields: [policyId], references: [id])
   sessions                Session[]
   auditLogs               AuditLog[]
   memoryItems             MemoryItem[]
@@ -99,8 +99,9 @@ model User {
   notifications           Notification[]
   userAgents              UserAgent[]
   tasks                   Task[]
-  createdAgentDefinitions AgentDefinition[] @relation("CreatedAgentDefinitions")
+  createdAgentDefinitions AgentDefinition[]   @relation("CreatedAgentDefinitions")
   serviceAttendances      ServiceAttendance[]
+  bulletinArchives        BulletinArchive[]
 }
 
 // ============================================================================
@@ -231,14 +232,14 @@ model WorshipService {
 }
 
 model SundaySchoolClass {
-  id                 String                @id @default(cuid())
+  id                 String               @id @default(cuid())
   ageGroup           SundaySchoolAgeGroup
   className          String
   teacherName        String?
   curriculumTheme    String?
   lastLessonFilePath String?
   lastGeneratedAt    DateTime?
-  updatedAt          DateTime              @updatedAt
+  updatedAt          DateTime             @updatedAt
 
   @@index([ageGroup])
 }
@@ -603,4 +604,28 @@ model CongregationProfile {
   ethnicGroups        String[]        @default([])
   educationLevels     String[]        @default([])
   updatedAt           DateTime        @updatedAt
+}
+
+// ============================================================================
+// Bulletin Archive (past Sunday service bulletins, for future AI format learning)
+// ============================================================================
+
+// Past bulletin PDFs uploaded through the Sunday Service Bulletin AI Tool.
+// Archived only — never shown in the weekly bulletin editor. Deduplicated per
+// church by content hash.
+model BulletinArchive {
+  id           String   @id @default(cuid())
+  churchName   String
+  fileName     String
+  mimeType     String
+  size         Int
+  sha256       String
+  content      Bytes
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@unique([churchName, sha256])
+  @@index([churchName, createdAt])
 }

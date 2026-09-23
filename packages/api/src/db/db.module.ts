@@ -17,6 +17,7 @@ import { MemoryItemRepository } from './memory-item.repository.js';
 import { SystemSettingsRepository } from './system-settings.repository.js';
 import { GroupRepository } from './group.repository.js';
 import { CongregationProfileRepository } from './congregation-profile.repository.js';
+import { BulletinArchiveRepository } from './bulletin-archive.repository.js';
 
 const repositories = [
   PolicyRepository,
@@ -36,6 +37,7 @@ const repositories = [
   SystemSettingsRepository,
   GroupRepository,
   CongregationProfileRepository,
+  BulletinArchiveRepository,
 ];
 
 @Global()

@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import multipart from '@fastify/multipart';
 import { createLogger } from '@clawix/shared';
 import { AppModule } from './app.module.js';
+import { BULLETIN_ARCHIVE_PATH } from './bulletin-archive/bulletin-archive.controller.js';
 import { registerSecurityPlugins } from './common/security.config.js';
 import { configureGlobalHttpDispatcher } from './common/http-dispatcher.js';
 
@@ -62,6 +63,18 @@ async function bootstrap() {
       },
     },
   );
+
+  // Past-bulletin PDFs arrive as base64 JSON (≈1.35× their size), which exceeds
+  // Fastify's 1 MB default. Raise the limit for that one route only; routes are
+  // added in app.listen(), so this onRoute hook sees them.
+  app
+    .getHttpAdapter()
+    .getInstance()
+    .addHook('onRoute', (route) => {
+      if (route.url === BULLETIN_ARCHIVE_PATH && route.method === 'POST') {
+        route.bodyLimit = 25 * 1024 * 1024;
+      }
+    });
 
   // Security plugins must be registered BEFORE Swagger routes
   await registerSecurityPlugins(app);

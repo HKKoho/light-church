@@ -4,6 +4,7 @@ import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule, ThrottlerStorage } from '@nestjs/throttler';
 import { AdminModule } from './admin/index.js';
 import { AiToolsModule } from './ai-tools/index.js';
+import { BulletinArchiveModule } from './bulletin-archive/index.js';
 import { DashboardModule } from './dashboard/index.js';
 import { AgentsModule } from './agents/index.js';
 import { AuditModule } from './audit/index.js';
@@ -72,6 +73,7 @@ import { TalkingFaceModule } from './talkingface/talkingface.module.js';
     PacksModule,
     WorkspaceModule,
     AiToolsModule,
+    BulletinArchiveModule,
     CongregationProfileModule,
     ClientModule,
     TalkingFaceModule,
