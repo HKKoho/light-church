@@ -17,7 +17,6 @@ import {
   CreditCard,
   FileCheck,
   FolderOpen,
-  Gamepad2,
   HandHeart,
   Handshake,
   Heart,
@@ -62,6 +61,7 @@ import {
   type SidebarLink,
 } from '@/components/dashboard/sidebar-nav-group';
 import { ADOPTION_PHASES } from '@/components/dashboard/adoption-phases';
+import { BUILT_IN_AI_TOOLS } from '@/components/dashboard/built-in-ai-tools';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -101,7 +101,6 @@ const phase2Items: readonly NavItem[] = [
   { key: 'skills', icon: Wrench, href: '/skills' },
   { key: 'tasks', icon: CalendarClock, href: '/tasks' },
   { key: 'workspace', icon: FolderOpen, href: '/workspace' },
-  { key: 'gameStudio', icon: Gamepad2, href: '/game-studio' },
 ];
 
 // Phase 3a — delegated ministry & pastoral care (Tier 2a: defined, monitored
@@ -179,11 +178,11 @@ const messages = {
       talkingFace: 'Talking Face',
       workspace: 'Workspace',
       allAiTools: 'All AI Tools',
+      gameBuilder: 'Game Builder',
       delegation: 'Delegation Register',
       wkflowGeneration: 'WkFlow Generation',
       escalations: 'Escalation & Override',
       curation: 'Knowledge Curation',
-      gameStudio: 'Game Studio',
       skills: 'Skills',
       agents: 'Agents',
       tasks: 'Scheduled Tasks',
@@ -237,11 +236,11 @@ const messages = {
       talkingFace: '會說話的頭像',
       workspace: '工作區',
       allAiTools: '所有 AI 工具',
+      gameBuilder: '遊戲工坊',
       delegation: '委派登記',
       wkflowGeneration: '工作流程生成',
       escalations: '升級與覆核',
       curation: '知識整理',
-      gameStudio: '遊戲工坊',
       skills: '技能',
       agents: '代理',
       tasks: '排程任務',
@@ -347,6 +346,7 @@ export function AppSidebar() {
   // Phase 1: one sidebar entry per tool in the shared AITools directory.
   const aiToolLinks: SidebarLink[] = [
     { key: 'allAiTools', href: '/ai-tools', label: t.nav.allAiTools, icon: Sparkles },
+    ...BUILT_IN_AI_TOOLS.map((tool) => ({ ...tool, label: t.nav[tool.key] ?? tool.key })),
     ...aiTools.map((tool) => ({
       key: `ai-tool:${tool.name}`,
       href: `/ai-tools/${encodeURIComponent(tool.name)}`,

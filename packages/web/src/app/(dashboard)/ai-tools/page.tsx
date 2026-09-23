@@ -23,6 +23,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { authFetch, getAccessToken } from '@/lib/auth';
 import { useT, type Messages } from '@/lib/i18n';
 import { AI_TOOLS_CHANGED_EVENT, useAiTools } from '@/hooks/use-ai-tools';
+import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from '@/components/dashboard/built-in-ai-tools';
 
 const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
 
@@ -32,7 +33,15 @@ const messages = {
     title: 'AI Tools',
     subtitle:
       'Ready-made AI tools for the church team. Pick one and use it — no agent setup needed.',
-    empty: 'No AI tools yet. An administrator can upload one below.',
+    empty: 'No church-uploaded AI tools yet. An administrator can upload one below.',
+    builtIn: 'Built-in',
+    builtInTools: {
+      gameBuilder: {
+        name: 'Game Builder',
+        description:
+          'Build a short, Scripture-rooted game for VBS, youth or family devotion — storyboard first, approved by a person before anything is built.',
+      },
+    },
     loadError: 'Failed to load AI tools',
     open: 'Open',
     external: 'External link',
@@ -56,7 +65,15 @@ const messages = {
     phase: '第一階段 · AI 作為工具',
     title: 'AI 工具',
     subtitle: '為教會同工準備好的 AI 工具，選一個即可使用——無需設定代理。',
-    empty: '尚無 AI 工具。管理員可在下方上傳。',
+    empty: '尚無教會上傳的 AI 工具。管理員可在下方上傳。',
+    builtIn: '內建',
+    builtInTools: {
+      gameBuilder: {
+        name: '遊戲工坊',
+        description:
+          '為暑期聖經班、青少年或家庭靈修製作以聖經為本的小遊戲——先有故事板，經人員核准後才開始製作。',
+      },
+    },
     loadError: '無法載入 AI 工具',
     open: '開啟',
     external: '外部連結',
@@ -81,6 +98,8 @@ const messages = {
   title: string;
   subtitle: string;
   empty: string;
+  builtIn: string;
+  builtInTools: Record<BuiltInAiTool['key'], { name: string; description: string }>;
   loadError: string;
   open: string;
   external: string;
@@ -214,16 +233,28 @@ export default function AiToolsPage() {
         </div>
       )}
 
-      {isLoading ? (
-        <Loader2 className="size-6 animate-spin text-muted-foreground" />
-      ) : tools.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-16 text-center">
-          <Sparkles className="mb-3 size-10 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">{t.empty}</p>
-        </div>
-      ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {tools.map((tool) => (
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {BUILT_IN_AI_TOOLS.map((tool) => (
+          <Card key={tool.key} className="gap-3 py-4">
+            <CardHeader className="px-4">
+              <CardTitle className="flex items-center gap-2 text-sm">
+                <tool.icon className="size-4 shrink-0 text-muted-foreground" />
+                <span className="truncate">{t.builtInTools[tool.key].name}</span>
+              </CardTitle>
+              <CardDescription className="line-clamp-2 text-xs">
+                {t.builtInTools[tool.key].description}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center gap-2 px-4">
+              <Button asChild size="sm">
+                <Link href={tool.href}>{t.open}</Link>
+              </Button>
+              <Badge variant="secondary">{t.builtIn}</Badge>
+            </CardContent>
+          </Card>
+        ))}
+        {!isLoading &&
+          tools.map((tool) => (
             <Card key={tool.name} className="gap-3 py-4">
               <CardHeader className="px-4">
                 <CardTitle className="flex items-center gap-2 text-sm">
@@ -274,7 +305,17 @@ export default function AiToolsPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+      </div>
+
+      {isLoading ? (
+        <Loader2 className="size-6 animate-spin text-muted-foreground" />
+      ) : (
+        tools.length === 0 && (
+          <div className="flex items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground">
+            <Sparkles className="size-4 shrink-0" />
+            {t.empty}
+          </div>
+        )
       )}
 
       {isAdmin && <UploadCard />}
