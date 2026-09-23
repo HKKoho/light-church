@@ -155,7 +155,10 @@ export class TalkingFaceAvatarController {
       sourcePhotoId: photoId,
       style,
     };
-    await fs.writeFile(path.join(AVATAR_STORE_DIR, `${newPhotoId}.meta.json`), JSON.stringify(meta));
+    await fs.writeFile(
+      path.join(AVATAR_STORE_DIR, `${newPhotoId}.meta.json`),
+      JSON.stringify(meta),
+    );
 
     logger.info(
       { photoId: newPhotoId, sourcePhotoId: photoId, style, requestedBy: req.user.sub },

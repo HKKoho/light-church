@@ -30,9 +30,7 @@ describe('TalkingFaceAvatarController.cartoonize', () => {
 
     const { TalkingFaceAvatarController } = await import('../talkingface-avatar.controller.js');
     mockCartoonize = { generate: vi.fn() };
-    controller = new TalkingFaceAvatarController(
-      mockCartoonize as unknown as CartoonizeService,
-    );
+    controller = new TalkingFaceAvatarController(mockCartoonize as unknown as CartoonizeService);
 
     await fs.writeFile(path.join(tmpDir, 'source-1.jpg'), Buffer.from('fake-jpeg'));
   });
@@ -48,10 +46,7 @@ describe('TalkingFaceAvatarController.cartoonize', () => {
 
     const result = await controller.cartoonize('source-1', { style: 'face_paint_v2' }, req);
 
-    expect(mockCartoonize.generate).toHaveBeenCalledWith(
-      Buffer.from('fake-jpeg'),
-      'face_paint_v2',
-    );
+    expect(mockCartoonize.generate).toHaveBeenCalledWith(Buffer.from('fake-jpeg'), 'face_paint_v2');
     expect(result.filename).toBe('cartoon-face_paint_v2.jpg');
 
     const meta = JSON.parse(
@@ -78,7 +73,7 @@ describe('TalkingFaceAvatarController.cartoonize', () => {
   });
 
   it('surfaces sidecar failures', async () => {
-    mockCartoonize.generate.mockRejectedValue(new Error("cartoonize sidecar boom"));
+    mockCartoonize.generate.mockRejectedValue(new Error('cartoonize sidecar boom'));
     await expect(
       controller.cartoonize('source-1', { style: 'face_paint_v2' }, req),
     ).rejects.toThrow(/boom/);
