@@ -48,8 +48,9 @@ The full plan, with work items and "done when" criteria for each phase, is in [`
 
 For deacons and volunteers who are new to AI. Open **AI Tools** in the sidebar and every tool your church has installed is listed by name. Click one and use it. There's no agent to brief and nothing to configure.
 
-- Tools come in three kinds: **built-in** (a Light Church page, e.g. **Game Builder**), **hosted** (a ready-made app that runs inside Light Church in a locked-down sandbox, e.g. **RollCall 點名**) and **external links** (open in a new tab, with a reminder not to paste members' personal data, e.g. **Mission Trip Companion 訪宣**).
-- Hosted tools remember your work. RollCall's attendance list is saved to your own account on the church server, never to an AI agent's workspace.
+- In the sidebar, **AI Tools** opens the overview, and its dropdown lists every tool: **Game Builder**, **Mission/Camp Companion**, **Roll Call** and **Sunday Service Bulletin** (in Chinese: 遊戲工坊, 訪宣/營會指南, 點名, 主日崇拜週刊).
+- Tools come in three kinds: **built-in** (a Light Church page, e.g. Game Builder), **hosted** (a ready-made app that runs inside Light Church in a locked-down sandbox, e.g. Roll Call and Sunday Service Bulletin) and **external links** (open in a new tab, with a reminder not to paste members' personal data, e.g. Mission/Camp Companion).
+- Hosted tools remember your work. Roll Call's attendance list is saved to your own account on the church server, never to an AI agent's workspace. Sunday Service Bulletin's AI analysis of past bulletins arrives in a later phase.
 - Your administrator adds, replaces or removes tools on the **AI Tools** page.
 
 ### Phase 2 — AI Volunteers _(to be constructed)_
@@ -111,9 +112,9 @@ No AI is involved. The request is saved straight to **Prayer Requests** and move
 
 ## Where your work is saved
 
-Each area of ministry has its own dashboard page, and anything a specialist drafts lands as a file in your workspace folders (`proposals/`, `reports/`, `mne/`, `comms/drafts/`, `field-ops/`, …). Games and interactive tools built by agents appear in **WkFlow Generation**, where they run fully sandboxed.
+Each area of ministry has its own dashboard page, and anything a specialist drafts lands as a file in your workspace folders (`proposals/`, `reports/`, `mne/`, `comms/drafts/`, `field-ops/`, …). Games and interactive tools built by agents (projectors) appear in the **Workspace** under `projector/`, marked **Projector**. Use the **Projectors** button to jump there, and click one to play it right in the Workspace.
 
-Nothing in a drafts folder, in WkFlow Generation or in AI Tools has been sent or published anywhere. Sending is always a deliberate step **you** take.
+Nothing in a drafts folder, a projector or an AI Tool has been sent or published anywhere. Sending is always a deliberate step **you** take.
 
 ---
 
@@ -219,8 +220,8 @@ data/AITools/
 - **Upload from the dashboard:** as super admin, open **AI Tools**, enter a tool name and choose one `.html` file (max 2 MB). Uploading an existing name replaces that tool.
 - **API:** `GET /api/v1/ai-tools`, `GET /api/v1/ai-tools/:name` (any signed-in user); `POST /api/v1/ai-tools` (multipart `name` + file) and `DELETE /api/v1/ai-tools/:name` (super admin only).
 - Tool pages run with `allow-scripts` but **without** `allow-same-origin`, so they can't read the dashboard session or call the API.
-- **Default tools** live in the repo under `ai-tools/` (RollCall 點名, Mission Trip Companion 訪宣). Install them with `node scripts/seed-ai-tools.mjs`; existing tools are kept unless you pass `--force`.
-- **Hosting a built web app as a tool:** `node scripts/build-ai-tool-bundle.mjs <dist-dir> "ai-tools/<Tool Name>" --description "…"` inlines a static build (e.g. Vite `dist/`) into one `index.html` (max 2 MB). RollCall was built from `reference/RollCall/dist`.
+- **Default tools** live in the repo under `ai-tools/` (`roll-call`, `mission-camp-companion`, `sunday-service-bulletin`). Each folder name is the tool's id; `tool.json` sets `displayName` and `description` per language (`{ "en": "…", "zh-TW": "…" }`). Install them with `node scripts/seed-ai-tools.mjs`; existing tools are kept unless you pass `--force`.
+- **Hosting a built web app as a tool:** `node scripts/build-ai-tool-bundle.mjs <dist-dir> "ai-tools/<Tool Name>" --description "…"` inlines a static build (e.g. Vite `dist/`) into one `index.html` (max 2 MB). Roll Call was built from `reference/RollCall/dist`; Sunday Service Bulletin has its own recipe in `scripts/ai-tool-builds/sunday-service-bulletin/build.sh`.
 - **Saved data:** tool pages can't use real browser storage (opaque-origin sandbox), so the viewer injects a `localStorage` stand-in and saves it per user via `GET/PUT /api/v1/ai-tools/:name/storage` to `<WORKSPACE_BASE_PATH>/AITools-data/<userId>/<tool>.json` (max 1 MB), outside agent workspaces.
 - **Built-in tools** (e.g. Game Builder → `/game-studio`) are listed in `packages/web/src/components/dashboard/built-in-ai-tools.ts`.
 - **Phase status** (which sidebar groups show TO BE CONSTRUCTED) is set in `packages/web/src/components/dashboard/adoption-phases.ts`.
@@ -341,7 +342,7 @@ field-ops/  logistics/, risk/, assets/
 .clawix/    audit.log (append-only)
 ```
 
-Game Studio's output goes to `workspace/games/<slug>/` and `workspace/projector/<slug>/` (shown on the **WkFlow Generation** page), created on demand rather than pre-seeded.
+Game Studio's output goes to `workspace/games/<slug>/` and `workspace/projector/<slug>/` (playable from the **Workspace**, marked **Projector**), created on demand rather than pre-seeded.
 
 - **7 reference skill files** (`donor-proposal`, `mne`, `safeguarding`, `data-protection`, `impact-report`, `grant-research`, `ngo-comms`) copied from `reference/` into `workspace/skills/`
 - `.clawix/audit.log` initialised (append-only)
@@ -362,7 +363,7 @@ Read-only reference packages — encoded best practice the relevant agent reads 
 | `ngo-comms/SKILL.md`         | `reference/…/skills/` | Proclamation, Ministries                                 | Accessible language standards; do-no-harm storytelling; dignity-preserving imagery; advocacy framing; status-note classification                                                                                                                                                                |
 | `game-builder/SKILL.md`      | `skills/builtin/`     | Game Studio                                              | Enforces STORYBOARD → APPROVE → BUILD → DELIVER; games render in a sandboxed, network-free iframe; permitted genres (puzzle, platformer, narrative, collector — no combat/arena); content rules (no fear/shame mechanics, theologically sound, age-appropriate, antagonists drawn with dignity) |
 | `gospel-mission/SKILL.md`    | `skills/builtin/`     | Game Studio (tone cross-check); available platform-wide  | Theological foundation (Great Commission, Great Commandment, stewardship); stakeholder messaging profiles for Christian foundations, church partners, individual supporters/intercessors, beneficiaries, and secular/institutional funders                                                      |
-| `projector-creator/SKILL.md` | `skills/builtin/`     | Any agent building a WkFlow Generation item              | General-purpose guidance for building sandboxed, no-network interactive tools that appear on the WkFlow Generation page (Game Studio is one specialization of this). Planned Phase 3a rename: `workflow-generator`                                                                              |
+| `projector-creator/SKILL.md` | `skills/builtin/`     | Any agent building a projector                           | General-purpose guidance for building sandboxed, no-network interactive tools that appear in the Workspace under `projector/` (Game Studio is one specialization of this)                                                                                                                       |
 
 ### Architecture docs
 
@@ -381,17 +382,17 @@ Development now follows the adoption phases in [`docs/AI_ADOPTION_PHASES.md`](do
 
 Light Church follows a **zero-trust architecture** for agent execution:
 
-| Threat                                | Mitigation                                                                                                                                           |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cross-user data access                | Workspaces only mounted into the owner's container                                                                                                   |
-| Sub-agent privilege escalation        | Sub-agents get read-only curated context, never the full workspace                                                                                   |
-| Memory poisoning                      | Agent context regenerated from the database each run                                                                                                 |
-| Disk exhaustion                       | Per-user quota enforcement (default 500 MB)                                                                                                          |
-| Path traversal                        | Workspace and AI Tools paths validated to stay inside their root; tool names are single safe path segments                                           |
-| Secret leakage                        | API keys encrypted at rest (AES-256-GCM)                                                                                                             |
-| Untrusted code execution              | All agent code runs inside sandboxed containers, never on the host                                                                                   |
-| Unreviewed content reaching a browser | Game Studio / WkFlow Generation output renders in a sandboxed iframe with no network access, and never builds before a human approves the storyboard |
-| Uploaded AI Tool pages                | Only super admins can upload; pages render in an opaque-origin sandbox (no `allow-same-origin`), so they can't reach the session or the API          |
+| Threat                                | Mitigation                                                                                                                                   |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cross-user data access                | Workspaces only mounted into the owner's container                                                                                           |
+| Sub-agent privilege escalation        | Sub-agents get read-only curated context, never the full workspace                                                                           |
+| Memory poisoning                      | Agent context regenerated from the database each run                                                                                         |
+| Disk exhaustion                       | Per-user quota enforcement (default 500 MB)                                                                                                  |
+| Path traversal                        | Workspace and AI Tools paths validated to stay inside their root; tool names are single safe path segments                                   |
+| Secret leakage                        | API keys encrypted at rest (AES-256-GCM)                                                                                                     |
+| Untrusted code execution              | All agent code runs inside sandboxed containers, never on the host                                                                           |
+| Unreviewed content reaching a browser | Game Studio / projector output renders in a sandboxed iframe with no network access, and never builds before a human approves the storyboard |
+| Uploaded AI Tool pages                | Only super admins can upload; pages render in an opaque-origin sandbox (no `allow-same-origin`), so they can't reach the session or the API  |
 
 ---
 
