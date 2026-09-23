@@ -71,6 +71,26 @@ builds familiarity and trust cheaply, so the church is ready for Phase 2.
   safe path segments: letters (incl. CJK), digits, spaces, `_`, `-` and `.`.
 - **Admin upload / remove UI** on `/ai-tools`, with a confirmation before removal.
 
+### Shipped: first tools from `reference/` (staged)
+
+- **Game Builder** — the existing Game Studio page, now a _built-in_ AI Tool
+  (`components/dashboard/built-in-ai-tools.ts`).
+- **RollCall 點名** — `reference/RollCall` (no AI, no server) inlined into one
+  HTML file by `scripts/build-ai-tool-bundle.mjs` and hosted in the sandbox.
+  Its `localStorage` is bridged to per-user server storage
+  (`/api/v1/ai-tools/:name/storage` → `AITools-data/<userId>/`), kept outside
+  agent workspaces because attendance lists hold member names.
+- **Mission Trip Companion 訪宣** — `reference/CampMissionHdBk` as a link tool to
+  its live deployment (its 151 MB of media rules out bundling).
+- Defaults live in `ai-tools/`; install with `node scripts/seed-ai-tools.mjs`.
+
+**Next (needs the engine):** `reference/SundayServices` (Gemini bulletin analysis
+on its own Express server) and `reference/GetinBible` (Gemini/OpenAI/Google TTS
+keys in the browser + its own Supabase). Their AI calls must move behind a
+Light Church engine endpoint — no provider keys in tool pages, and all LLM
+calls through `engine/providers/*` for token accounting — and GetinBible needs
+a decision on keeping Supabase vs. moving student progress into Light Church.
+
 ### Remaining Phase 1 work
 
 1. **Starter tool set.** Seed 5–8 tools deacons actually need: sermon-outline
@@ -102,7 +122,7 @@ Coordinator + 10 NGO Operations + 7 Church Ministries agents, one specialist at
 a time, draft-only, human sends.
 
 **Sidebar (AI Volunteers):** Conversations, Agents, Talking Face, Skills,
-Scheduled Tasks, Workspace, Game Studio.
+Scheduled Tasks, Workspace. (Game Studio moved to AI Tools as the built-in **Game Builder**.)
 
 ### Work items
 
@@ -206,14 +226,14 @@ corpus with citations; the attribution rule is enforced and tested.
 
 ## Sidebar map (current code)
 
-| Group (phase)                           | Items                                                                                |
-| --------------------------------------- | ------------------------------------------------------------------------------------ |
-| AI Tools (P1)                           | All AI Tools, one entry per tool in `AITools/`                                       |
-| AI Volunteers (P2)                      | Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace, Game Studio |
-| Care & Discipleship                     | Shown for decentralized (cell-group) churches only: Prayer, Scripture, Outreach      |
-| Ministry Delegation (P3a)               | Delegation Register, WkFlow Generation, Pastoral Care                                |
-| Governance, Assurance & Liability (P3b) | Dashboard, Token Usage, Audit Logs, Escalation & Override, Settings                  |
-| Data & Domain Curation (P3c)            | Knowledge Curation                                                                   |
+| Group (phase)                           | Items                                                                           |
+| --------------------------------------- | ------------------------------------------------------------------------------- |
+| AI Tools (P1)                           | All AI Tools, one entry per tool in `AITools/`                                  |
+| AI Volunteers (P2)                      | Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace         |
+| Care & Discipleship                     | Shown for decentralized (cell-group) churches only: Prayer, Scripture, Outreach |
+| Ministry Delegation (P3a)               | Delegation Register, WkFlow Generation, Pastoral Care                           |
+| Governance, Assurance & Liability (P3b) | Dashboard, Token Usage, Audit Logs, Escalation & Override, Settings             |
+| Data & Domain Curation (P3c)            | Knowledge Curation                                                              |
 
 ## Housekeeping
 

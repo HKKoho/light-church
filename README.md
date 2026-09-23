@@ -48,12 +48,13 @@ The full plan, with work items and "done when" criteria for each phase, is in [`
 
 For deacons and volunteers who are new to AI. Open **AI Tools** in the sidebar and every tool your church has installed is listed by name. Click one and use it. There's no agent to brief and nothing to configure.
 
-- Tools are either a **built-in page** (runs inside Light Church, in a locked-down sandbox) or an **external link** (opens in a new tab, with a reminder not to paste members' personal data).
+- Tools come in three kinds: **built-in** (a Light Church page, e.g. **Game Builder**), **hosted** (a ready-made app that runs inside Light Church in a locked-down sandbox, e.g. **RollCall 點名**) and **external links** (open in a new tab, with a reminder not to paste members' personal data, e.g. **Mission Trip Companion 訪宣**).
+- Hosted tools remember your work. RollCall's attendance list is saved to your own account on the church server, never to an AI agent's workspace.
 - Your administrator adds, replaces or removes tools on the **AI Tools** page.
 
 ### Phase 2 — AI Volunteers _(to be constructed)_
 
-When your team is comfortable with tools, they can start briefing AI like a volunteer: "draft this", "research that", "remind me every Monday". Phase 2 uses the agents already built into Light Church, found under **AI Volunteers**: Conversations, Agents, Talking Face, Skills, Scheduled Tasks, Workspace and Game Studio. See [Meet your AI volunteers](#meet-your-ai-volunteers) below.
+When your team is comfortable with tools, they can start briefing AI like a volunteer: "draft this", "research that", "remind me every Monday". Phase 2 uses the agents already built into Light Church, found under **AI Volunteers**: Conversations, Agents, Talking Face, Skills, Scheduled Tasks and Workspace. See [Meet your AI volunteers](#meet-your-ai-volunteers) below.
 
 ### Phase 3 — Delegation, with governance and curation _(to be constructed)_
 
@@ -76,7 +77,7 @@ _(Phase 2)._ At the front desk is the **Ministry Coordinator**, the primary assi
 | **Kingdom Impact**       | _Kingdom Impact_               | Indicators beyond outputs (salvations, baptisms, discipleship depth), data-collection forms, dashboard summaries             |
 | **Proclamation**         | _Proclamation_                 | Newsletters, social posts, op-eds, advocacy and witness content                                                              |
 | **Mission Field**        | _Mission Field / Safeguarding_ | Logistics lists, trip risk registers, safeguarding incident write-ups _after_ a person has handled the situation             |
-| **Game Studio**          | _Game Studio_                  | Short, Scripture-rooted narrative games for VBS, youth and family devotion. Storyboard first, human-approved before building |
+| **Game Studio**          | _AI Tools → Game Builder_      | Short, Scripture-rooted narrative games for VBS, youth and family devotion. Storyboard first, human-approved before building |
 | **Church Ministries**    | _via the Coordinator_          | Sermon prep, Sunday-school lessons, Bible studies, worship planning, prayer guides, church communications, church admin      |
 
 Each specialist reads a set of **best-practice guides** ("skills") before it drafts. These cover things like how funders expect proposals to be structured, the right audience framing, and the data-protection rules for sensitive information.
@@ -218,6 +219,10 @@ data/AITools/
 - **Upload from the dashboard:** as super admin, open **AI Tools**, enter a tool name and choose one `.html` file (max 2 MB). Uploading an existing name replaces that tool.
 - **API:** `GET /api/v1/ai-tools`, `GET /api/v1/ai-tools/:name` (any signed-in user); `POST /api/v1/ai-tools` (multipart `name` + file) and `DELETE /api/v1/ai-tools/:name` (super admin only).
 - Tool pages run with `allow-scripts` but **without** `allow-same-origin`, so they can't read the dashboard session or call the API.
+- **Default tools** live in the repo under `ai-tools/` (RollCall 點名, Mission Trip Companion 訪宣). Install them with `node scripts/seed-ai-tools.mjs`; existing tools are kept unless you pass `--force`.
+- **Hosting a built web app as a tool:** `node scripts/build-ai-tool-bundle.mjs <dist-dir> "ai-tools/<Tool Name>" --description "…"` inlines a static build (e.g. Vite `dist/`) into one `index.html` (max 2 MB). RollCall was built from `reference/RollCall/dist`.
+- **Saved data:** tool pages can't use real browser storage (opaque-origin sandbox), so the viewer injects a `localStorage` stand-in and saves it per user via `GET/PUT /api/v1/ai-tools/:name/storage` to `<WORKSPACE_BASE_PATH>/AITools-data/<userId>/<tool>.json` (max 1 MB), outside agent workspaces.
+- **Built-in tools** (e.g. Game Builder → `/game-studio`) are listed in `packages/web/src/components/dashboard/built-in-ai-tools.ts`.
 - **Phase status** (which sidebar groups show TO BE CONSTRUCTED) is set in `packages/web/src/components/dashboard/adoption-phases.ts`.
 
 ### Seed the ministry configuration

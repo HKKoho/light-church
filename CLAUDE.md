@@ -38,6 +38,7 @@ pnpm run uninstall:clawix -- --full # Also remove .env, data/, skills/custom/
 # NGO-specific setup
 node scripts/seed-ngo-agents.mjs    # Create five NGO specialist agents
 node scripts/setup-ngo.mjs          # Seed 28-folder workspace structure + skill files
+node scripts/seed-ai-tools.mjs      # Install default Phase 1 AI Tools (ai-tools/ → data/AITools/)
 ```
 
 **Fresh clone setup order:**
