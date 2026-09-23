@@ -34,10 +34,13 @@ if (!pgPass) {
   process.exit(1);
 }
 
-// From the host, Postgres is reachable at localhost:5433 (mapped port)
-const DATABASE_URL = `postgresql://${pgUser}:${pgPass}@localhost:5433/${pgDb}?schema=public`;
+// From the host, this checkout's Postgres is published on localhost:5443 by both
+// docker-compose.dev.yml and docker-compose.prod.yml. (It used to be 5433, which
+// other Clawix checkouts on the same machine may still use — never fall back to it.)
+const PG_HOST_PORT = 5443;
+const DATABASE_URL = `postgresql://${pgUser}:${pgPass}@localhost:${PG_HOST_PORT}/${pgDb}?schema=public`;
 
-console.log(`\nConnecting to: postgresql://${pgUser}:****@localhost:5433/${pgDb}\n`);
+console.log(`\nConnecting to: postgresql://${pgUser}:****@localhost:${PG_HOST_PORT}/${pgDb}\n`);
 
 try {
   execSync('pnpm --filter @clawix/api run seed:church', {

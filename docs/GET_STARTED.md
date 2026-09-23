@@ -86,7 +86,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:3000
 TELEGRAM_BOT_TOKEN=123456789:ABCdef...
 
 # Database (defaults work for docker-compose dev)
-DATABASE_URL="postgresql://clawix:clawix_dev@localhost:5433/clawix"
+DATABASE_URL="postgresql://clawix:clawix_dev@localhost:5443/clawix"
 REDIS_URL="redis://localhost:6379"
 ```
 
@@ -259,7 +259,7 @@ pnpm run db:studio      # Open Prisma Studio
 | -------- | ----------------------- | ---------------------------- |
 | API      | `http://localhost:3001` |                              |
 | Web      | `http://localhost:3000` |                              |
-| Postgres | `localhost:5433`        | `clawix` / `clawix_dev`      |
+| Postgres | `localhost:5443`        | `clawix` / `clawix_dev`      |
 | Redis    | `localhost:6379`        |                              |
 | pgAdmin  | `http://localhost:5050` | `admin@clawix.dev` / `admin` |
 

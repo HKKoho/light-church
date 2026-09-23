@@ -25,7 +25,7 @@ pnpm run db:studio        # Prisma Studio GUI
 pnpm run db:reset         # Reset and re-migrate (destructive)
 
 # Infrastructure (local dev)
-pnpm run docker:dev       # Start Postgres (5433), Redis, pgAdmin
+pnpm run docker:dev       # Start Postgres (5443), Redis, pgAdmin
 pnpm run docker:dev:down  # Stop local infra
 
 # Production deployment
