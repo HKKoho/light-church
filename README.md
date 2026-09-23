@@ -248,7 +248,7 @@ pnpm install
 cp .env.example .env                 # set PROVIDER_ENCRYPTION_KEY, provider key, etc.
 pnpm --filter @clawix/shared run build
 docker build -t clawix-agent:latest -f infra/docker/agent/Dockerfile .
-pnpm run docker:dev                  # Postgres (5433) + Redis
+pnpm run docker:dev                  # Postgres (5443) + Redis
 pnpm run db:migrate && pnpm run db:seed
 pnpm run dev                         # API on :3001, dashboard on :3000
 ```
