@@ -30,17 +30,19 @@ export interface GenerateVideoResult {
  */
 @Injectable()
 export class SadTalkerService {
-  private readonly baseUrl: string;
-
-  constructor(@Inject(ConfigService) configService: ConfigService) {
-    this.baseUrl = configService.getOrThrow<string>('SADTALKER_URL');
-  }
+  constructor(@Inject(ConfigService) private readonly configService: ConfigService) {}
 
   /**
    * Generates a lip-synced MP4 video from a portrait photo and a WAV audio buffer.
    * The caller is responsible for ensuring both inputs are valid.
    */
   async generateVideo(imageBuffer: Buffer, audioBuffer: Buffer): Promise<GenerateVideoResult> {
+    // Read lazily (like TTS_PIPER_URL) so an unconfigured sidecar only fails
+    // photo-avatar requests instead of preventing the whole API from booting.
+    const baseUrl = this.configService.get<string>('SADTALKER_URL');
+    if (!baseUrl) {
+      throw new ExternalServiceError('sadtalker', 'SADTALKER_URL is not configured');
+    }
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), GENERATE_TIMEOUT_MS);
 
@@ -68,7 +70,7 @@ export class SadTalkerService {
         'audio.wav',
       );
 
-      const response = await fetch(`${this.baseUrl}/generate`, {
+      const response = await fetch(`${baseUrl}/generate`, {
         method: 'POST',
         body: form,
         signal: controller.signal,
