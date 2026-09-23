@@ -1,12 +1,19 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ImagePlus, Loader2, Mic, MicOff, Send, Trash2, Volume2 } from 'lucide-react';
+import { ImagePlus, Loader2, Mic, MicOff, Send, Sparkles, Trash2, Volume2 } from 'lucide-react';
 import { authFetch, ensureAccessToken } from '@/lib/auth';
 import { useAuthedImageUrl } from '@/hooks/use-authed-image';
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useSpeechInput } from '@/hooks/use-speech-input';
 import {
   AvatarStage3D,
@@ -38,7 +45,16 @@ interface AvatarListItem {
   photoId: string;
   filename: string;
   uploadedAt: string;
+  sourcePhotoId?: string;
+  style?: string;
 }
+
+const CARTOON_STYLES = [
+  { value: 'face_paint_v2', label: 'Face Paint v2' },
+  { value: 'face_paint_v1', label: 'Face Paint v1' },
+  { value: 'celeba_distill', label: 'Celeba Distill' },
+  { value: 'paprika', label: 'Paprika' },
+] as const;
 
 async function decodeBase64Audio(base64: string): Promise<AudioBuffer> {
   const binary = atob(base64);
@@ -78,6 +94,8 @@ export default function TalkingFacePage() {
   const [selectedPhotoId, setSelectedPhotoId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [cartoonizingId, setCartoonizingId] = useState<string | null>(null);
+  const [cartoonStyle, setCartoonStyle] = useState<string>(CARTOON_STYLES[0].value);
 
   // mode: '3d' uses TalkingHead.js; 'photo' uses SadTalker video pipeline
   const [mode, setMode] = useState<'3d' | 'photo'>('3d');
@@ -147,6 +165,28 @@ export default function TalkingFacePage() {
       }
     },
     [selectedPhotoId],
+  );
+
+  // --- cartoonize a selfie into an anime-style talking-face avatar ---
+  const handleCartoonize = useCallback(
+    async (photoId: string, style: string) => {
+      setCartoonizingId(photoId);
+      setError('');
+      try {
+        const item = await authFetch<AvatarListItem>(
+          `/api/v1/talkingface/avatar/${photoId}/cartoonize`,
+          { method: 'POST', body: JSON.stringify({ style }) },
+        );
+        setAvatars((prev) => [item, ...prev]);
+        setSelectedPhotoId(item.photoId);
+        setMode('photo');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Cartoonize failed');
+      } finally {
+        setCartoonizingId(null);
+      }
+    },
+    [],
   );
 
   // --- WS callbacks ---
@@ -310,6 +350,25 @@ export default function TalkingFacePage() {
             />
           </div>
 
+          {/* Cartoonize style picker — applies to whichever photo's Cartoonize button is clicked */}
+          {avatars.some((a) => !a.sourcePhotoId) && (
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">Cartoon style:</span>
+              <Select value={cartoonStyle} onValueChange={setCartoonStyle}>
+                <SelectTrigger size="sm" className="h-7 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {CARTOON_STYLES.map((s) => (
+                    <SelectItem key={s.value} value={s.value}>
+                      {s.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           {/* Avatar list */}
           {avatars.length > 0 && (
             <ul className="mt-3 space-y-1">
@@ -326,24 +385,50 @@ export default function TalkingFacePage() {
                     setMode('photo');
                   }}
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
                     <AvatarThumbnail
                       photoId={a.photoId}
-                      className="size-8 rounded-full object-cover"
+                      className="size-8 rounded-full object-cover shrink-0"
                     />
-                    <span className="truncate max-w-[180px]">{a.filename}</span>
+                    <span className="truncate max-w-[140px]">{a.filename}</span>
+                    {a.sourcePhotoId && (
+                      <span className="shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] uppercase tracking-wide text-muted-foreground">
+                        cartoon
+                      </span>
+                    )}
                   </div>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="size-7 shrink-0 text-muted-foreground hover:text-destructive"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      void handleDeleteAvatar(a.photoId);
-                    }}
-                  >
-                    <Trash2 className="size-3.5" />
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {!a.sourcePhotoId && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-7 text-muted-foreground hover:text-primary"
+                        title={`Cartoonize (${cartoonStyle})`}
+                        disabled={cartoonizingId === a.photoId}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleCartoonize(a.photoId, cartoonStyle);
+                        }}
+                      >
+                        {cartoonizingId === a.photoId ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Sparkles className="size-3.5" />
+                        )}
+                      </Button>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-7 text-muted-foreground hover:text-destructive"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        void handleDeleteAvatar(a.photoId);
+                      }}
+                    >
+                      <Trash2 className="size-3.5" />
+                    </Button>
+                  </div>
                 </li>
               ))}
             </ul>

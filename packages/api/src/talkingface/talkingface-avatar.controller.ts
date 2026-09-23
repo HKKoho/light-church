@@ -4,6 +4,7 @@ import * as crypto from 'node:crypto';
 
 import {
   BadRequestException,
+  Body,
   Controller,
   Delete,
   Get,
@@ -20,6 +21,7 @@ import { createLogger } from '@clawix/shared';
 import { Roles } from '../auth/roles.decorator.js';
 import type { JwtPayload } from '../auth/auth.types.js';
 import { UserRole } from '../generated/prisma/enums.js';
+import { CARTOON_STYLES, CartoonizeService, isCartoonStyle } from './cartoonize.service.js';
 
 const logger = createLogger('talkingface:avatar');
 
@@ -39,6 +41,9 @@ export interface AvatarListItem {
   readonly photoId: string;
   readonly filename: string;
   readonly uploadedAt: string;
+  /** Set when this avatar is a cartoonized variant of another uploaded photo. */
+  readonly sourcePhotoId?: string;
+  readonly style?: string;
 }
 
 /**
@@ -52,6 +57,8 @@ export interface AvatarListItem {
 @Controller('api/v1/talkingface/avatar')
 @Roles(UserRole.super_admin, UserRole.admin_staff)
 export class TalkingFaceAvatarController {
+  constructor(private readonly cartoonizeService: CartoonizeService) {}
+
   /** POST /api/v1/talkingface/avatar/upload */
   @Post('upload')
   async upload(@Req() req: FastifyRequest & { user: JwtPayload }): Promise<AvatarUploadResult> {
@@ -112,6 +119,49 @@ export class TalkingFaceAvatarController {
     const mime =
       file.ext === '.png' ? 'image/png' : file.ext === '.webp' ? 'image/webp' : 'image/jpeg';
     void reply.type(mime).send(buffer);
+  }
+
+  /**
+   * POST /api/v1/talkingface/avatar/:photoId/cartoonize — converts an
+   * uploaded photo into a cartoon/anime portrait via the AnimeGANv2 sidecar
+   * and stores the result as a new avatar, linked back to its source.
+   */
+  @Post(':photoId/cartoonize')
+  async cartoonize(
+    @Param('photoId') photoId: string,
+    @Body() body: { style?: string },
+    @Req() req: FastifyRequest & { user: JwtPayload },
+  ): Promise<AvatarUploadResult> {
+    const style = body?.style;
+    if (!isCartoonStyle(style)) {
+      throw new BadRequestException(
+        `Unsupported style: ${String(style)}. Use one of: ${CARTOON_STYLES.join(', ')}`,
+      );
+    }
+
+    const sourceBuffer = await this.readPhotoBuffer(photoId);
+    const { image } = await this.cartoonizeService.generate(sourceBuffer, style);
+
+    const newPhotoId = crypto.randomUUID();
+    const filename = `cartoon-${style}.jpg`;
+
+    await fs.mkdir(AVATAR_STORE_DIR, { recursive: true });
+    await fs.writeFile(path.join(AVATAR_STORE_DIR, `${newPhotoId}.jpg`), image);
+
+    const meta: AvatarListItem = {
+      photoId: newPhotoId,
+      filename,
+      uploadedAt: new Date().toISOString(),
+      sourcePhotoId: photoId,
+      style,
+    };
+    await fs.writeFile(path.join(AVATAR_STORE_DIR, `${newPhotoId}.meta.json`), JSON.stringify(meta));
+
+    logger.info(
+      { photoId: newPhotoId, sourcePhotoId: photoId, style, requestedBy: req.user.sub },
+      'Avatar photo cartoonized',
+    );
+    return { photoId: newPhotoId, filename };
   }
 
   /** DELETE /api/v1/talkingface/avatar/:photoId */
