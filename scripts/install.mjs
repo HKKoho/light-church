@@ -11,7 +11,7 @@
  * Re-running is safe: existing `.env` is preserved. For routine
  * restart/rebuild, use `scripts/update.mjs` instead.
  *
- * Usage: node scripts/install.mjs
+ * Usage: node scripts/install.mjs [--force-ai-tools]
  */
 
 import { execSync, spawnSync } from 'node:child_process';
@@ -21,6 +21,7 @@ import { randomBytes } from 'node:crypto';
 import { stdin, stdout } from 'node:process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { installAiTools } from './lib/ai-tools-install.mjs';
 import { readDotEnv, stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -605,6 +606,19 @@ async function main() {
     process.exit(1);
   }
   ok('API is healthy');
+
+  step('Installing default AI Tools');
+  try {
+    for (const t of installAiTools({
+      root: ROOT,
+      force: process.argv.includes('--force-ai-tools'),
+    })) {
+      if (t.action === 'skip') info(`${t.name} already installed (--force-ai-tools to replace)`);
+      else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
+    }
+  } catch (err) {
+    warn(`Could not install AI Tools: ${err.message}`);
+  }
 
   console.log(`\n${bold(green('=== Installation complete ==='))}\n`);
   const finalApi = answers?.apiUrl ?? `http://localhost:${apiPort}`;
