@@ -168,26 +168,23 @@ export default function TalkingFacePage() {
   );
 
   // --- cartoonize a selfie into an anime-style talking-face avatar ---
-  const handleCartoonize = useCallback(
-    async (photoId: string, style: string) => {
-      setCartoonizingId(photoId);
-      setError('');
-      try {
-        const item = await authFetch<AvatarListItem>(
-          `/api/v1/talkingface/avatar/${photoId}/cartoonize`,
-          { method: 'POST', body: JSON.stringify({ style }) },
-        );
-        setAvatars((prev) => [item, ...prev]);
-        setSelectedPhotoId(item.photoId);
-        setMode('photo');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Cartoonize failed');
-      } finally {
-        setCartoonizingId(null);
-      }
-    },
-    [],
-  );
+  const handleCartoonize = useCallback(async (photoId: string, style: string) => {
+    setCartoonizingId(photoId);
+    setError('');
+    try {
+      const item = await authFetch<AvatarListItem>(
+        `/api/v1/talkingface/avatar/${photoId}/cartoonize`,
+        { method: 'POST', body: JSON.stringify({ style }) },
+      );
+      setAvatars((prev) => [item, ...prev]);
+      setSelectedPhotoId(item.photoId);
+      setMode('photo');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Cartoonize failed');
+    } finally {
+      setCartoonizingId(null);
+    }
+  }, []);
 
   // --- WS callbacks ---
   const handleChunk = useCallback(async (chunk: SpeakChunk) => {

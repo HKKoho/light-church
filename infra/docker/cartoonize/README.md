@@ -9,10 +9,10 @@ just another `photoId` to `SadTalkerService.generateVideo`.
 
 ## API
 
-| Method | Path        | Body                                                                | Response    |
-| ------ | ----------- | -------------------------------------------------------------------- | ----------- |
-| `GET`  | `/health`   | —                                                                     | `{ "status": "ok", "device": "cpu\|cuda" }` |
-| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `style` (form field, optional) | `image/jpeg` |
+| Method | Path        | Body                                                                | Response                                    |
+| ------ | ----------- | ------------------------------------------------------------------- | ------------------------------------------- |
+| `GET`  | `/health`   | —                                                                   | `{ "status": "ok", "device": "cpu\|cuda" }` |
+| `POST` | `/generate` | multipart: `image` (JPEG/PNG/WebP) + `style` (form field, optional) | `image/jpeg`                                |
 
 `style` is one of `face_paint_v2` (default), `face_paint_v1`,
 `celeba_distill`, `paprika` — the checkpoints AnimeGANv2 ships pretrained
@@ -73,9 +73,9 @@ Much lighter than SadTalker — a single small conv-net forward pass per image,
 no video/audio processing.
 
 | Mode | RAM  | Speed (per image) |
-| ---- | ---- | ------------------ |
-| CPU  | 2 GB | ~1–3 s              |
-| GPU  | 2 GB | <0.5 s              |
+| ---- | ---- | ----------------- |
+| CPU  | 2 GB | ~1–3 s            |
+| GPU  | 2 GB | <0.5 s            |
 
 ## Licence note
 
