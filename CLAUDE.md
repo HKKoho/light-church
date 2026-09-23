@@ -32,13 +32,15 @@ pnpm run docker:dev:down  # Stop local infra
 pnpm run install:clawix   # Interactive first-time setup: generates .env, builds images, starts stack
 pnpm run update:clawix    # Rebuild + restart (use after git pull or config changes)
 pnpm run update:clawix -- --pull    # git pull --ff-only, then rebuild + restart
+pnpm run update:clawix -- --force-ai-tools  # also replace installed default AI Tools with ./ai-tools/
 pnpm run uninstall:clawix           # Remove containers/images/volumes
 pnpm run uninstall:clawix -- --full # Also remove .env, data/, skills/custom/
 
 # NGO-specific setup
 node scripts/seed-ngo-agents.mjs    # Create five NGO specialist agents
 node scripts/setup-ngo.mjs          # Seed 28-folder workspace structure + skill files
-node scripts/seed-ai-tools.mjs      # Install default Phase 1 AI Tools (ai-tools/ → data/AITools/)
+node scripts/seed-ai-tools.mjs      # Install default Phase 1 AI Tools (ai-tools/ → data/AITools/) without Docker;
+                                    # install/update:clawix already do this via the API container
 ```
 
 **Fresh clone setup order:**

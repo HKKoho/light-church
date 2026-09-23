@@ -10,6 +10,7 @@
  *   --pull          git pull before rebuild
  *   --no-build      skip --build on `docker compose up` (plain restart)
  *   --mode=prod|dev override CLAWIX_DEPLOY_MODE
+ *   --force-ai-tools  replace installed default AI Tools with ./ai-tools/
  *
  * Usage:
  *   node scripts/update.mjs           # rebuild + restart (default)
@@ -21,6 +22,7 @@ import { execSync, spawnSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { installAiTools } from './lib/ai-tools-install.mjs';
 import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -45,17 +47,18 @@ function runVisible(cmd) {
 }
 
 function parseArgs(argv) {
-  const flags = { pull: false, build: true, mode: null };
+  const flags = { pull: false, build: true, mode: null, forceAiTools: false };
   for (const a of argv) {
     if (a === '--pull') flags.pull = true;
     else if (a === '--no-build') flags.build = false;
+    else if (a === '--force-ai-tools') flags.forceAiTools = true;
     else if (a.startsWith('--mode=')) flags.mode = a.slice('--mode='.length);
     else if (a === '-h' || a === '--help') {
       console.log(
         readFileSync(new URL(import.meta.url))
           .toString()
           .split('\n')
-          .slice(1, 18)
+          .slice(1, 19)
           .join('\n'),
       );
       process.exit(0);
@@ -170,6 +173,16 @@ async function main() {
     process.exit(1);
   }
   ok('API is healthy');
+
+  step('Installing default AI Tools');
+  try {
+    for (const t of installAiTools({ root: ROOT, force: flags.forceAiTools })) {
+      if (t.action === 'skip') ok(`${t.name} already installed (--force-ai-tools to replace)`);
+      else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
+    }
+  } catch (err) {
+    warn(`Could not install AI Tools: ${err.message}`);
+  }
 
   console.log(`\n${bold(green('=== Update complete ==='))}\n`);
   console.log(`  ${bold('API:')}           ${cyan(`http://localhost:${apiPort}`)}`);
