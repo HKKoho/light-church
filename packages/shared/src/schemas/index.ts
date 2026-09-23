@@ -135,6 +135,9 @@ export { talkingFaceSpeakSchema, type TalkingFaceSpeakInput } from './talkingfac
 
 export {
   aiToolNameSchema,
+  aiToolStorageSchema,
+  MAX_AI_TOOL_STORAGE_BYTES,
+  type AiToolStorageInput,
   type AiToolDetail,
   type AiToolKind,
   type AiToolSummary,

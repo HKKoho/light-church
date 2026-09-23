@@ -91,6 +91,45 @@ describe('AiToolsService', () => {
     );
   });
 
+  describe('per-user storage', () => {
+    const userId = 'cku1abc2def3';
+
+    it('returns an empty store, then round-trips saved data per user', async () => {
+      await writeTool('RollCall', { 'index.html': '<p/>' });
+      await expect(service.getStorage('RollCall', userId)).resolves.toEqual({});
+
+      await service.putStorage('RollCall', userId, { rollCallSystemTemp: '{"members":[]}' });
+      await expect(service.getStorage('RollCall', userId)).resolves.toEqual({
+        rollCallSystemTemp: '{"members":[]}',
+      });
+      await expect(service.getStorage('RollCall', 'otheruser1')).resolves.toEqual({});
+    });
+
+    it('keeps storage outside the shared AITools directory', async () => {
+      await writeTool('RollCall', { 'index.html': '<p/>' });
+      await service.putStorage('RollCall', userId, { k: 'v' });
+      await expect(
+        fs.readFile(path.join(base, 'AITools-data', userId, 'RollCall.json'), 'utf-8'),
+      ).resolves.toBe('{"k":"v"}');
+      await expect(service.list()).resolves.toHaveLength(1);
+    });
+
+    it('404s for unknown tools and rejects unsafe user ids', async () => {
+      await expect(service.getStorage('Nope', userId)).rejects.toBeInstanceOf(NotFoundException);
+      await writeTool('RollCall', { 'index.html': '<p/>' });
+      await expect(service.putStorage('RollCall', '../x', {})).rejects.toBeInstanceOf(
+        BadRequestException,
+      );
+    });
+
+    it('treats a corrupt storage file as empty', async () => {
+      await writeTool('RollCall', { 'index.html': '<p/>' });
+      await fs.mkdir(path.join(base, 'AITools-data', userId), { recursive: true });
+      await fs.writeFile(path.join(base, 'AITools-data', userId, 'RollCall.json'), '{oops');
+      await expect(service.getStorage('RollCall', userId)).resolves.toEqual({});
+    });
+  });
+
   it('removes a tool folder, and 404s when it does not exist', async () => {
     await writeTool('Old', { 'index.html': 'x' });
     await service.remove('Old');

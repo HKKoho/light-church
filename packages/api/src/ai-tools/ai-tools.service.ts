@@ -4,7 +4,7 @@ import * as fs from 'fs/promises';
 
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { z } from 'zod';
-import { aiToolNameSchema, createLogger } from '@clawix/shared';
+import { aiToolNameSchema, aiToolStorageSchema, createLogger } from '@clawix/shared';
 import type { AiToolDetail, AiToolSummary } from '@clawix/shared';
 
 import { ScopedFs } from '../workspace/scoped-fs.js';
@@ -34,10 +34,28 @@ type ToolMeta = z.infer<typeof toolMetaSchema>;
  */
 @Injectable()
 export class AiToolsService {
+  private static resolveRoot(dir: string): string {
+    return path.resolve(process.env['WORKSPACE_BASE_PATH'] ?? './data', dir);
+  }
+
   private async createScopedFs(): Promise<ScopedFs> {
-    const root = path.resolve(process.env['WORKSPACE_BASE_PATH'] ?? './data', 'AITools');
+    const root = AiToolsService.resolveRoot('AITools');
     await fs.mkdir(root, { recursive: true });
     return new ScopedFs(root);
+  }
+
+  // Per-user tool storage lives outside both the shared AITools directory and
+  // the user's workspace, so agent containers never see it (it can hold member
+  // names, e.g. attendance lists).
+  private async createStorageFs(): Promise<ScopedFs> {
+    const root = AiToolsService.resolveRoot('AITools-data');
+    await fs.mkdir(root, { recursive: true });
+    return new ScopedFs(root);
+  }
+
+  private static storagePath(userId: string, name: string): string {
+    if (!/^[A-Za-z0-9-]{1,64}$/.test(userId)) throw new BadRequestException('Invalid user');
+    return `/${userId}/${name}.json`;
   }
 
   private static parseName(raw: string): string {
@@ -109,6 +127,30 @@ export class AiToolsService {
     logger.info({ name, size: data.length }, 'Uploaded AI tool');
     const meta = await this.readMeta(sfs, name);
     return { name, kind: 'html', description: meta.description ?? null, url: null };
+  }
+
+  async getStorage(rawName: string, userId: string): Promise<Record<string, string>> {
+    const name = AiToolsService.parseName(rawName);
+    await this.get(name); // 404 for unknown tools
+    const sfs = await this.createStorageFs();
+    const file = AiToolsService.storagePath(userId, name);
+    if (!(await sfs.exists(file))) return {};
+    try {
+      const parsed: unknown = JSON.parse((await sfs.readFile(file, 'utf-8')) as string);
+      const result = aiToolStorageSchema.safeParse({ data: parsed });
+      if (result.success) return result.data.data;
+    } catch {
+      // Fall through to an empty store rather than breaking the tool.
+    }
+    logger.warn({ name, userId }, 'Ignoring unreadable AI tool storage');
+    return {};
+  }
+
+  async putStorage(rawName: string, userId: string, data: Record<string, string>): Promise<void> {
+    const name = AiToolsService.parseName(rawName);
+    await this.get(name);
+    const sfs = await this.createStorageFs();
+    await sfs.writeFile(AiToolsService.storagePath(userId, name), JSON.stringify(data));
   }
 
   async remove(rawName: string): Promise<void> {
