@@ -28,6 +28,8 @@ export interface AiToolSummary {
   readonly descriptions: AiToolDisplayName | null;
   /** External URL — present only for `link` tools. */
   readonly url: string | null;
+  /** Link tool that signs the user in via POST /api/v1/ai-tools/:name/sso. */
+  readonly sso: boolean;
 }
 
 export interface AiToolDetail extends AiToolSummary {

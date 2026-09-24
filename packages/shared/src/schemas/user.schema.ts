@@ -9,6 +9,7 @@ const userRoleSchema = z.enum([
   'senior_pastor',
   'pastor',
   'admin_staff',
+  'finadmin',
   'ministry_leader',
   'volunteer',
   'guest',

@@ -52,6 +52,9 @@ enum UserRole {
   senior_pastor
   pastor
   admin_staff
+  // Finance administrator: operational access plus the Finance Pipeline AI Tool
+  // (single sign-on into the SecureFin pipeline).
+  finadmin
   ministry_leader
   volunteer
   guest

@@ -2,12 +2,18 @@
 import * as path from 'path';
 import * as fs from 'fs/promises';
 
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import { z } from 'zod';
 import { aiToolNameSchema, aiToolStorageSchema, createLogger } from '@clawix/shared';
 import type { AiToolDetail, AiToolDisplayName, AiToolSummary } from '@clawix/shared';
 
 import { ScopedFs } from '../workspace/scoped-fs.js';
+import { signSsoToken, type SsoUser } from './tool-sso.js';
 
 const logger = createLogger('ai-tools');
 
@@ -37,6 +43,21 @@ const toolMetaSchema = z.object({
     .string()
     .url()
     .refine((u) => /^https?:\/\//i.test(u), 'Only http(s) URLs are allowed')
+    .optional(),
+  // Only these user roles see and open the tool (default: everyone).
+  roles: z.array(z.string().max(32)).max(20).optional(),
+  // Single sign-on into a link tool: the API signs a short-lived hand-off with
+  // the secret in env var `secretEnv` (name must end in _SSO_SECRET, so a
+  // tool.json can't point at other secrets) and the viewer POSTs it to url+path.
+  sso: z
+    .object({
+      secretEnv: z.string().regex(/^[A-Z0-9_]+_SSO_SECRET$/),
+      path: z
+        .string()
+        .regex(/^\/[A-Za-z0-9/_-]*$/)
+        .max(200),
+      audience: z.string().regex(/^[a-z0-9-]{1,64}$/),
+    })
     .optional(),
 });
 type ToolMeta = z.infer<typeof toolMetaSchema>;
@@ -111,35 +132,46 @@ export class AiToolsService {
     return {};
   }
 
-  private async summarize(sfs: ScopedFs, name: string): Promise<AiToolSummary | null> {
+  private static allows(meta: ToolMeta, role: string): boolean {
+    return !meta.roles || meta.roles.includes(role);
+  }
+
+  /** null when the tool doesn't exist, is invalid, or `role` may not use it. */
+  private async summarize(
+    sfs: ScopedFs,
+    name: string,
+    role: string,
+  ): Promise<AiToolSummary | null> {
     const meta = await this.readMeta(sfs, name);
+    if (!AiToolsService.allows(meta, role)) return null;
     const { description, descriptions } = AiToolsService.toDescriptions(meta);
     const displayName = AiToolsService.toDisplayName(meta);
     if (await sfs.exists(`/${name}/index.html`)) {
-      return { name, displayName, kind: 'html', description, descriptions, url: null };
+      return { name, displayName, kind: 'html', description, descriptions, url: null, sso: false };
     }
     if (meta.url) {
-      return { name, displayName, kind: 'link', description, descriptions, url: meta.url };
+      const sso = Boolean(meta.sso);
+      return { name, displayName, kind: 'link', description, descriptions, url: meta.url, sso };
     }
     return null;
   }
 
-  async list(): Promise<AiToolSummary[]> {
+  async list(role: string): Promise<AiToolSummary[]> {
     const sfs = await this.createScopedFs();
     const dirents = await sfs.readdir('/');
     const tools: AiToolSummary[] = [];
     for (const dirent of dirents) {
       if (!dirent.isDirectory() || !aiToolNameSchema.safeParse(dirent.name).success) continue;
-      const tool = await this.summarize(sfs, dirent.name);
+      const tool = await this.summarize(sfs, dirent.name, role);
       if (tool) tools.push(tool);
     }
     return tools.sort((a, b) => a.name.localeCompare(b.name));
   }
 
-  async get(rawName: string): Promise<AiToolDetail> {
+  async get(rawName: string, role: string): Promise<AiToolDetail> {
     const name = AiToolsService.parseName(rawName);
     const sfs = await this.createScopedFs();
-    const tool = await this.summarize(sfs, name);
+    const tool = await this.summarize(sfs, name, role);
     if (!tool) throw new NotFoundException(`AI tool "${name}" not found`);
     const html =
       tool.kind === 'html'
@@ -166,12 +198,13 @@ export class AiToolsService {
       kind: 'html',
       ...AiToolsService.toDescriptions(meta),
       url: null,
+      sso: false,
     };
   }
 
-  async getStorage(rawName: string, userId: string): Promise<Record<string, string>> {
+  async getStorage(rawName: string, userId: string, role: string): Promise<Record<string, string>> {
     const name = AiToolsService.parseName(rawName);
-    await this.get(name); // 404 for unknown tools
+    await this.get(name, role); // 404 for unknown (or not permitted) tools
     const sfs = await this.createStorageFs();
     const file = AiToolsService.storagePath(userId, name);
     if (!(await sfs.exists(file))) return {};
@@ -186,11 +219,36 @@ export class AiToolsService {
     return {};
   }
 
-  async putStorage(rawName: string, userId: string, data: Record<string, string>): Promise<void> {
+  async putStorage(
+    rawName: string,
+    userId: string,
+    role: string,
+    data: Record<string, string>,
+  ): Promise<void> {
     const name = AiToolsService.parseName(rawName);
-    await this.get(name);
+    await this.get(name, role);
     const sfs = await this.createStorageFs();
     await sfs.writeFile(AiToolsService.storagePath(userId, name), JSON.stringify(data));
+  }
+
+  /** Signs a single-sign-on hand-off for a link tool with an `sso` block. */
+  async ssoLaunch(rawName: string, user: SsoUser): Promise<{ action: string; token: string }> {
+    const name = AiToolsService.parseName(rawName);
+    const sfs = await this.createScopedFs();
+    const meta = await this.readMeta(sfs, name);
+    if (!meta.url || !AiToolsService.allows(meta, user.role)) {
+      throw new NotFoundException(`AI tool "${name}" not found`);
+    }
+    if (!meta.sso) throw new BadRequestException(`AI tool "${name}" has no single sign-on`);
+    const secret = process.env[meta.sso.secretEnv] ?? '';
+    if (secret.length < 32) {
+      throw new ServiceUnavailableException(
+        `Single sign-on for "${name}" is not configured (${meta.sso.secretEnv})`,
+      );
+    }
+    const action = new URL(meta.sso.path, meta.url).toString();
+    logger.info({ name, userId: user.sub, role: user.role }, 'Issued AI tool SSO hand-off');
+    return { action, token: signSsoToken(user, meta.sso.audience, secret) };
   }
 
   async remove(rawName: string): Promise<void> {

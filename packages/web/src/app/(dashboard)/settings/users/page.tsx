@@ -84,6 +84,7 @@ const ROLE_ORDER = [
   'senior_pastor',
   'pastor',
   'admin_staff',
+  'finadmin',
   'ministry_leader',
   'volunteer',
   'guest',
@@ -167,10 +168,14 @@ const OPERATIONAL = new Set<RoleKey>([
   'senior_pastor',
   'pastor',
   'admin_staff',
+  'finadmin',
   'ministry_leader',
   'volunteer',
 ]);
 const EVERYONE = new Set<RoleKey>(ROLE_ORDER);
+// Finance Pipeline AI Tool (single sign-on into the SecureFin pipeline) — must
+// match the "roles" list in ai-tools/finance-pipeline/tool.json.
+const FINANCE = new Set<RoleKey>(['super_admin', 'finadmin']);
 const ELEVATED = new Set<RoleKey>([
   'super_admin',
   'senior_pastor',
@@ -218,6 +223,10 @@ const permissionMatrix: PermissionGroup[] = [
       { key: 'manageGroups', allowed: ELEVATED },
     ],
   },
+  {
+    categoryKey: 'finance',
+    permissions: [{ key: 'financePipeline', allowed: FINANCE }],
+  },
 ];
 
 const roleIcons: Record<RoleKey, typeof ShieldCheck> = {
@@ -225,6 +234,7 @@ const roleIcons: Record<RoleKey, typeof ShieldCheck> = {
   senior_pastor: ShieldCheck,
   pastor: Shield,
   admin_staff: Shield,
+  finadmin: Shield,
   ministry_leader: Shield,
   volunteer: Eye,
   guest: Eye,
@@ -290,6 +300,7 @@ const messages = {
       senior_pastor: 'Senior Pastor',
       pastor: 'Pastor',
       admin_staff: 'Admin Staff',
+      finadmin: 'Finance Admin',
       ministry_leader: 'Ministry Leader',
       volunteer: 'Volunteer',
       guest: 'Guest',
@@ -303,6 +314,8 @@ const messages = {
         'Same cross-department visibility as Senior Pastor; scoped to ministry oversight rather than platform administration.',
       admin_staff:
         'Build & operate: create agents, write skills, run agents, schedule tasks, monitor usage, manage channels, SDK integration.',
+      finadmin:
+        'Runs agents within their own department and opens the Finance Pipeline (bank transactions, classification, reports) with single sign-on.',
       ministry_leader:
         'Operates within their own department’s workspace folders: creates and runs agents, submits skills, manages that department’s content.',
       volunteer:
@@ -334,6 +347,7 @@ const messages = {
       skills: 'Skills',
       governance: 'Governance',
       administration: 'Administration',
+      finance: 'Finance',
     },
     permissions: {
       viewAgentDefs: 'View agent definitions',
@@ -354,6 +368,7 @@ const messages = {
       configureProviders: 'Configure providers',
       orgSettings: 'Org settings',
       manageGroups: 'Manage groups',
+      financePipeline: 'Open Finance Pipeline (single sign-on)',
     },
     createDialog: {
       title: 'Create User',
@@ -442,6 +457,7 @@ const messages = {
       senior_pastor: '主任牧師',
       pastor: '牧師',
       admin_staff: '行政同工',
+      finadmin: '財務管理員',
       ministry_leader: '事工負責人',
       volunteer: '志工',
       guest: '訪客',
@@ -454,6 +470,7 @@ const messages = {
       pastor: '與主任牧師相同的跨類別檢視權限；著重於事工督導而非平台管理。',
       admin_staff:
         '建置與營運：建立代理、撰寫技能、執行代理、排程任務、監控用量、管理頻道、SDK 整合。',
+      finadmin: '在自己部門內執行代理，並可透過單一登入開啟財務流程（銀行交易、分類、報表）。',
       ministry_leader:
         '僅限於自己負責的事工類別工作區資料夾：建立與執行代理、提交技能、管理該類別內容。',
       volunteer: '可在自己負責的事工類別內執行代理與檢視內容，無法建立或編輯代理。',
@@ -484,6 +501,7 @@ const messages = {
       skills: '技能',
       governance: '治理',
       administration: '管理',
+      finance: '財務',
     },
     permissions: {
       viewAgentDefs: '檢視代理定義',
@@ -504,6 +522,7 @@ const messages = {
       configureProviders: '設定供應商',
       orgSettings: '組織設定',
       manageGroups: '管理群組',
+      financePipeline: '開啟財務流程（單一登入）',
     },
     createDialog: {
       title: '建立使用者',
@@ -590,7 +609,13 @@ const messages = {
     allowed: string;
     notAllowed: string;
   };
-  categories: { agents: string; skills: string; governance: string; administration: string };
+  categories: {
+    agents: string;
+    skills: string;
+    governance: string;
+    administration: string;
+    finance: string;
+  };
   permissions: Record<string, string>;
   createDialog: {
     title: string;

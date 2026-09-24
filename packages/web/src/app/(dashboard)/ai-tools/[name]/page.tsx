@@ -18,6 +18,7 @@ import {
 import { handleToolServerRequest, type ToolServerNotice } from '@/lib/ai-tool-server-routes';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { aiToolDescription, aiToolLabel } from '@/hooks/use-ai-tools';
+import { SsoLaunchButton } from './sso-launch-button';
 
 const messages = {
   en: {
@@ -215,12 +216,16 @@ export default function AiToolViewerPage() {
             <CardDescription className="text-amber-600 dark:text-amber-400">
               {t.externalHint}
             </CardDescription>
-            <Button asChild className="mt-2 w-fit">
-              <a href={tool.url} target="_blank" rel="noopener noreferrer">
-                <ExternalLink className="mr-2 size-4" />
-                {t.openExternal}
-              </a>
-            </Button>
+            {tool.sso ? (
+              <SsoLaunchButton toolName={tool.name} />
+            ) : (
+              <Button asChild className="mt-2 w-fit">
+                <a href={tool.url} target="_blank" rel="noopener noreferrer">
+                  <ExternalLink className="mr-2 size-4" />
+                  {t.openExternal}
+                </a>
+              </Button>
+            )}
           </CardHeader>
         </Card>
       ) : (
