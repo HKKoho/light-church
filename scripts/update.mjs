@@ -23,6 +23,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installAiTools } from './lib/ai-tools-install.mjs';
+import { ensureEnvSecret, jwtSecretProblem, readEnvValue } from './lib/env-secrets.mjs';
 import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -118,6 +119,22 @@ async function main() {
     ok('Pulled');
   }
 
+  if (deployMode === 'production') {
+    step('Secrets');
+    const jwtProblem = jwtSecretProblem(readEnvValue(ENV_FILE, 'JWT_SECRET'));
+    if (jwtProblem) {
+      fail(`${jwtProblem} — anyone who knows it could forge logins.`);
+      console.log('  Set a new one in .env (everyone will need to sign in again):');
+      console.log('    JWT_SECRET=$(openssl rand -hex 48)');
+      process.exit(1);
+    }
+    if (ensureEnvSecret(ENV_FILE, 'POSTGRES_APP_PASSWORD', 24)) {
+      ok('Added POSTGRES_APP_PASSWORD to .env — the API now uses a rows-only database login');
+    } else {
+      ok('Secrets look fine');
+    }
+  }
+
   step('Pre-flight checks');
   const problems = stackPreflight({ root: ROOT, composeFile, deployMode, ports });
   if (problems.length > 0) {
@@ -178,6 +195,7 @@ async function main() {
   try {
     for (const t of installAiTools({ root: ROOT, force: flags.forceAiTools })) {
       if (t.action === 'skip') ok(`${t.name} already installed (--force-ai-tools to replace)`);
+      else if (t.action === 'retire') ok(`Removed ${t.name} (now built into Light Church)`);
       else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
     }
   } catch (err) {

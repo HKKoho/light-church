@@ -57,7 +57,12 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      # Owner login: used only by entrypoint.sh for migrations and bootstrap.
       DATABASE_URL: postgresql://${POSTGRES_USER:-clawix}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-clawix}?schema=public
+      # Everyday login the API runs as (rows only, append-only audit log) —
+      # see infra/docker/api/db-roles.cjs. Empty password = keep using the owner.
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-}
+      DATABASE_APP_URL: postgresql://lightchurch_app:${POSTGRES_APP_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-clawix}?schema=public
       REDIS_URL: redis://redis:6379
       PORT: '3003'
       HOST: '0.0.0.0'
@@ -86,6 +91,14 @@ services:
       # Talking Face sidecars — optional; leave the cartoonize service
       # commented out below and this URL unset if you don't need it.
       CARTOONIZE_URL: ${CARTOONIZE_URL:-http://cartoonize:7861}
+      # Local model (Ollama) for Roll Call's AI — member names never go to a
+      # cloud provider. Inside the container "localhost" is the container, so
+      # the default reaches Ollama on the Docker host.
+      LOCAL_LLM_URL: ${LOCAL_LLM_URL:-http://host.docker.internal:11434}
+      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-qwen2.5vl:7b}
+    # Makes host.docker.internal resolve on Linux too (Docker Desktop has it).
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./data:/data

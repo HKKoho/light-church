@@ -19,6 +19,8 @@ export default tseslint.config(
       '**/prisma/setup-ngo.ts',
       '**/generated/**',
       'scripts/**',
+      // Container start-up helpers (plain Node, run by entrypoint.sh).
+      'infra/docker/**/*.cjs',
     ],
   },
   js.configs.recommended,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { createLogger } from '@clawix/shared';
 import type { CreateTaskInput, UpdateTaskInput } from '@clawix/shared';
 
@@ -26,9 +26,12 @@ export class TasksService {
     return this.taskRepo.findAll(pagination);
   }
 
-  async findById(id: string) {
+  /** A task is visible only to the user who created it. */
+  async findById(id: string, userId: string) {
     logger.debug({ id }, 'findById task');
-    return this.taskRepo.findById(id);
+    const task = await this.taskRepo.findById(id);
+    if (task.createdByUserId !== userId) throw new NotFoundException('Task not found');
+    return task;
   }
 
   async create(userId: string, input: CreateTaskInput) {

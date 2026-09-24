@@ -52,6 +52,9 @@ enum UserRole {
   senior_pastor
   pastor
   admin_staff
+  // Finance administrator: operational access plus the Finance Pipeline AI Tool
+  // (single sign-on into the SecureFin pipeline).
+  finadmin
   ministry_leader
   volunteer
   guest
@@ -102,6 +105,9 @@ model User {
   createdAgentDefinitions AgentDefinition[]   @relation("CreatedAgentDefinitions")
   serviceAttendances      ServiceAttendance[]
   bulletinArchives        BulletinArchive[]
+  createdActivities       Activity[]          @relation("ActivityCreatedBy")
+  updatedActivities       Activity[]          @relation("ActivityUpdatedBy")
+  activityAssets          ActivityAsset[]
 }
 
 // ============================================================================
@@ -628,4 +634,108 @@ model BulletinArchive {
 
   @@unique([churchName, sha256])
   @@index([churchName, createdAt])
+}
+
+// ============================================================================
+// Mission / Camp Companion (AI Tool) — activities and their uploaded files
+// ============================================================================
+
+// A mission trip, camp, retreat or other activity. `content` is a JSON document
+// validated by activityContentSchema (@clawix/shared): details, schedule, team,
+// contacts, packing list, devotionals, songs and notes. Leaders edit; every
+// signed-in user can view.
+model Activity {
+  id          String   @id @default(cuid())
+  title       String
+  content     Json
+  createdById String?
+  updatedById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User?           @relation("ActivityCreatedBy", fields: [createdById], references: [id], onDelete: SetNull)
+  updatedBy User?           @relation("ActivityUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+  assets    ActivityAsset[]
+
+  @@index([updatedAt])
+}
+
+// A photo, document or audio file attached to an activity. The bytes live on
+// disk under <WORKSPACE_BASE_PATH>/activities/<activityId>/<id><ext>.
+model ActivityAsset {
+  id           String   @id @default(cuid())
+  activityId   String
+  kind         String // image | document | audio
+  fileName     String
+  mimeType     String
+  size         Int
+  uploadedById String?
+  createdAt    DateTime @default(now())
+
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  uploadedBy User?    @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+
+  @@index([activityId])
+}
+
+// ============================================================================
+// Roll Call (AI Tool) — groups, their members, and saved roll calls
+// ============================================================================
+
+// A congregation or group whose attendance is taken (Sunday service, youth
+// fellowship, a cell group). Member names are personal data: they stay in
+// this database and only ever reach a local model (Ollama), and only when a
+// super_admin has switched Roll Call's local AI on.
+model RollCallGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members  RollCallMember[]
+  sessions RollCallSession[]
+}
+
+model RollCallMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  name      String
+  note      String   @default("")
+  // Inactive members keep their history but leave the roll-call grid.
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  marks RollCallMark[]
+
+  @@index([groupId])
+}
+
+// One roll call (a meeting on a date). Members without a mark were absent.
+model RollCallSession {
+  id         String   @id @default(cuid())
+  groupId    String
+  date       DateTime @db.Date
+  label      String   @default("")
+  guestCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  marks RollCallMark[]
+
+  @@index([groupId, date])
+}
+
+model RollCallMark {
+  sessionId String
+  memberId  String
+  markedAt  DateTime @default(now())
+
+  session RollCallSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  member  RollCallMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, memberId])
+  @@index([memberId])
 }

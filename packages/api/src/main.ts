@@ -4,9 +4,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import multipart from '@fastify/multipart';
 import { createLogger } from '@clawix/shared';
 import { AppModule } from './app.module.js';
+import { ACTIVITIES_PATH } from './activities/activities.controller.js';
 import { BULLETIN_ARCHIVE_PATH } from './bulletin-archive/bulletin-archive.controller.js';
 import { registerSecurityPlugins } from './common/security.config.js';
 import { configureGlobalHttpDispatcher } from './common/http-dispatcher.js';
+import { secretProblems } from './common/secret-strength.js';
 
 const logger = createLogger('api');
 
@@ -29,6 +31,15 @@ process.on('uncaughtException', (err: Error) => {
 });
 
 async function bootstrap() {
+  const weak = secretProblems(process.env);
+  if (weak.length > 0) {
+    if (process.env['NODE_ENV'] === 'production') {
+      for (const problem of weak) logger.fatal(problem);
+      process.exit(1);
+    }
+    for (const problem of weak) logger.warn(`${problem} (allowed outside production)`);
+  }
+
   const httpConfig = configureGlobalHttpDispatcher();
   logger.info(
     { connectTimeoutMs: httpConfig.connectTimeoutMs },
@@ -80,6 +91,11 @@ async function bootstrap() {
       if (route.url === BULLETIN_ARCHIVE_PATH && route.method === 'POST') {
         route.bodyLimit = 25 * 1024 * 1024;
       }
+      // A long Mission/Camp activity (devotionals, lyrics) can exceed 1 MB.
+      const saveActivity =
+        (route.url === ACTIVITIES_PATH && route.method === 'POST') ||
+        (route.url === `${ACTIVITIES_PATH}/:id` && route.method === 'PUT');
+      if (saveActivity) route.bodyLimit = 5 * 1024 * 1024;
     });
 
   // Security plugins must be registered BEFORE Swagger routes

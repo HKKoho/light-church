@@ -108,13 +108,13 @@ const messages = {
         title: 'Mission/Camp Companion',
         subtitle: 'devotionals · hymns · logistics',
         description:
-          'Carry the daily devotionals, hymns and trip logistics for a mission trip or camp on your phone — currently the 2026 Indonesia short-term mission trip.',
+          'Plan a mission trip or camp with your team — daily devotionals, songs, schedule, photos and notes, with the 2026 Indonesia trip as a worked example.',
       },
       rollCall: {
         title: 'Roll Call',
-        subtitle: 'attendance · names · export',
+        subtitle: 'attendance · care · forecast',
         description:
-          'Take attendance for a service, fellowship or meeting — add or import names, tick who is present, see the attendance rate and export the list.',
+          'Take attendance for a service, fellowship or meeting, keep the history, and see who may need a pastoral follow-up — with forecasts for next time.',
       },
       bulletin: {
         title: 'Sunday Service Bulletin',
@@ -187,12 +187,14 @@ const messages = {
       missionCamp: {
         title: '訪宣/營會指南',
         subtitle: '靈修 · 詩歌 · 行程',
-        description: '把訪宣或營會的每日靈修、詩歌與行程資料帶在手機上——現為 2026 印尼短期訪宣隊。',
+        description:
+          '與團隊一同籌備訪宣或營會——每日靈修、詩歌、行程、相片及筆記，並以 2026 印尼訪宣隊為範例。',
       },
       rollCall: {
         title: '點名',
-        subtitle: '出席 · 名單 · 匯出',
-        description: '為崇拜、團契或聚會點名——新增或匯入名單、點選出席者、查看出席率並匯出名單。',
+        subtitle: '出席 · 關顧 · 預測',
+        description:
+          '為崇拜、團契或聚會點名並保存紀錄，留意哪些人可能需要牧養跟進，並預測下次出席人數。',
       },
       bulletin: {
         title: '主日崇拜週刊',
@@ -308,7 +310,7 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(16,185,129,0.45)]',
     span: 'col-span-1',
     action: 'open',
-    href: '/ai-tools/mission-camp-companion',
+    href: '/activities',
   },
   {
     key: 'rollCall',
@@ -320,7 +322,7 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(56,189,248,0.45)]',
     span: 'col-span-1',
     action: 'open',
-    href: '/ai-tools/roll-call',
+    href: '/roll-call',
   },
   {
     key: 'bulletin',

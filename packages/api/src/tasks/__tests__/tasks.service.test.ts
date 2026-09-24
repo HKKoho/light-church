@@ -182,10 +182,16 @@ describe('TasksService.findById', () => {
   it('returns the task by id', async () => {
     const { service, taskRepo } = makeService();
 
-    const result = await service.findById(taskId);
+    const result = await service.findById(taskId, userId);
 
     expect(taskRepo.findById).toHaveBeenCalledWith(taskId);
     expect(result.id).toBe(taskId);
+  });
+
+  it("hides another user's task", async () => {
+    const { service } = makeService();
+
+    await expect(service.findById(taskId, 'someone-else')).rejects.toThrow('Task not found');
   });
 });
 

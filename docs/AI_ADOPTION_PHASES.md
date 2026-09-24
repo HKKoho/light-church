@@ -85,14 +85,45 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
 
 - **Game Builder / 遊戲工坊** — the existing Game Studio page, now a _built-in_
   AI Tool (`components/dashboard/built-in-ai-tools.ts`).
-- **Roll Call / 點名** (`roll-call`) — `reference/RollCall` (no AI, no server) inlined into one
-  HTML file by `scripts/build-ai-tool-bundle.mjs` and hosted in the sandbox.
+- **Roll Call / 點名** — a _built-in_ AI Tool at `/roll-call`. Groups (a service,
+  a fellowship), their member lists and every roll call are kept in Postgres
+  (`RollCallGroup`, `RollCallMember`, `RollCallSession`, `RollCallMark`), so
+  attendance has a history. Volunteers and staff take the roll; ministry
+  leaders and staff manage lists and see **Care & trends**:
+  - _Follow-up prompts_ — regular attenders who missed 3+ in a row, people
+    coming less often, and people coming back after a gap; plus a _forecast_
+    of next time's attendance (EWMA with a range and direction). Plain
+    statistics on the server (`roll-call-insights.ts`); nothing is sent to a model.
+  - _Duplicate names_ — spelling matches on the server (`roll-call-names.ts`).
+  - _Local AI_ (off until a super_admin switches it on) — reads a photo of a
+    paper sign-in sheet, and finds Chinese/English pairs such as 陳大文 /
+    Chan Tai Man. It calls **only** a local Ollama model
+    (`engine/local-llm/local-llm.service.ts`, `LOCAL_LLM_URL` /
+    `LOCAL_LLM_MODEL`, default `qwen2.5vl:7b`); non-local URLs are refused,
+    and every use is audit-logged (counts only, never names). What the model
+    reads is shown for a person to check before anyone is marked present.
+- **Quick Roll Call / 快速點名** (`roll-call`) — the original `reference/RollCall` (no AI, no server) inlined into one
+  HTML file by `scripts/build-ai-tool-bundle.mjs` and hosted in the sandbox. Its CSV
+  export can be imported into Roll Call's history.
   Its `localStorage` is bridged to per-user server storage
   (`/api/v1/ai-tools/:name/storage` → `AITools-data/<userId>/`), kept outside
   agent workspaces because attendance lists hold member names.
-- **Mission/Camp Companion / 訪宣/營會指南** (`mission-camp-companion`) —
-  `reference/CampMissionHdBk` as a link tool to its live deployment (its 151 MB
-  of media rules out bundling).
+- **Mission/Camp Companion / 訪宣/營會指南** — a _built-in_ AI Tool at
+  `/activities`, modelled on `reference/CampMissionHdBk`. Each activity (mission
+  trip, camp, retreat) holds its details, schedule, team & contacts, packing
+  list, daily devotionals, songs (lyrics, YouTube, audio), photos & files, and a
+  free-form note. Ministry leaders and staff (`super_admin`, `senior_pastor`,
+  `pastor`, `admin_staff`, `ministry_leader`) create, edit and duplicate
+  activities; everyone else views. Text lives in Postgres (`Activity`); files
+  under `<data>/activities/<id>/` (`ActivityAsset`). The 2026 Indonesia trip is
+  created once as the worked example. The old link tool
+  (`mission-camp-companion`) is removed from installs by
+  `scripts/lib/retired-ai-tools.mjs`.
+- **Finance Pipeline / 財務流程** (`finance-pipeline`) — `reference/finance-pipeline-main`
+  (SecureFin: bank-transaction RPA, AI classification, review, Excel/warehouse
+  export) as a link tool to its separately hosted app (`FINANCE_PIPELINE_URL`).
+  It keeps its own server, database and AI keys; bringing it inside Light
+  Church (real login, Postgres, AI via the engine) would be a separate project.
 - **Sunday Service Bulletin / 主日崇拜週刊** (`sunday-service-bulletin`) —
   `reference/SundayServices` bundled as one file; rebuild with
   `scripts/ai-tool-builds/sunday-service-bulletin/build.sh`. The build adds an

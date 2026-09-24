@@ -27,13 +27,18 @@ export class AiToolsController {
   constructor(private readonly aiToolsService: AiToolsService) {}
 
   @Get()
-  async list(): Promise<{ success: boolean; data: AiToolSummary[] }> {
-    return { success: true, data: await this.aiToolsService.list() };
+  async list(
+    @Req() req: { user: JwtPayload },
+  ): Promise<{ success: boolean; data: AiToolSummary[] }> {
+    return { success: true, data: await this.aiToolsService.list(req.user.role) };
   }
 
   @Get(':name')
-  async get(@Param('name') name: string): Promise<{ success: boolean; data: AiToolDetail }> {
-    return { success: true, data: await this.aiToolsService.get(name) };
+  async get(
+    @Req() req: { user: JwtPayload },
+    @Param('name') name: string,
+  ): Promise<{ success: boolean; data: AiToolDetail }> {
+    return { success: true, data: await this.aiToolsService.get(name, req.user.role) };
   }
 
   // The signed-in user's saved localStorage for an HTML tool (storage bridge).
@@ -42,7 +47,10 @@ export class AiToolsController {
     @Req() req: { user: JwtPayload },
     @Param('name') name: string,
   ): Promise<{ success: boolean; data: Record<string, string> }> {
-    return { success: true, data: await this.aiToolsService.getStorage(name, req.user.sub) };
+    return {
+      success: true,
+      data: await this.aiToolsService.getStorage(name, req.user.sub, req.user.role),
+    };
   }
 
   @Put(':name/storage')
@@ -51,8 +59,20 @@ export class AiToolsController {
     @Param('name') name: string,
     @Body(new ZodValidationPipe(aiToolStorageSchema)) body: AiToolStorageInput,
   ): Promise<{ success: boolean }> {
-    await this.aiToolsService.putStorage(name, req.user.sub, body.data);
+    await this.aiToolsService.putStorage(name, req.user.sub, req.user.role, body.data);
     return { success: true };
+  }
+
+  // Single sign-on hand-off for a link tool (e.g. Finance Pipeline): returns the
+  // tool's SSO endpoint and a 60-second, single-use signed token for the viewer
+  // to POST there. Only roles listed in the tool's tool.json may request one.
+  @Post(':name/sso')
+  async sso(
+    @Req() req: { user: JwtPayload },
+    @Param('name') name: string,
+  ): Promise<{ success: boolean; data: { action: string; token: string } }> {
+    const { sub, email, role } = req.user;
+    return { success: true, data: await this.aiToolsService.ssoLaunch(name, { sub, email, role }) };
   }
 
   // Multipart: `name` field + one .html file. Re-uploading an existing name

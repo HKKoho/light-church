@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+dist
+build
+coverage
+.git
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+*.db
+staging
+reports
+exports

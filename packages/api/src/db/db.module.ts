@@ -18,6 +18,8 @@ import { SystemSettingsRepository } from './system-settings.repository.js';
 import { GroupRepository } from './group.repository.js';
 import { CongregationProfileRepository } from './congregation-profile.repository.js';
 import { BulletinArchiveRepository } from './bulletin-archive.repository.js';
+import { ActivityRepository } from './activity.repository.js';
+import { RollCallRepository } from './roll-call.repository.js';
 
 const repositories = [
   PolicyRepository,
@@ -38,6 +40,8 @@ const repositories = [
   GroupRepository,
   CongregationProfileRepository,
   BulletinArchiveRepository,
+  ActivityRepository,
+  RollCallRepository,
 ];
 
 @Global()

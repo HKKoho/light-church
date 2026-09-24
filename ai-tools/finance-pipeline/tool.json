@@ -1,0 +1,17 @@
+{
+  "displayName": {
+    "en": "Finance Pipeline",
+    "zh-TW": "財務流程"
+  },
+  "description": {
+    "en": "Extract bank transactions, classify them with AI, review them and export Excel reports. Opens the SecureFin Pipeline, signed in with your Light Church account (Finance Admin role).",
+    "zh-TW": "擷取銀行交易、以 AI 分類、審閱並匯出 Excel 報表。以你的光教會帳戶（財務管理員角色）單一登入開啟 SecureFin 財務流程。"
+  },
+  "url": "${FINANCE_PIPELINE_URL:-http://localhost:3030}",
+  "roles": ["finadmin", "super_admin"],
+  "sso": {
+    "secretEnv": "FINANCE_PIPELINE_SSO_SECRET",
+    "path": "/api/auth/sso",
+    "audience": "finance-pipeline"
+  }
+}

@@ -18,3 +18,5 @@ export { SystemSettingsRepository } from './system-settings.repository.js';
 export { GroupRepository } from './group.repository.js';
 export { CongregationProfileRepository } from './congregation-profile.repository.js';
 export { BulletinArchiveRepository } from './bulletin-archive.repository.js';
+export { ActivityRepository } from './activity.repository.js';
+export { RollCallRepository } from './roll-call.repository.js';

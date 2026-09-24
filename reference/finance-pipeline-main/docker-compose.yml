@@ -1,0 +1,92 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      # Pinned here (not just the Dockerfile's ENV) because `env_file` values
+      # below would otherwise override the image defaults with .env.example's
+      # literal "./finance.db" etc., pointing the DB outside the volume.
+      DB_PATH: /app/data/finance.db
+      STAGING_DIR: /app/data/staging
+      REPORTS_DIR: /app/data/reports
+      EXPORT_JSON_DIR: /app/data/exports/json
+      EXPORT_CSV_DIR: /app/data/exports/csv
+      # Drop "<BANK_ID>__anything.pdf" here and it's picked up automatically
+      # at the next midnight sweep (or via POST /api/pipeline/inbox/sweep).
+      INBOX_DIR: /app/data/inbox
+      # Override to point Layer 5 warehouse export at the postgres service below.
+      WAREHOUSE_POSTGRES_URL: ${WAREHOUSE_POSTGRES_URL:-}
+      # The chat route in server.ts is a thin proxy to the ai-assistant service.
+      AI_ASSISTANT_URL: http://ai-assistant:4001
+    volumes:
+      # Persists finance.db, staging files, generated Excel reports, exports,
+      # and the inbox (pending + processed statement PDFs).
+      - app-data:/app/data
+    restart: unless-stopped
+
+  # Layer 4 (AI assistant) as its own service: it's a plain LLM-API caller
+  # with no heavy runtime needs, but it's split out from `app` so it can be
+  # scaled, restarted, or have its own API key/model swapped independently.
+  # Shares the same SQLite file as `app` (it reads/writes `transactions` and
+  # `audit_events` directly) via the same named volume.
+  ai-assistant:
+    build:
+      context: .
+      dockerfile: layer4-ai-assistant/Dockerfile
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DB_PATH: /app/data/finance.db
+      PORT: "4001"
+    volumes:
+      - app-data:/app/data
+    restart: unless-stopped
+
+  # Layer 1 (RPA extraction) is NOT started by `docker compose up` — it's an
+  # on-demand job, not a persistent service (it attaches over CDP to a bank
+  # portal tab that's already open and authenticated, runs one extraction,
+  # and exits). Invoke it explicitly:
+  #   docker compose --profile rpa run --rm rpa-worker --bank BNU --from 2026-01-01 --to 2026-03-31
+  # CDP_URL must point somewhere this container can actually reach the
+  # browser — host.docker.internal resolves to the Docker host on Docker
+  # Desktop (macOS/Windows); on Linux, add extra_hosts or use --network host.
+  rpa-worker:
+    build:
+      context: .
+      dockerfile: layer1-rpa/Dockerfile
+    profiles: ["rpa"]
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      CDP_URL: ${CDP_URL:-http://host.docker.internal:9222}
+      STAGING_DIR: /app/data/staging
+    volumes:
+      - app-data:/app/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # Optional: PostgreSQL warehouse target for Layer 5 export.
+  # Not required to run the app — SQLite (in the `app-data` volume) is the
+  # primary database. Start with: docker compose --profile warehouse up
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["warehouse"]
+    environment:
+      POSTGRES_USER: finpipeline
+      POSTGRES_PASSWORD: finpipeline
+      POSTGRES_DB: finpipeline
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  app-data:
+  postgres-data:

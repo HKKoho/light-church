@@ -512,6 +512,8 @@ async function main() {
       env = upsertEnvLine(env, 'JWT_SECRET', secret(48));
       env = upsertEnvLine(env, 'PROVIDER_ENCRYPTION_KEY', secret(32));
       env = upsertEnvLine(env, 'POSTGRES_PASSWORD', secret(16));
+      // The API's everyday database login (rows only) — see infra/docker/api/db-roles.cjs.
+      env = upsertEnvLine(env, 'POSTGRES_APP_PASSWORD', secret(24));
       env = upsertEnvLine(env, 'POSTGRES_USER', 'clawix');
       env = upsertEnvLine(env, 'POSTGRES_DB', 'clawix');
       env = upsertEnvLine(env, 'CORS_ALLOWED_ORIGINS', answers.corsOrigins);
@@ -614,6 +616,7 @@ async function main() {
       force: process.argv.includes('--force-ai-tools'),
     })) {
       if (t.action === 'skip') info(`${t.name} already installed (--force-ai-tools to replace)`);
+      else if (t.action === 'retire') ok(`Removed ${t.name} (now built into Light Church)`);
       else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
     }
   } catch (err) {
