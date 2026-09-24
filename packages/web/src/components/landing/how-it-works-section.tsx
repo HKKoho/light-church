@@ -24,7 +24,7 @@ const messages = {
     title: 'Help by help, trust by trust',
     subtitle:
       'Trust is built, not assumed. Light Church starts with small, useful help and grows only as your team is ready — the same way a church comes to trust a new volunteer.',
-    status: { live: 'Available', building: 'Building now', planned: 'To be constructed' },
+    status: { live: 'Available', building: 'Building now', planned: 'are you ready more advance AI services' },
     steps: [
       {
         phase: 'Phase 1',

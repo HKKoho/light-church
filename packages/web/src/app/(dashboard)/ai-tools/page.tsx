@@ -30,6 +30,12 @@ import {
 } from '@/hooks/use-ai-tools';
 import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from '@/components/dashboard/built-in-ai-tools';
 
+// Roll Call stays in the sidebar dropdown but has no card on this page.
+type BuiltInCardKey = Exclude<BuiltInAiTool['key'], 'rollCall'>;
+const BUILT_IN_CARDS = BUILT_IN_AI_TOOLS.filter(
+  (tool): tool is BuiltInAiTool & { key: BuiltInCardKey } => tool.key !== 'rollCall',
+);
+
 const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
 
 const messages = {
@@ -50,11 +56,6 @@ const messages = {
         name: 'Mission/Camp Companion',
         description:
           'Plan a mission trip, camp or retreat together — details, schedule, daily devotionals, songs, photos, files and notes. Leaders edit; the whole team views.',
-      },
-      rollCall: {
-        name: 'Roll Call',
-        description:
-          'Take attendance with saved history, pastoral-care alerts and attendance forecasts. Optional local AI reads sign-in sheet photos — names never leave the server.',
       },
     },
     loadError: 'Failed to load AI tools',
@@ -93,11 +94,6 @@ const messages = {
         description:
           '一同籌備訪宣、營會或退修會——資料、行程、每日靈修、詩歌、相片、檔案及筆記。領袖編輯，全隊檢視。',
       },
-      rollCall: {
-        name: '點名',
-        description:
-          '點名並保存出席紀錄，附牧養關顧提示及出席預測。可選用本機 AI 讀取簽到表相片——姓名不會離開伺服器。',
-      },
     },
     loadError: '無法載入 AI 工具',
     open: '開啟',
@@ -124,7 +120,7 @@ const messages = {
   subtitle: string;
   empty: string;
   builtIn: string;
-  builtInTools: Record<BuiltInAiTool['key'], { name: string; description: string }>;
+  builtInTools: Record<BuiltInCardKey, { name: string; description: string }>;
   loadError: string;
   open: string;
   external: string;
@@ -260,7 +256,7 @@ export default function AiToolsPage() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {BUILT_IN_AI_TOOLS.map((tool) => (
+        {BUILT_IN_CARDS.map((tool) => (
           <Card key={tool.key} className="gap-3 py-4">
             <CardHeader className="px-4">
               <CardTitle className="flex items-center gap-2 text-sm">
