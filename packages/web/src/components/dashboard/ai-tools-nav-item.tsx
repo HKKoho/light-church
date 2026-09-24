@@ -21,12 +21,12 @@ const messages = {
   en: {
     aiTools: 'AI Tools',
     toggle: 'Show or hide AI tools',
-    builtIn: { gameBuilder: 'Game Builder' },
+    builtIn: { gameBuilder: 'Game Builder', missionCamp: 'Mission/Camp Companion' },
   },
   'zh-TW': {
     aiTools: 'AI 工具',
     toggle: '顯示或隱藏 AI 工具',
-    builtIn: { gameBuilder: '遊戲工坊' },
+    builtIn: { gameBuilder: '遊戲工坊', missionCamp: '訪宣/營會指南' },
   },
 } satisfies Messages<{
   aiTools: string;

@@ -108,7 +108,7 @@ const messages = {
         title: 'Mission/Camp Companion',
         subtitle: 'devotionals · hymns · logistics',
         description:
-          'Carry the daily devotionals, hymns and trip logistics for a mission trip or camp on your phone — currently the 2026 Indonesia short-term mission trip.',
+          'Plan a mission trip or camp with your team — daily devotionals, songs, schedule, photos and notes, with the 2026 Indonesia trip as a worked example.',
       },
       rollCall: {
         title: 'Roll Call',
@@ -187,7 +187,7 @@ const messages = {
       missionCamp: {
         title: '訪宣/營會指南',
         subtitle: '靈修 · 詩歌 · 行程',
-        description: '把訪宣或營會的每日靈修、詩歌與行程資料帶在手機上——現為 2026 印尼短期訪宣隊。',
+        description: '與團隊一同籌備訪宣或營會——每日靈修、詩歌、行程、相片及筆記，並以 2026 印尼訪宣隊為範例。',
       },
       rollCall: {
         title: '點名',
@@ -308,7 +308,7 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(16,185,129,0.45)]',
     span: 'col-span-1',
     action: 'open',
-    href: '/ai-tools/mission-camp-companion',
+    href: '/activities',
   },
   {
     key: 'rollCall',

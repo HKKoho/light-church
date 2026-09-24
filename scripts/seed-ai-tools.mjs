@@ -13,8 +13,9 @@
  * Usage:
  *   node scripts/seed-ai-tools.mjs [--force]
  */
-import { cp, mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { cp, mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { isRetiredDefault, RETIRED_AI_TOOLS } from './lib/retired-ai-tools.mjs';
 import { fillToolPlaceholders, toolEnv } from './lib/tool-placeholders.mjs';
 
 const force = process.argv.includes('--force');
@@ -23,6 +24,14 @@ const source = path.resolve('ai-tools');
 const target = path.resolve(process.env.WORKSPACE_BASE_PATH ?? './data', 'AITools');
 
 await mkdir(target, { recursive: true });
+for (const { name } of RETIRED_AI_TOOLS) {
+  const dir = path.join(target, name);
+  const raw = await readFile(path.join(dir, 'tool.json'), 'utf8').catch(() => null);
+  if (isRetiredDefault(name, raw)) {
+    await rm(dir, { recursive: true, force: true });
+    console.log(`remove ${name} (now built into Light Church)`);
+  }
+}
 const entries = await readdir(source, { withFileTypes: true });
 
 for (const entry of entries) {

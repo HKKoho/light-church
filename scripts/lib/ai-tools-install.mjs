@@ -17,11 +17,12 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { isRetiredDefault, RETIRED_AI_TOOLS } from './retired-ai-tools.mjs';
 import { fillToolPlaceholders, toolEnv } from './tool-placeholders.mjs';
 
 const TARGET = '/data/AITools';
 
-/** @returns {{ name: string, action: 'add' | 'update' | 'skip' }[]} */
+/** @returns {{ name: string, action: 'add' | 'update' | 'skip' | 'retire' }[]} */
 export function installAiTools({ root, container = 'lightchurch-api', force = false }) {
   const docker = (...args) => execFileSync('docker', args, { stdio: 'pipe' });
   const tools = readdirSync(join(root, 'ai-tools'), { withFileTypes: true })
@@ -29,7 +30,18 @@ export function installAiTools({ root, container = 'lightchurch-api', force = fa
     .map((e) => e.name);
 
   docker('exec', container, 'mkdir', '-p', TARGET);
-  return tools.map((name) => {
+  const retired = RETIRED_AI_TOOLS.flatMap(({ name }) => {
+    let text = null;
+    try {
+      text = docker('exec', container, 'cat', `${TARGET}/${name}/tool.json`).toString('utf8');
+    } catch {
+      return [];
+    }
+    if (!isRetiredDefault(name, text)) return [];
+    docker('exec', container, 'rm', '-rf', `${TARGET}/${name}`);
+    return [{ name, action: 'retire' }];
+  });
+  const installed = tools.map((name) => {
     const dest = `${TARGET}/${name}`;
     let exists = true;
     try {
@@ -59,4 +71,5 @@ export function installAiTools({ root, container = 'lightchurch-api', force = fa
     }
     return { name, action: exists ? 'update' : 'add' };
   });
+  return [...retired, ...installed];
 }

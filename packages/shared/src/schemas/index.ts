@@ -152,3 +152,17 @@ export {
   type ArchiveBulletinsResult,
   type BulletinArchiveEntry,
 } from './bulletin-archive.schema.js';
+
+export {
+  ACTIVITY_KINDS,
+  ACTIVITY_EDITOR_ROLES,
+  activityContentSchema,
+  saveActivitySchema,
+  type ActivityAssetInfo,
+  type ActivityAssetKind,
+  type ActivityContent,
+  type ActivityDetail,
+  type ActivityKind,
+  type ActivitySummary,
+  type SaveActivityInput,
+} from './activity.schema.js';

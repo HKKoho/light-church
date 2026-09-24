@@ -90,9 +90,17 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
   Its `localStorage` is bridged to per-user server storage
   (`/api/v1/ai-tools/:name/storage` → `AITools-data/<userId>/`), kept outside
   agent workspaces because attendance lists hold member names.
-- **Mission/Camp Companion / 訪宣/營會指南** (`mission-camp-companion`) —
-  `reference/CampMissionHdBk` as a link tool to its live deployment (its 151 MB
-  of media rules out bundling).
+- **Mission/Camp Companion / 訪宣/營會指南** — a _built-in_ AI Tool at
+  `/activities`, modelled on `reference/CampMissionHdBk`. Each activity (mission
+  trip, camp, retreat) holds its details, schedule, team & contacts, packing
+  list, daily devotionals, songs (lyrics, YouTube, audio), photos & files, and a
+  free-form note. Ministry leaders and staff (`super_admin`, `senior_pastor`,
+  `pastor`, `admin_staff`, `ministry_leader`) create, edit and duplicate
+  activities; everyone else views. Text lives in Postgres (`Activity`); files
+  under `<data>/activities/<id>/` (`ActivityAsset`). The 2026 Indonesia trip is
+  created once as the worked example. The old link tool
+  (`mission-camp-companion`) is removed from installs by
+  `scripts/lib/retired-ai-tools.mjs`.
 - **Finance Pipeline / 財務流程** (`finance-pipeline`) — `reference/finance-pipeline-main`
   (SecureFin: bank-transaction RPA, AI classification, review, Excel/warehouse
   export) as a link tool to its separately hosted app (`FINANCE_PIPELINE_URL`).

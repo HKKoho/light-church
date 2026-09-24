@@ -178,6 +178,7 @@ async function main() {
   try {
     for (const t of installAiTools({ root: ROOT, force: flags.forceAiTools })) {
       if (t.action === 'skip') ok(`${t.name} already installed (--force-ai-tools to replace)`);
+      else if (t.action === 'retire') ok(`Removed ${t.name} (now built into Light Church)`);
       else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
     }
   } catch (err) {

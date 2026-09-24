@@ -46,6 +46,11 @@ const messages = {
         description:
           'Build a short, Scripture-rooted game for VBS, youth or family devotion — storyboard first, approved by a person before anything is built.',
       },
+      missionCamp: {
+        name: 'Mission/Camp Companion',
+        description:
+          'Plan a mission trip, camp or retreat together — details, schedule, daily devotionals, songs, photos, files and notes. Leaders edit; the whole team views.',
+      },
     },
     loadError: 'Failed to load AI tools',
     open: 'Open',
@@ -77,6 +82,11 @@ const messages = {
         name: '遊戲工坊',
         description:
           '為暑期聖經班、青少年或家庭靈修製作以聖經為本的小遊戲——先有故事板，經人員核准後才開始製作。',
+      },
+      missionCamp: {
+        name: '訪宣/營會指南',
+        description:
+          '一同籌備訪宣、營會或退修會——資料、行程、每日靈修、詩歌、相片、檔案及筆記。領袖編輯，全隊檢視。',
       },
     },
     loadError: '無法載入 AI 工具',

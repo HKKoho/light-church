@@ -614,6 +614,7 @@ async function main() {
       force: process.argv.includes('--force-ai-tools'),
     })) {
       if (t.action === 'skip') info(`${t.name} already installed (--force-ai-tools to replace)`);
+      else if (t.action === 'retire') ok(`Removed ${t.name} (now built into Light Church)`);
       else ok(`${t.action === 'add' ? 'Added' : 'Updated'} ${t.name}`);
     }
   } catch (err) {
