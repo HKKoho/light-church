@@ -112,9 +112,9 @@ const messages = {
       },
       rollCall: {
         title: 'Roll Call',
-        subtitle: 'attendance · names · export',
+        subtitle: 'attendance · care · forecast',
         description:
-          'Take attendance for a service, fellowship or meeting — add or import names, tick who is present, see the attendance rate and export the list.',
+          'Take attendance for a service, fellowship or meeting, keep the history, and see who may need a pastoral follow-up — with forecasts for next time.',
       },
       bulletin: {
         title: 'Sunday Service Bulletin',
@@ -191,8 +191,8 @@ const messages = {
       },
       rollCall: {
         title: '點名',
-        subtitle: '出席 · 名單 · 匯出',
-        description: '為崇拜、團契或聚會點名——新增或匯入名單、點選出席者、查看出席率並匯出名單。',
+        subtitle: '出席 · 關顧 · 預測',
+        description: '為崇拜、團契或聚會點名並保存紀錄，留意哪些人可能需要牧養跟進，並預測下次出席人數。',
       },
       bulletin: {
         title: '主日崇拜週刊',
@@ -320,7 +320,7 @@ const NGO_SCENARIO_META: readonly NgoScenarioMeta[] = [
     shadow: 'hover:shadow-[0_8px_32px_-8px_rgba(56,189,248,0.45)]',
     span: 'col-span-1',
     action: 'open',
-    href: '/ai-tools/roll-call',
+    href: '/roll-call',
   },
   {
     key: 'bulletin',

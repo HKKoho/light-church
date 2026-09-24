@@ -51,6 +51,11 @@ const messages = {
         description:
           'Plan a mission trip, camp or retreat together — details, schedule, daily devotionals, songs, photos, files and notes. Leaders edit; the whole team views.',
       },
+      rollCall: {
+        name: 'Roll Call',
+        description:
+          'Take attendance with saved history, pastoral-care alerts and attendance forecasts. Optional local AI reads sign-in sheet photos — names never leave the server.',
+      },
     },
     loadError: 'Failed to load AI tools',
     open: 'Open',
@@ -87,6 +92,11 @@ const messages = {
         name: '訪宣/營會指南',
         description:
           '一同籌備訪宣、營會或退修會——資料、行程、每日靈修、詩歌、相片、檔案及筆記。領袖編輯，全隊檢視。',
+      },
+      rollCall: {
+        name: '點名',
+        description:
+          '點名並保存出席紀錄，附牧養關顧提示及出席預測。可選用本機 AI 讀取簽到表相片——姓名不會離開伺服器。',
       },
     },
     loadError: '無法載入 AI 工具',

@@ -677,3 +677,65 @@ model ActivityAsset {
 
   @@index([activityId])
 }
+
+// ============================================================================
+// Roll Call (AI Tool) — groups, their members, and saved roll calls
+// ============================================================================
+
+// A congregation or group whose attendance is taken (Sunday service, youth
+// fellowship, a cell group). Member names are personal data: they stay in
+// this database and only ever reach a local model (Ollama), and only when a
+// super_admin has switched Roll Call's local AI on.
+model RollCallGroup {
+  id          String   @id @default(cuid())
+  name        String
+  description String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members  RollCallMember[]
+  sessions RollCallSession[]
+}
+
+model RollCallMember {
+  id        String   @id @default(cuid())
+  groupId   String
+  name      String
+  note      String   @default("")
+  // Inactive members keep their history but leave the roll-call grid.
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  marks RollCallMark[]
+
+  @@index([groupId])
+}
+
+// One roll call (a meeting on a date). Members without a mark were absent.
+model RollCallSession {
+  id         String   @id @default(cuid())
+  groupId    String
+  date       DateTime @db.Date
+  label      String   @default("")
+  guestCount Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  marks RollCallMark[]
+
+  @@index([groupId, date])
+}
+
+model RollCallMark {
+  sessionId String
+  memberId  String
+  markedAt  DateTime @default(now())
+
+  session RollCallSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  member  RollCallMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@id([sessionId, memberId])
+  @@index([memberId])
+}
