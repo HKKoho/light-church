@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import type { ReactNode } from 'react';
-import type { BookOpen } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
+import { ChevronRight, type BookOpen } from 'lucide-react';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -10,6 +10,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
 import { isPhaseConstructed, type AdoptionPhaseId } from './adoption-phases';
 
 // 2px left stripe on hover/active — matches the lift-and-stripe vocabulary used
@@ -43,6 +44,10 @@ export function SidebarNavGroup({
   children,
 }: SidebarNavGroupProps) {
   const pending = phase !== undefined && !isPhaseConstructed(phase);
+  // A pending phase's links stay tucked behind its label button until the user
+  // opts in (or is already on one of its pages). Icon-collapsed mode always shows them.
+  const [expanded, setExpanded] = useState(() => links.some((item) => isActive(item.href)));
+  const hideLinks = pending && links.length > 0 && !expanded;
   return (
     <SidebarGroup>
       <SidebarGroupLabel className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground/70">
@@ -50,11 +55,21 @@ export function SidebarNavGroup({
         <span className="truncate">{label}</span>
       </SidebarGroupLabel>
       {pending && (
-        <span className="px-2 pb-1 font-mono text-[9px] uppercase tracking-[0.14em] text-amber-600 group-data-[collapsible=icon]:hidden dark:text-amber-400">
-          {toBeConstructedLabel}
-        </span>
+        <button
+          type="button"
+          aria-expanded={!hideLinks}
+          onClick={() => {
+            setExpanded((open) => !open);
+          }}
+          className="mx-2 mb-1 flex items-center gap-1 rounded-md border border-amber-500/40 px-2 py-1 text-left font-mono text-[10px] tracking-[0.08em] text-amber-600 transition-colors hover:bg-amber-500/10 group-data-[collapsible=icon]:hidden dark:text-amber-400"
+        >
+          <span className="flex-1">{toBeConstructedLabel}</span>
+          <ChevronRight
+            className={cn('size-3 shrink-0 transition-transform', !hideLinks && 'rotate-90')}
+          />
+        </button>
       )}
-      <SidebarMenu>
+      <SidebarMenu className={cn(hideLinks && 'hidden group-data-[collapsible=icon]:flex')}>
         {links.map((item) => (
           <SidebarMenuItem key={item.key}>
             <SidebarMenuButton

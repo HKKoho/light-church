@@ -168,7 +168,7 @@ const messages = {
     groupGovernance: 'Governance, Assurance & Liability',
     groupAdmin: 'Administration',
     groupCuration: 'Data & Domain Curation',
-    toBeConstructed: 'are you ready more advance AI services',
+    toBeConstructed: 'are you ready more advance AI services?',
     nav: {
       conversations: 'Conversations',
       talkingFace: 'Talking Face',
