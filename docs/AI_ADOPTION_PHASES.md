@@ -85,29 +85,37 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
 
 - **Game Builder / 遊戲工坊** — the existing Game Studio page, now a _built-in_
   AI Tool (`components/dashboard/built-in-ai-tools.ts`).
-- **Roll Call / 點名** — a _built-in_ AI Tool at `/roll-call`. Groups (a service,
-  a fellowship), their member lists and every roll call are kept in Postgres
-  (`RollCallGroup`, `RollCallMember`, `RollCallSession`, `RollCallMark`), so
-  attendance has a history. Volunteers and staff take the roll; ministry
-  leaders and staff manage lists and see **Care & trends**:
-  - _Follow-up prompts_ — regular attenders who missed 3+ in a row, people
-    coming less often, and people coming back after a gap; plus a _forecast_
-    of next time's attendance (EWMA with a range and direction). Plain
-    statistics on the server (`roll-call-insights.ts`); nothing is sent to a model.
-  - _Duplicate names_ — spelling matches on the server (`roll-call-names.ts`).
-  - _Local AI_ (off until a super_admin switches it on) — reads a photo of a
-    paper sign-in sheet, and finds Chinese/English pairs such as 陳大文 /
-    Chan Tai Man. It calls **only** a local Ollama model
-    (`engine/local-llm/local-llm.service.ts`, `LOCAL_LLM_URL` /
-    `LOCAL_LLM_MODEL`, default `qwen2.5vl:7b`); non-local URLs are refused,
-    and every use is audit-logged (counts only, never names). What the model
-    reads is shown for a person to check before anyone is marked present.
-- **Quick Roll Call / 快速點名** (`roll-call`) — the original `reference/RollCall` (no AI, no server) inlined into one
-  HTML file by `scripts/build-ai-tool-bundle.mjs` and hosted in the sandbox. Its CSV
-  export can be imported into Roll Call's history.
-  Its `localStorage` is bridged to per-user server storage
-  (`/api/v1/ai-tools/:name/storage` → `AITools-data/<userId>/`), kept outside
-  agent workspaces because attendance lists hold member names.
+- **Roll Call / 點名** — a _built-in_ AI Tool at `/roll-call` with two modes:
+  - **Simple / 簡易** — the original `reference/RollCall` app
+    (茶果嶺浸信會點名應用程式) rebuilt as a Light Church page: one quick list per
+    user (`RollCallSimpleList`), tap to mark, count, 30-minute countdown, CSV
+    import/export. Its export imports into Smart mode's history.
+  - **Smart / 智能** — groups (a service, a fellowship), their members and every
+    roll call kept in Postgres (`RollCallGroup`, `RollCallMember`,
+    `RollCallSession`, `RollCallMark`). Members can carry sex and birth year.
+    Volunteers and staff take the roll; ministry leaders and staff manage lists
+    and see:
+    - _Care & trends_ — who hasn't been in: regulars who missed last time
+      (a gentle check-in), missed 3+ in a row, are coming less often, or came
+      back after a gap. Recording a follow-up (with a note) clears the reminder;
+      each group card shows how many are waiting. Plus recent attendance and a
+      forecast for next time (`roll-call-insights.ts`).
+    - _Analysis_ — a pandas-style table of every member (attended, rate, recent
+      change, run, last seen, regular / occasional / rare / lapsed / new),
+      monthly summaries, and breakdowns by sex and age band, with CSV export
+      (`roll-call-analysis.ts`).
+    - _Duplicates_ — names with the same spelling (ignoring case, spacing,
+      punctuation and English word order) are merged automatically so nobody
+      is counted twice; similar spellings are suggested for a one-click merge.
+    - _Local AI_ (off until a super_admin switches it on) — suggests
+      Chinese/English pairs such as 陳大文 / Chan Tai Man. Only Chinese names go
+      to a local Ollama model to be romanised; the matching happens on the
+      server (`engine/local-llm/local-llm.service.ts`, `LOCAL_LLM_URL` /
+      `LOCAL_LLM_MODEL`, default `qwen2.5vl:7b`). Non-local URLs are refused,
+      and every use is audit-logged (counts only, never names).
+      All statistics are computed on the server; no member data goes to any
+      cloud service. The old hosted Roll Call app is retired from installs by
+      `scripts/lib/retired-ai-tools.mjs`.
 - **Mission/Camp Companion / 訪宣/營會指南** — a _built-in_ AI Tool at
   `/activities`, modelled on `reference/CampMissionHdBk`. Each activity (mission
   trip, camp, retreat) holds its details, schedule, team & contacts, packing

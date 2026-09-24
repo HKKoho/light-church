@@ -1,39 +1,30 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Camera, Check, Download, Loader2, Minus, Plus, Search } from 'lucide-react';
+import { Check, Download, Minus, Plus, Search } from 'lucide-react';
 import type {
   RollCallGroupDetail,
   RollCallMemberInfo,
   RollCallSessionDetail,
-  RollCallSheetName,
 } from '@clawix/shared';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authFetch } from '@/lib/auth';
-import { downloadCsv, groupApi, readSheet, todayIso } from '../roll-call-api';
+import { downloadCsv, groupApi, todayIso } from '../roll-call-api';
 import { useRollCallT } from '../messages';
-import { SheetReview, type SheetDecision } from './sheet-review';
-import { Countdown } from './countdown';
+import { Countdown } from '../countdown';
 
 interface TakeRollProps {
   readonly group: RollCallGroupDetail;
   readonly sessionId: string | null;
-  readonly aiReady: boolean;
   readonly onSessionChange: (id: string) => void;
   readonly onMembersAdded: (members: RollCallMemberInfo[]) => void;
 }
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
-export function TakeRoll({
-  group,
-  sessionId,
-  aiReady,
-  onSessionChange,
-  onMembersAdded,
-}: TakeRollProps) {
+export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: TakeRollProps) {
   const t = useRollCallT();
   const [session, setSession] = useState<RollCallSessionDetail | null>(null);
   const [present, setPresent] = useState<Set<string>>(new Set());
@@ -45,9 +36,6 @@ export function TakeRoll({
   const [walkIn, setWalkIn] = useState('');
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [error, setError] = useState<string | null>(null);
-  const [reading, setReading] = useState(false);
-  const [sheet, setSheet] = useState<RollCallSheetName[] | null>(null);
-  const photoRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const api = groupApi(group.id);
 
@@ -124,7 +112,7 @@ export function TakeRoll({
   const addNames = async (names: string[]): Promise<RollCallMemberInfo[]> => {
     const res = await authFetch<{ data: RollCallMemberInfo[] }>(`${api}/members`, {
       method: 'POST',
-      body: JSON.stringify({ names }),
+      body: JSON.stringify({ members: names.map((name) => ({ name })) }),
     });
     onMembersAdded(res.data);
     return res.data;
@@ -137,32 +125,6 @@ export function TakeRoll({
       const [member] = await addNames([name]);
       setWalkIn('');
       if (member) update({ present: new Set(present).add(member.id) });
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t.failed);
-    }
-  };
-
-  const onPhoto = async (file: File | undefined) => {
-    if (!file) return;
-    setReading(true);
-    setError(null);
-    try {
-      setSheet(await readSheet(group.id, file));
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t.failed);
-    } finally {
-      setReading(false);
-      if (photoRef.current) photoRef.current.value = '';
-    }
-  };
-
-  const applySheet = async (decision: SheetDecision) => {
-    setSheet(null);
-    try {
-      const added = decision.newNames.length > 0 ? await addNames(decision.newNames) : [];
-      const next = new Set(present);
-      for (const id of [...decision.memberIds, ...added.map((m) => m.id)]) next.add(id);
-      update({ present: next });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t.failed);
     }
@@ -282,31 +244,6 @@ export function TakeRoll({
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-        {aiReady && (
-          <>
-            <input
-              ref={photoRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              capture="environment"
-              className="hidden"
-              onChange={(e) => void onPhoto(e.target.files?.[0])}
-            />
-            <Button
-              variant="outline"
-              disabled={reading}
-              title={t.readSheetHint}
-              onClick={() => photoRef.current?.click()}
-            >
-              {reading ? (
-                <Loader2 className="mr-2 size-4 animate-spin" />
-              ) : (
-                <Camera className="mr-2 size-4" />
-              )}
-              {t.readSheet}
-            </Button>
-          </>
-        )}
         <Button
           variant="outline"
           onClick={() =>
@@ -321,7 +258,6 @@ export function TakeRoll({
           {t.exportCsv}
         </Button>
       </div>
-      {reading && <p className="text-sm text-muted-foreground">{t.reading}</p>}
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {active.length === 0 && <p className="text-sm text-muted-foreground">{t.noMembers}</p>}
@@ -364,15 +300,6 @@ export function TakeRoll({
           {t.add}
         </Button>
       </form>
-
-      {sheet && (
-        <SheetReview
-          names={sheet}
-          members={group.members}
-          onApply={(d) => void applySheet(d)}
-          onClose={() => setSheet(null)}
-        />
-      )}
     </div>
   );
 }

@@ -43,12 +43,30 @@ describe('computeInsights', () => {
   it('notices someone coming back after a gap, and a declining pattern', () => {
     const { alerts } = computeInsights(
       members,
-      sessions({ amy: '1111111110001', ben: '1111111110010', cat: '1111111111111' }),
+      sessions({ amy: '1111111110001', ben: '1111111100101', cat: '1111111111111' }),
     );
     expect(alerts.map((a) => [a.memberId, a.kind])).toEqual([
       ['ben', 'declining'],
       ['amy', 'returned'],
     ]);
+  });
+
+  it('asks for a gentle check-in when a regular missed the last one or two', () => {
+    const { alerts } = computeInsights(members, sessions({ amy: '1111110', ben: '1011010' }));
+    expect(alerts).toEqual([
+      expect.objectContaining({ memberId: 'amy', kind: 'absent', streak: 1, followedUp: false }),
+    ]);
+  });
+
+  it('marks an absence as handled once a follow-up is recorded after it began', () => {
+    const list = sessions({ amy: '11111000' }); // absence began 2026-01-06
+    const before = computeInsights([{ ...members[0]!, followedUpAt: '2026-01-05' }], list);
+    const after = computeInsights(
+      [{ ...members[0]!, followedUpAt: '2026-01-07', followUpNote: 'Phoned' }],
+      list,
+    );
+    expect(before.alerts[0]?.followedUp).toBe(false);
+    expect(after.alerts[0]).toMatchObject({ followedUp: true, followUpNote: 'Phoned' });
   });
 
   it('lists active members who never attended, and ignores inactive ones', () => {

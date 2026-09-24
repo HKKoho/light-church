@@ -11,6 +11,7 @@ const en = {
   creating: 'Creating…',
   titleLabel: 'Title',
   titlePlaceholder: 'e.g. 2027 Youth Camp',
+  untitled: 'New activity',
   kindLabel: 'Type',
   kinds: {
     mission: 'Mission trip',
@@ -125,6 +126,7 @@ const messages = {
     creating: '建立中…',
     titleLabel: '名稱',
     titlePlaceholder: '例如：2027 青少年營',
+    untitled: '新活動',
     kindLabel: '類型',
     kinds: { mission: '訪宣', camp: '營會', retreat: '退修會', other: '其他' },
     empty: '尚未有活動。',

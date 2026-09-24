@@ -22,12 +22,13 @@ import { authFetch } from '@/lib/auth';
 import { useRollCallAi } from '../ai-switch';
 import { groupApi } from '../roll-call-api';
 import { useRollCallT } from '../messages';
+import { AnalysisPanel } from './analysis-panel';
 import { HistoryPanel } from './history-panel';
 import { InsightsPanel } from './insights-panel';
 import { MembersPanel } from './members-panel';
 import { TakeRoll } from './take-roll';
 
-type Tab = 'roll' | 'history' | 'members' | 'care';
+type Tab = 'roll' | 'history' | 'members' | 'care' | 'analysis';
 
 export default function RollCallGroupPage() {
   const t = useRollCallT();
@@ -135,13 +136,13 @@ export default function RollCallGroupPage() {
           <TabsTrigger value="history">{t.tabs.history}</TabsTrigger>
           <TabsTrigger value="members">{t.tabs.members}</TabsTrigger>
           {group.canManage && <TabsTrigger value="care">{t.tabs.care}</TabsTrigger>}
+          {group.canManage && <TabsTrigger value="analysis">{t.tabs.analysis}</TabsTrigger>}
         </TabsList>
         <div className="pt-4">
           <TabsContent value="roll">
             <TakeRoll
               group={group}
               sessionId={sessionId}
-              aiReady={ai.ready}
               onSessionChange={setSessionId}
               onMembersAdded={membersAdded}
             />
@@ -162,6 +163,11 @@ export default function RollCallGroupPage() {
           {group.canManage && (
             <TabsContent value="care">
               <InsightsPanel groupId={group.id} />
+            </TabsContent>
+          )}
+          {group.canManage && (
+            <TabsContent value="analysis">
+              <AnalysisPanel groupId={group.id} groupName={group.name} />
             </TabsContent>
           )}
         </div>

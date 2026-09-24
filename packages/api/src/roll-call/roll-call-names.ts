@@ -1,7 +1,7 @@
 // packages/api/src/roll-call/roll-call-names.ts
 //
-// On-server name matching: spots likely duplicates in a member list and
-// matches names read from a sign-in sheet to members. No model involved.
+// On-server name matching: spots likely duplicates in a member list, and
+// pairs Chinese names with romanisations the local model supplied.
 
 /** Lowercase, width-fold, strip punctuation/spaces; Latin words sorted. */
 export function normalizeName(name: string): string {
@@ -64,7 +64,6 @@ export interface NamePair<T extends NamedItem> {
 }
 
 export const DUPLICATE_THRESHOLD = 0.7;
-export const MATCH_THRESHOLD = 0.75;
 
 export function findDuplicates<T extends NamedItem>(items: readonly T[]): NamePair<T>[] {
   const pairs: NamePair<T>[] = [];
@@ -78,19 +77,6 @@ export function findDuplicates<T extends NamedItem>(items: readonly T[]): NamePa
     }
   }
   return pairs.sort((p, q) => q.score - p.score);
-}
-
-/** The member a written name most likely refers to, if any. */
-export function bestMatch<T extends NamedItem>(
-  text: string,
-  items: readonly T[],
-): { item: T; score: number } | null {
-  let best: { item: T; score: number } | null = null;
-  for (const item of items) {
-    const score = nameSimilarity(text, item.name);
-    if (score >= MATCH_THRESHOLD && (!best || score > best.score)) best = { item, score };
-  }
-  return best;
 }
 
 /** How a Chinese name may be written in other forms (from the local model). */

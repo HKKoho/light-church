@@ -19,10 +19,15 @@ export interface InsightMember {
   readonly id: string;
   readonly name: string;
   readonly active: boolean;
+  /** YYYY-MM-DD of the last recorded follow-up, if any. */
+  readonly followedUpAt?: string | null;
+  readonly followUpNote?: string;
 }
 
 /** Missed this many sessions in a row → "missing". */
 export const MISSING_STREAK = 3;
+/** A regular (this share of earlier sessions) who missed the last one or two → "absent". */
+const CHECK_IN_RATE = 0.75;
 /** …after attending at least this share of earlier sessions. */
 const REGULAR_RATE = 0.5;
 /** Earlier sessions needed before a pattern counts. */
@@ -50,10 +55,12 @@ function trailingAbsences(record: readonly { present: boolean }[]): number {
   return n;
 }
 
-function alertFor(
+type AlertCore = Omit<RollCallAlert, 'followedUp' | 'followedUpAt' | 'followUpNote'>;
+
+function alertCore(
   member: InsightMember,
   sessions: readonly InsightSession[],
-): RollCallAlert | null {
+): { alert: AlertCore; since: string } | null {
   const record = history(member, sessions);
   if (!record) return null;
   const present = record.map((r) => r.present);
@@ -61,13 +68,26 @@ function alertFor(
   const base = { memberId: member.id, name: member.name, lastPresent };
 
   const missed = trailingAbsences(record);
-  if (missed >= MISSING_STREAK) {
+  // The absence began at the first roll call of the current run of misses.
+  const since = record[record.length - missed]?.date ?? '';
+  if (missed > 0) {
     const before = present.slice(0, present.length - missed);
     const previousRate = rate(before);
-    if (before.length >= MIN_HISTORY && previousRate >= REGULAR_RATE) {
-      return { ...base, kind: 'missing', streak: missed, previousRate, recentRate: 0 };
+    if (before.length >= MIN_HISTORY) {
+      if (missed >= MISSING_STREAK && previousRate >= REGULAR_RATE) {
+        return {
+          alert: { ...base, kind: 'missing', streak: missed, previousRate, recentRate: 0 },
+          since,
+        };
+      }
+      if (missed < MISSING_STREAK && previousRate >= CHECK_IN_RATE) {
+        return {
+          alert: { ...base, kind: 'absent', streak: missed, previousRate, recentRate: 0 },
+          since,
+        };
+      }
     }
-    return null;
+    if (missed >= MISSING_STREAK) return null;
   }
 
   // Came back after a long gap: worth a welcome.
@@ -77,11 +97,14 @@ function alertFor(
     if (gap >= MISSING_STREAK) {
       const before = present.slice(0, earlier.length - gap);
       return {
-        ...base,
-        kind: 'returned',
-        streak: gap,
-        previousRate: rate(before),
-        recentRate: rate(present.slice(-RECENT_WINDOW)),
+        alert: {
+          ...base,
+          kind: 'returned',
+          streak: gap,
+          previousRate: rate(before),
+          recentRate: rate(present.slice(-RECENT_WINDOW)),
+        },
+        since: record.at(-1)?.date ?? '',
       };
     }
   }
@@ -90,13 +113,39 @@ function alertFor(
     const recentRate = rate(present.slice(-RECENT_WINDOW));
     const previousRate = rate(present.slice(0, -RECENT_WINDOW));
     if (previousRate - recentRate >= DECLINE_DROP) {
-      return { ...base, kind: 'declining', streak: missed, previousRate, recentRate };
+      return {
+        alert: { ...base, kind: 'declining', streak: missed, previousRate, recentRate },
+        since: record[record.length - RECENT_WINDOW]?.date ?? '',
+      };
     }
   }
   return null;
 }
 
-const ORDER: Record<RollCallAlert['kind'], number> = { missing: 0, declining: 1, returned: 2 };
+function alertFor(
+  member: InsightMember,
+  sessions: readonly InsightSession[],
+): RollCallAlert | null {
+  const found = alertCore(member, sessions);
+  if (!found) return null;
+  const at = member.followedUpAt ?? null;
+  return {
+    ...found.alert,
+    followedUp: !!at && at >= found.since,
+    followedUpAt: at,
+    followUpNote: member.followUpNote ?? '',
+  };
+}
+
+/** Alerts that still ask someone to reach out. */
+export const needsFollowUp = (a: RollCallAlert) => a.kind !== 'returned' && !a.followedUp;
+
+const ORDER: Record<RollCallAlert['kind'], number> = {
+  missing: 0,
+  absent: 1,
+  declining: 2,
+  returned: 3,
+};
 
 function mean(xs: readonly number[]): number {
   return xs.reduce((a, b) => a + b, 0) / Math.max(1, xs.length);
@@ -149,7 +198,12 @@ export function computeInsights(
   const alerts = active
     .map((m) => alertFor(m, sessions))
     .filter((a): a is RollCallAlert => a !== null)
-    .sort((a, b) => ORDER[a.kind] - ORDER[b.kind] || b.streak - a.streak);
+    .sort(
+      (a, b) =>
+        Number(a.followedUp) - Number(b.followedUp) ||
+        ORDER[a.kind] - ORDER[b.kind] ||
+        b.streak - a.streak,
+    );
   const neverAttended =
     sessions.length === 0
       ? []

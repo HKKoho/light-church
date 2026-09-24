@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 import type { RollCallGroup, RollCallMember, RollCallSession } from '../generated/prisma/client.js';
+import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 
 export type RollCallGroupRow = RollCallGroup & {
@@ -56,9 +57,16 @@ export class RollCallRepository {
     });
   }
 
-  async addMembers(groupId: string, names: readonly string[]): Promise<RollCallMember[]> {
+  async addMembers(
+    groupId: string,
+    people: readonly { name: string; sex?: string; birthYear?: number | null }[],
+  ): Promise<RollCallMember[]> {
     return this.prisma.$transaction(
-      names.map((name) => this.prisma.rollCallMember.create({ data: { groupId, name } })),
+      people.map((p) =>
+        this.prisma.rollCallMember.create({
+          data: { groupId, name: p.name, sex: p.sex ?? '', birthYear: p.birthYear ?? null },
+        }),
+      ),
     );
   }
 
@@ -68,7 +76,15 @@ export class RollCallRepository {
 
   updateMember(
     id: string,
-    data: { name?: string; note?: string; active?: boolean },
+    data: {
+      name?: string;
+      note?: string;
+      active?: boolean;
+      sex?: string;
+      birthYear?: number | null;
+      followedUpAt?: Date;
+      followUpNote?: string;
+    },
   ): Promise<RollCallMember> {
     return this.prisma.rollCallMember.update({ where: { id }, data });
   }
@@ -135,5 +151,17 @@ export class RollCallRepository {
 
   deleteSession(id: string): Promise<RollCallSession> {
     return this.prisma.rollCallSession.delete({ where: { id } });
+  }
+
+  findSimpleList(userId: string): Promise<{ data: unknown; updatedAt: Date } | null> {
+    return this.prisma.rollCallSimpleList.findUnique({ where: { userId } });
+  }
+
+  saveSimpleList(userId: string, data: Prisma.InputJsonValue): Promise<{ updatedAt: Date }> {
+    return this.prisma.rollCallSimpleList.upsert({
+      where: { userId },
+      create: { userId, data },
+      update: { data },
+    });
   }
 }

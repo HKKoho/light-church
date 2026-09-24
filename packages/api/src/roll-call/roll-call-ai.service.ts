@@ -1,34 +1,23 @@
 // packages/api/src/roll-call/roll-call-ai.service.ts
 //
-// Roll Call's local-AI features. Member names only ever go to the local model
-// (LocalLlmService refuses non-local URLs), only while a super_admin has the
-// switch on, and every use is written to the audit log (counts, never names).
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  ServiceUnavailableException,
-} from '@nestjs/common';
-import type { RollCallAiStatus, RollCallDuplicate, RollCallSheetName } from '@clawix/shared';
+// Roll Call's local-AI feature: suggesting Chinese/English duplicates. Only
+// Chinese names go to the local model (LocalLlmService refuses non-local
+// URLs), only while a super_admin has the switch on, and every use is written
+// to the audit log (counts, never names).
+import { ForbiddenException, Injectable, ServiceUnavailableException } from '@nestjs/common';
+import type { RollCallAiStatus, RollCallDuplicate } from '@clawix/shared';
 
 import { AuditLogRepository } from '../db/audit-log.repository.js';
 import { RollCallRepository } from '../db/roll-call.repository.js';
 import { SystemSettingsRepository } from '../db/system-settings.repository.js';
 import { LocalLlmService } from '../engine/local-llm/local-llm.service.js';
 import { assertManager, toMemberInfo, type Actor, RollCallService } from './roll-call.service.js';
-import { bestMatch, findCrossScriptDuplicates, findDuplicates } from './roll-call-names.js';
+import { findCrossScriptDuplicates, findDuplicates } from './roll-call-names.js';
 
 /** Key in SystemSettings.settings; written only through setEnabled(). */
 const SETTING_KEY = 'rollCallLocalAi';
-const SHEET_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
-const MAX_SHEET_BYTES = 15 * 1024 * 1024;
 /** Names per model call when looking for cross-script duplicates. */
 const MAX_AI_NAMES = 300;
-
-const SHEET_PROMPT = `This photo shows a church attendance sign-in sheet (handwritten or printed).
-List every person's name written on it, exactly as written, in Chinese or English.
-Ignore headings, dates, phone numbers, signatures you cannot read, and other text.
-Reply with JSON only: {"names": ["name 1", "name 2"]}`;
 
 const formsPrompt = (names: readonly string[]) => `For each numbered Chinese name below, give:
 - "cantonese": its Hong Kong Cantonese romanisation as on an HKID card (陳大文 → Chan Tai Man)
@@ -132,43 +121,5 @@ export class RollCallAiService {
       details: { model: this.llm.model, names: chinese.length, suggestions: found.length },
     });
     return result;
-  }
-
-  /** Reads names from a sign-in sheet photo and matches them to members. */
-  async readSheet(
-    groupId: string,
-    image: { mimeType: string; data: Buffer },
-    actor: Actor,
-  ): Promise<RollCallSheetName[]> {
-    await this.assertEnabled();
-    await this.rollCall.loadGroup(groupId);
-    if (!SHEET_TYPES.has(image.mimeType)) {
-      throw new BadRequestException('Upload a JPG, PNG or WebP photo');
-    }
-    if (image.data.length === 0 || image.data.length > MAX_SHEET_BYTES) {
-      throw new BadRequestException('The photo is empty or larger than 15 MB');
-    }
-    const reply = await this.llm.json(SHEET_PROMPT, image);
-    const texts = (Array.isArray(reply['names']) ? (reply['names'] as unknown[]) : [])
-      .filter((n): n is string => typeof n === 'string')
-      .map((n) => n.trim().slice(0, 100))
-      .filter(Boolean);
-    const members = (await this.repo.listMembers(groupId)).map(toMemberInfo);
-    const names = [...new Set(texts)].map((text) => {
-      const match = bestMatch(text, members);
-      return { text, memberId: match?.item.id ?? null, score: match?.score ?? 0 };
-    });
-    await this.audit.create({
-      userId: actor.id,
-      action: 'rollcall.ai.read_sheet',
-      resource: 'RollCallGroup',
-      resourceId: groupId,
-      details: {
-        model: this.llm.model,
-        names: names.length,
-        matched: names.filter((n) => n.memberId).length,
-      },
-    });
-    return names;
   }
 }

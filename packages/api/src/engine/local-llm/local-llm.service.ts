@@ -102,14 +102,8 @@ export class LocalLlmService {
     });
   }
 
-  /**
-   * One prompt (optionally with an image) → a JSON object. The model is asked
-   * for JSON; the reply is parsed leniently (first {...} block).
-   */
-  async json(
-    prompt: string,
-    image?: { mimeType: string; data: Buffer },
-  ): Promise<Record<string, unknown>> {
+  /** One prompt → a JSON object (the reply is parsed leniently: first {...} block). */
+  async json(prompt: string): Promise<Record<string, unknown>> {
     const start = Date.now();
     let text: string;
     try {
@@ -117,22 +111,7 @@ export class LocalLlmService {
         model: this.model,
         temperature: 0,
         response_format: { type: 'json_object' },
-        messages: [
-          {
-            role: 'user',
-            content: image
-              ? [
-                  {
-                    type: 'image_url',
-                    image_url: {
-                      url: `data:${image.mimeType};base64,${image.data.toString('base64')}`,
-                    },
-                  },
-                  { type: 'text', text: prompt },
-                ]
-              : prompt,
-          },
-        ],
+        messages: [{ role: 'user', content: prompt }],
       });
       text = res.choices[0]?.message.content ?? '';
       logger.info(

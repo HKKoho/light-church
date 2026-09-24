@@ -2,13 +2,19 @@
 
 import { useRef, useState } from 'react';
 import { Check, Copy, Loader2, Pencil, Plus, RotateCcw, Upload, UserMinus } from 'lucide-react';
-import type { RollCallDuplicate, RollCallGroupDetail, RollCallMemberInfo } from '@clawix/shared';
+import {
+  ROLL_CALL_SEXES,
+  type RollCallDuplicate,
+  type RollCallGroupDetail,
+  type RollCallMemberInfo,
+  type RollCallSex,
+} from '@clawix/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
-import { groupApi, parseCsv } from '../roll-call-api';
+import { ageOf, groupApi, parsePeople } from '../roll-call-api';
 import { useRollCallT } from '../messages';
 
 interface MembersProps {
@@ -17,6 +23,12 @@ interface MembersProps {
   readonly onChanged: () => void;
 }
 
+type MemberPatch = Partial<
+  Pick<RollCallMemberInfo, 'name' | 'note' | 'active' | 'sex' | 'birthYear'>
+>;
+
+const selectClass = 'h-8 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs';
+
 function MemberRow({
   member,
   canManage,
@@ -24,12 +36,20 @@ function MemberRow({
 }: {
   member: RollCallMemberInfo;
   canManage: boolean;
-  onSave: (patch: Partial<Pick<RollCallMemberInfo, 'name' | 'note' | 'active'>>) => Promise<void>;
+  onSave: (patch: MemberPatch) => Promise<void>;
 }) {
   const t = useRollCallT();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(member.name);
   const [note, setNote] = useState(member.note);
+  const [sex, setSex] = useState<RollCallSex>(member.sex);
+  const [year, setYear] = useState(member.birthYear === null ? '' : String(member.birthYear));
+  const age = ageOf(member.birthYear);
+  const thisYear = new Date().getFullYear();
+  const yearNum = Number(year);
+  const yearOk =
+    year === '' || (Number.isInteger(yearNum) && yearNum >= 1900 && yearNum <= thisYear);
+
   if (editing) {
     return (
       <li className="flex flex-wrap items-center gap-2 px-3 py-2">
@@ -40,8 +60,29 @@ function MemberRow({
           aria-label={t.rename}
           onChange={(e) => setName(e.target.value)}
         />
+        <select
+          className={selectClass}
+          value={sex}
+          aria-label={t.sex}
+          onChange={(e) => setSex(e.target.value as RollCallSex)}
+        >
+          {ROLL_CALL_SEXES.map((s) => (
+            <option key={s || 'none'} value={s}>
+              {t.sexes[s]}
+            </option>
+          ))}
+        </select>
         <Input
-          className="h-8 flex-1"
+          className="h-8 w-28"
+          inputMode="numeric"
+          value={year}
+          maxLength={4}
+          placeholder={t.birthYear}
+          aria-label={t.birthYear}
+          onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
+        />
+        <Input
+          className="h-8 min-w-[10rem] flex-1"
           value={note}
           maxLength={500}
           placeholder={t.note}
@@ -50,9 +91,14 @@ function MemberRow({
         />
         <Button
           size="sm"
-          disabled={!name.trim()}
+          disabled={!name.trim() || !yearOk}
           onClick={() =>
-            void onSave({ name: name.trim(), note: note.trim() }).then(() => setEditing(false))
+            void onSave({
+              name: name.trim(),
+              note: note.trim(),
+              sex,
+              birthYear: year === '' ? null : yearNum,
+            }).then(() => setEditing(false))
           }
         >
           <Check className="mr-1 size-3.5" />
@@ -69,6 +115,11 @@ function MemberRow({
       className={`flex items-center gap-2 px-3 py-2 text-sm ${member.active ? '' : 'text-muted-foreground'}`}
     >
       <span className="font-medium">{member.name}</span>
+      {(member.sex || age !== null) && (
+        <span className="text-xs text-muted-foreground">
+          {[t.sexShort[member.sex], age !== null ? t.age(age) : ''].filter(Boolean).join(' · ')}
+        </span>
+      )}
       {member.note && <span className="truncate text-xs text-muted-foreground">{member.note}</span>}
       {!member.active && <Badge variant="secondary">{t.inactive}</Badge>}
       {canManage && (
@@ -125,21 +176,18 @@ export function MembersPanel({ group, aiReady, onChanged }: MembersProps) {
     }
   };
 
-  const addNames = (names: string[]) =>
+  const addPeople = (source: string) =>
     run('add', async () => {
-      const clean = names.map((n) => n.trim()).filter(Boolean);
-      if (clean.length === 0) return;
-      await authFetch(`${api}/members`, { method: 'POST', body: JSON.stringify({ names: clean }) });
+      const members = parsePeople(source);
+      if (members.length === 0) return;
+      await authFetch(`${api}/members`, { method: 'POST', body: JSON.stringify({ members }) });
       setText('');
       onChanged();
     });
 
   const importCsv = async (file: File | undefined) => {
     if (!file) return;
-    const rows = parseCsv(await file.text());
-    const first = rows[0]?.[0]?.trim() ?? '';
-    const body = first === '姓名' || /^name$/i.test(first) ? rows.slice(1) : rows;
-    await addNames(body.map((r) => r[0] ?? ''));
+    await addPeople(await file.text());
     if (fileRef.current) fileRef.current.value = '';
   };
 
@@ -188,10 +236,7 @@ export function MembersPanel({ group, aiReady, onChanged }: MembersProps) {
           aria-label={t.addNames}
         />
         <div className="flex gap-2">
-          <Button
-            disabled={busy === 'add' || !text.trim()}
-            onClick={() => void addNames(text.split('\n'))}
-          >
+          <Button disabled={busy === 'add' || !text.trim()} onClick={() => void addPeople(text)}>
             {busy === 'add' ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
@@ -301,7 +346,7 @@ export function MembersPanel({ group, aiReady, onChanged }: MembersProps) {
         <ul className="divide-y rounded-md border">
           {shown.map((m) => (
             <MemberRow
-              key={`${m.id}-${m.name}-${m.note}-${m.active}`}
+              key={`${m.id}-${m.name}-${m.note}-${m.active}-${m.sex}-${m.birthYear}`}
               member={m}
               canManage={group.canManage}
               onSave={(patch) => saveMember(m.id, patch)}

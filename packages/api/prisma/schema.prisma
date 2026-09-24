@@ -108,6 +108,7 @@ model User {
   createdActivities       Activity[]          @relation("ActivityCreatedBy")
   updatedActivities       Activity[]          @relation("ActivityUpdatedBy")
   activityAssets          ActivityAsset[]
+  rollCallSimpleList      RollCallSimpleList?
 }
 
 // ============================================================================
@@ -698,13 +699,20 @@ model RollCallGroup {
 }
 
 model RollCallMember {
-  id        String   @id @default(cuid())
-  groupId   String
-  name      String
-  note      String   @default("")
+  id           String    @id @default(cuid())
+  groupId      String
+  name         String
+  note         String    @default("")
   // Inactive members keep their history but leave the roll-call grid.
-  active    Boolean  @default(true)
-  createdAt DateTime @default(now())
+  active       Boolean   @default(true)
+  // Optional details for attendance analysis: "male" | "female" | "" (not given).
+  sex          String    @default("")
+  birthYear    Int?
+  // Pastoral follow-up: when someone last reached out, and a short note. An
+  // absence reminder clears once a follow-up is recorded after it began.
+  followedUpAt DateTime?
+  followUpNote String    @default("")
+  createdAt    DateTime  @default(now())
 
   group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   marks RollCallMark[]
@@ -738,4 +746,14 @@ model RollCallMark {
 
   @@id([sessionId, memberId])
   @@index([memberId])
+}
+
+// Roll Call's simple mode (茶果嶺浸信會點名應用程式): one quick list per user —
+// names, who is ticked present, and the list's file name — saved as JSON.
+model RollCallSimpleList {
+  userId    String   @id
+  data      Json
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

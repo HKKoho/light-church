@@ -76,7 +76,7 @@ export default function ActivitiesPage() {
       const res = await authFetch<{ data: ActivityDetail }>(ACTIVITIES_API, {
         method: 'POST',
         body: JSON.stringify({
-          title: title.trim(),
+          title: title.trim() || t.untitled,
           content: activityContentSchema.parse({ kind }),
         }),
       });
@@ -150,7 +150,7 @@ export default function ActivitiesPage() {
                 ))}
               </select>
             </div>
-            <Button onClick={() => void create()} disabled={busy || title.trim() === ''}>
+            <Button onClick={() => void create()} disabled={busy}>
               {busy ? (
                 <Loader2 className="mr-2 size-4 animate-spin" />
               ) : (

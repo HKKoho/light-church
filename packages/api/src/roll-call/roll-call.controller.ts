@@ -1,23 +1,13 @@
 // packages/api/src/roll-call/roll-call.controller.ts
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import type { FastifyRequest } from 'fastify';
 import {
   addRollCallMembersSchema,
   createRollCallSessionSchema,
   mergeRollCallMembersSchema,
   rollCallAiSettingsSchema,
+  rollCallFollowUpSchema,
+  simpleRollCallSchema,
   saveRollCallGroupSchema,
   saveRollCallSessionSchema,
   updateRollCallMemberSchema,
@@ -27,6 +17,9 @@ import type {
   CreateRollCallSessionInput,
   MergeRollCallMembersInput,
   RollCallAiSettingsInput,
+  RollCallAnalysis,
+  RollCallFollowUpInput,
+  SimpleRollCall,
   RollCallAiStatus,
   RollCallDuplicate,
   RollCallGroupDetail,
@@ -35,7 +28,6 @@ import type {
   RollCallMemberInfo,
   RollCallSessionDetail,
   RollCallSessionSummary,
-  RollCallSheetName,
   SaveRollCallGroupInput,
   SaveRollCallSessionInput,
   UpdateRollCallMemberInput,
@@ -46,6 +38,7 @@ import { Roles } from '../auth/roles.decorator.js';
 import { ZodValidationPipe } from '../common/zod-validation.pipe.js';
 import { UserRole } from '../generated/prisma/enums.js';
 import { RollCallAiService } from './roll-call-ai.service.js';
+import { RollCallSimpleService } from './roll-call-simple.service.js';
 import { RollCallService } from './roll-call.service.js';
 
 interface AuthedRequest {
@@ -69,7 +62,22 @@ export class RollCallController {
   constructor(
     private readonly service: RollCallService,
     private readonly ai: RollCallAiService,
+    private readonly simple: RollCallSimpleService,
   ) {}
+
+  // Simple mode: the signed-in user's own quick list.
+  @Get('simple')
+  async getSimple(@Req() req: AuthedRequest): Promise<{ success: boolean; data: SimpleRollCall }> {
+    return ok(await this.simple.get(req.user.sub));
+  }
+
+  @Put('simple')
+  async saveSimple(
+    @Req() req: AuthedRequest,
+    @Body(new ZodValidationPipe(simpleRollCallSchema)) body: SimpleRollCall,
+  ): Promise<{ success: boolean; data: SimpleRollCall }> {
+    return ok(await this.simple.save(req.user.sub, body));
+  }
 
   @Get('ai')
   async aiStatus(): Promise<{ success: boolean; data: RollCallAiStatus }> {
@@ -85,8 +93,10 @@ export class RollCallController {
   }
 
   @Get('groups')
-  async listGroups(): Promise<{ success: boolean; data: RollCallGroupSummary[] }> {
-    return ok(await this.service.listGroups());
+  async listGroups(
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean; data: RollCallGroupSummary[] }> {
+    return ok(await this.service.listGroups(actor(req)));
   }
 
   @Post('groups')
@@ -128,7 +138,7 @@ export class RollCallController {
     @Param('id') id: string,
     @Body(new ZodValidationPipe(addRollCallMembersSchema)) body: AddRollCallMembersInput,
   ): Promise<{ success: boolean; data: RollCallMemberInfo[] }> {
-    return ok(await this.service.addMembers(id, body.names));
+    return ok(await this.service.addMembers(id, body.members));
   }
 
   @Put('groups/:id/members/:memberId')
@@ -168,16 +178,22 @@ export class RollCallController {
     return ok(await this.service.insights(id, actor(req)));
   }
 
-  // Multipart: one photo of a sign-in sheet.
-  @Post('groups/:id/read-sheet')
-  async readSheet(
-    @Req() req: FastifyRequest & AuthedRequest,
+  @Get('groups/:id/analysis')
+  async analysis(
+    @Req() req: AuthedRequest,
     @Param('id') id: string,
-  ): Promise<{ success: boolean; data: RollCallSheetName[] }> {
-    const file = await req.file();
-    if (!file) throw new BadRequestException('No photo uploaded');
-    const data = await file.toBuffer();
-    return ok(await this.ai.readSheet(id, { mimeType: file.mimetype, data }, actor(req)));
+  ): Promise<{ success: boolean; data: RollCallAnalysis }> {
+    return ok(await this.service.analysis(id, actor(req)));
+  }
+
+  @Post('groups/:id/members/:memberId/follow-up')
+  async followUp(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+    @Param('memberId') memberId: string,
+    @Body(new ZodValidationPipe(rollCallFollowUpSchema)) body: RollCallFollowUpInput,
+  ): Promise<{ success: boolean; data: RollCallMemberInfo }> {
+    return ok(await this.service.followUp(id, memberId, body.note, actor(req)));
   }
 
   @Get('groups/:id/sessions')

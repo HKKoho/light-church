@@ -1,8 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { HeartHandshake, Loader2, TrendingDown, TrendingUp, UserX, MoveRight } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  Check,
+  HeartHandshake,
+  Loader2,
+  MoveRight,
+  PartyPopper,
+  TrendingDown,
+  TrendingUp,
+  UserX,
+} from 'lucide-react';
 import type { RollCallAlert, RollCallInsights } from '@clawix/shared';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { authFetch } from '@/lib/auth';
 import { groupApi } from '../roll-call-api';
 import { useRollCallT, type RollCallT } from '../messages';
@@ -19,32 +30,110 @@ function alertText(t: RollCallT, a: RollCallAlert): string {
   const headline =
     a.kind === 'missing'
       ? t.missing(a.streak)
-      : a.kind === 'returned'
-        ? t.returned(a.streak)
-        : t.declining;
+      : a.kind === 'absent'
+        ? t.absentAlert(a.streak)
+        : a.kind === 'returned'
+          ? t.returned(a.streak)
+          : t.declining;
   return detail ? `${headline} — ${detail}` : headline;
 }
 
 const TONE: Record<RollCallAlert['kind'], string> = {
   missing: 'border-amber-500/50 bg-amber-500/10',
+  absent: 'border-sky-500/40 bg-sky-500/5',
   declining: 'border-orange-500/40 bg-orange-500/5',
   returned: 'border-emerald-500/50 bg-emerald-500/10',
 };
+
+function FollowUpCard({
+  groupId,
+  alert,
+  onDone,
+}: {
+  groupId: string;
+  alert: RollCallAlert;
+  onDone: () => void;
+}) {
+  const t = useRollCallT();
+  const [note, setNote] = useState('');
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const save = async () => {
+    setBusy(true);
+    setError(null);
+    try {
+      await authFetch(`${groupApi(groupId)}/members/${alert.memberId}/follow-up`, {
+        method: 'POST',
+        body: JSON.stringify({ note: note.trim() }),
+      });
+      onDone();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : t.failed);
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <li className={`flex flex-col gap-2 rounded-md border px-3 py-2 text-sm ${TONE[alert.kind]}`}>
+      <div className="flex items-start gap-2">
+        <div className="min-w-0 flex-1">
+          <p className="font-medium">{alert.name}</p>
+          <p className="text-xs text-muted-foreground">{alertText(t, alert)}</p>
+        </div>
+        {!open && (
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-7 shrink-0 text-xs"
+            onClick={() => setOpen(true)}
+          >
+            <Check className="mr-1 size-3.5" />
+            {t.markFollowedUp}
+          </Button>
+        )}
+      </div>
+      {open && (
+        <div className="flex gap-2">
+          <Input
+            className="h-8"
+            value={note}
+            maxLength={500}
+            placeholder={t.followUpNotePlaceholder}
+            aria-label={t.note}
+            onChange={(e) => setNote(e.target.value)}
+          />
+          <Button size="sm" className="h-8" disabled={busy} onClick={() => void save()}>
+            {t.save}
+          </Button>
+        </div>
+      )}
+      {error && <p className="text-xs text-destructive">{error}</p>}
+    </li>
+  );
+}
 
 export function InsightsPanel({ groupId }: { groupId: string }) {
   const t = useRollCallT();
   const [data, setData] = useState<RollCallInsights | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     authFetch<{ data: RollCallInsights }>(`${groupApi(groupId)}/insights`)
       .then((res) => setData(res.data))
       .catch((err: unknown) => setError(err instanceof Error ? err.message : t.failed));
   }, [groupId, t.failed]);
 
+  useEffect(() => {
+    load();
+  }, [load]);
+
   if (error) return <p className="text-sm text-destructive">{error}</p>;
   if (!data) return <Loader2 className="size-5 animate-spin text-muted-foreground" />;
 
+  const open = data.alerts.filter((a) => a.kind !== 'returned' && !a.followedUp);
+  const welcome = data.alerts.filter((a) => a.kind === 'returned');
+  const handled = data.alerts.filter((a) => a.kind !== 'returned' && a.followedUp);
   const max = Math.max(1, ...data.trend.map((p) => p.present + p.guests));
   const f = data.forecast;
   const Direction =
@@ -59,16 +148,53 @@ export function InsightsPanel({ groupId }: { groupId: string }) {
           <HeartHandshake className="size-4" />
           {t.alerts}
         </h3>
-        {data.alerts.length === 0 && <p className="text-sm text-muted-foreground">{t.noAlerts}</p>}
+        {open.length === 0 && <p className="text-sm text-muted-foreground">{t.noAlerts}</p>}
         <ul className="grid gap-2 md:grid-cols-2">
-          {data.alerts.map((a) => (
-            <li key={a.memberId} className={`rounded-md border px-3 py-2 text-sm ${TONE[a.kind]}`}>
-              <p className="font-medium">{a.name}</p>
-              <p className="text-xs text-muted-foreground">{alertText(t, a)}</p>
-            </li>
+          {open.map((a) => (
+            <FollowUpCard key={a.memberId} groupId={groupId} alert={a} onDone={load} />
           ))}
         </ul>
       </section>
+
+      {welcome.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <PartyPopper className="size-4" />
+            {t.welcomeBack}
+          </h3>
+          <ul className="grid gap-2 md:grid-cols-2">
+            {welcome.map((a) => (
+              <li
+                key={a.memberId}
+                className={`rounded-md border px-3 py-2 text-sm ${TONE.returned}`}
+              >
+                <p className="font-medium">{a.name}</p>
+                <p className="text-xs text-muted-foreground">{alertText(t, a)}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {handled.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h3 className="text-sm font-semibold text-muted-foreground">{t.handled}</h3>
+          <ul className="divide-y rounded-md border text-sm">
+            {handled.map((a) => (
+              <li key={a.memberId} className="flex flex-wrap gap-x-3 px-3 py-2">
+                <span className="font-medium">{a.name}</span>
+                <span className="text-xs text-muted-foreground">{alertText(t, a)}</span>
+                {a.followedUpAt && (
+                  <span className="text-xs text-emerald-600">
+                    {t.followedUp(a.followedUpAt.slice(0, 10))}
+                    {a.followUpNote && ` — ${a.followUpNote}`}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <section className="flex flex-col gap-2">

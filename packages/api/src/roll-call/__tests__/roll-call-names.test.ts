@@ -2,7 +2,6 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  bestMatch,
   findCrossScriptDuplicates,
   findDuplicates,
   nameSimilarity,
@@ -28,15 +27,13 @@ describe('name matching', () => {
     expect(nameSimilarity('陳大文', 'Chan Tai Man')).toBe(0);
   });
 
-  it('finds duplicates and the best member for a written name', () => {
+  it('finds duplicates', () => {
     const members = [
       { id: '1', name: 'Peter Chan' },
       { id: '2', name: 'Chan Peter' },
       { id: '3', name: 'Mary Lee' },
     ];
     expect(findDuplicates(members).map((p) => [p.a.id, p.b.id, p.score])).toEqual([['1', '2', 1]]);
-    expect(bestMatch('mary  lee', members)?.item.id).toBe('3');
-    expect(bestMatch('John', members)).toBeNull();
   });
 
   it('matches romanised Chinese names but never on a shared surname alone', () => {

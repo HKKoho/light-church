@@ -59,7 +59,7 @@ export function HistoryPanel({ group, onOpen, onMembersAdded }: HistoryProps) {
       const members = (
         await authFetch<{ data: RollCallMemberInfo[] }>(`${api}/members`, {
           method: 'POST',
-          body: JSON.stringify({ names }),
+          body: JSON.stringify({ members: names.map((name) => ({ name })) }),
         })
       ).data;
       onMembersAdded(members);

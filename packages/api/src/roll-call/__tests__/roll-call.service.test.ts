@@ -19,8 +19,14 @@ interface Member {
   name: string;
   note: string;
   active: boolean;
+  sex: string;
+  birthYear: number | null;
+  followedUpAt: Date | null;
+  followUpNote: string;
   createdAt: Date;
 }
+
+const people = (...names: string[]) => names.map((name) => ({ name }));
 
 function fakeRepo() {
   const members: Member[] = [];
@@ -30,12 +36,24 @@ function fakeRepo() {
     members,
     findGroup: vi.fn(async (id: string) => (id === 'g1' ? group : null)),
     listMembers: vi.fn(async () => [...members]),
-    addMembers: vi.fn(async (groupId: string, names: string[]) =>
-      names.map((name) => {
-        const m = { id: `m${++seq}`, groupId, name, note: '', active: true, createdAt: new Date() };
-        members.push(m);
-        return m;
-      }),
+    addMembers: vi.fn(
+      async (groupId: string, input: { name: string; sex?: string; birthYear?: number | null }[]) =>
+        input.map((p) => {
+          const m: Member = {
+            id: `m${++seq}`,
+            groupId,
+            name: p.name,
+            note: '',
+            active: true,
+            sex: p.sex ?? '',
+            birthYear: p.birthYear ?? null,
+            followedUpAt: null,
+            followUpNote: '',
+            createdAt: new Date(Date.now() + seq),
+          };
+          members.push(m);
+          return m;
+        }),
     ),
     findMember: vi.fn(async (id: string) => members.find((m) => m.id === id) ?? null),
     updateMember: vi.fn(async (id: string, data: Partial<Member>) => {
@@ -43,7 +61,13 @@ function fakeRepo() {
       Object.assign(m, data);
       return m;
     }),
-    mergeMembers: vi.fn(),
+    mergeMembers: vi.fn(async (_keepId: string, mergeId: string) => {
+      members.splice(
+        members.findIndex((m) => m.id === mergeId),
+        1,
+      );
+    }),
+    listGroups: vi.fn(async () => [group]),
     findSession: vi.fn(async (id: string) =>
       id === 's1'
         ? {
@@ -72,9 +96,9 @@ describe('RollCallService', () => {
   });
 
   it('adds only new names, and re-activates a returning member', async () => {
-    await service.addMembers('g1', ['Peter Chan', '陳大文']);
+    await service.addMembers('g1', people('Peter Chan', '陳大文'));
     await service.updateMember('g1', 'm1', { active: false }, leader);
-    const result = await service.addMembers('g1', ['chan peter', 'Mary Lee', 'Mary  Lee']);
+    const result = await service.addMembers('g1', people('chan peter', 'Mary Lee', 'Mary  Lee'));
     expect(result.map((m) => [m.name, m.active])).toEqual([
       ['Peter Chan', true],
       ['Mary Lee', true],
@@ -82,8 +106,41 @@ describe('RollCallService', () => {
     expect(repo.members).toHaveLength(3);
   });
 
+  it('merges members with the same name automatically, keeping the earliest', async () => {
+    await service.addMembers('g1', [
+      { name: 'Mary Lee' },
+      { name: 'John', sex: 'male', birthYear: 1990 },
+    ]);
+    // A rename that collides with an existing name merges the two people.
+    const survivor = await service.updateMember('g1', 'm2', { name: 'mary  lee' }, leader);
+    expect(survivor).toMatchObject({ id: 'm1', name: 'Mary Lee', sex: 'male', birthYear: 1990 });
+    expect(repo.mergeMembers).toHaveBeenCalledWith('m1', 'm2');
+    expect(repo.members.map((m) => m.id)).toEqual(['m1']);
+  });
+
+  it('fills in blank details when a known name is added again', async () => {
+    await service.addMembers('g1', people('Amy'));
+    const [amy] = await service.addMembers('g1', [{ name: 'amy', sex: 'female', birthYear: 2010 }]);
+    expect(amy).toMatchObject({ id: 'm1', sex: 'female', birthYear: 2010 });
+  });
+
+  it('records a pastoral follow-up (managers only)', async () => {
+    await service.addMembers('g1', people('Amy'));
+    await expect(service.followUp('g1', 'm1', 'Called', volunteer)).rejects.toBeInstanceOf(
+      ForbiddenException,
+    );
+    const amy = await service.followUp('g1', 'm1', 'Called', leader);
+    expect(amy.followUpNote).toBe('Called');
+    expect(amy.followedUpAt).not.toBeNull();
+  });
+
+  it('shows follow-up counts on the group list only to managers', async () => {
+    expect((await service.listGroups(volunteer))[0]?.followUpCount).toBe(0);
+    expect((await service.listGroups(leader))[0]?.followUpCount).toBe(0);
+  });
+
   it('only records members of the group as present', async () => {
-    await service.addMembers('g1', ['Amy']);
+    await service.addMembers('g1', people('Amy'));
     await service.saveSession('g1', 's1', {
       date: '2026-09-20',
       label: 'Sunday',
@@ -97,7 +154,7 @@ describe('RollCallService', () => {
   });
 
   it('lets volunteers take the roll but not manage the group', async () => {
-    await service.addMembers('g1', ['Amy', 'Amie']);
+    await service.addMembers('g1', people('Amy', 'Amie'));
     await expect(service.mergeMembers('g1', 'm1', 'm2', volunteer)).rejects.toBeInstanceOf(
       ForbiddenException,
     );
@@ -146,16 +203,12 @@ describe('RollCallAiService', () => {
       service,
       audit as unknown as AuditLogRepository,
     );
-    await service.addMembers('g1', ['陳大文', 'Chan Tai Man', 'Mary Lee', 'Mary Lea']);
+    await service.addMembers('g1', people('陳大文', 'Chan Tai Man', 'Mary Lee', 'Mary Lea'));
   });
 
   it('is off until a super admin switches it on', async () => {
     expect((await ai.status()).enabled).toBe(false);
     await expect(ai.setEnabled(true, leader)).rejects.toBeInstanceOf(ForbiddenException);
-    const image = { mimeType: 'image/jpeg', data: Buffer.from('jpg') };
-    await expect(ai.readSheet('g1', image, leader)).rejects.toBeInstanceOf(
-      ServiceUnavailableException,
-    );
     await expect(ai.duplicates('g1', true, leader)).rejects.toBeInstanceOf(
       ServiceUnavailableException,
     );
@@ -177,7 +230,7 @@ describe('RollCallAiService', () => {
 
   it('matches the local model’s romanisations on the server, so it cannot invent pairs', async () => {
     await ai.setEnabled(true, admin);
-    await ai['rollCall'].addMembers('g1', ['Peter Wong', '陈大文']);
+    await ai['rollCall'].addMembers('g1', people('Peter Wong', '陈大文'));
     llm.json.mockResolvedValueOnce({
       names: [
         { i: 0, cantonese: 'Chan Tai Man', mandarin: 'Chen Da Wen', traditional: '陳大文' },
@@ -197,25 +250,5 @@ describe('RollCallAiService', () => {
     expect(prompt).toContain('陳大文');
     expect(prompt).not.toContain('Mary Lee');
     expect(JSON.stringify(audit.create.mock.calls)).not.toContain('陳大文');
-  });
-
-  it('reads a sign-in sheet and matches names to members', async () => {
-    await ai.setEnabled(true, admin);
-    llm.json.mockResolvedValueOnce({ names: ['mary lee', 'John Doe', 'mary lee', 42] });
-    const names = await ai.readSheet(
-      'g1',
-      { mimeType: 'image/jpeg', data: Buffer.from('jpg') },
-      volunteer,
-    );
-    expect(names).toEqual([
-      { text: 'mary lee', memberId: 'm3', score: 1 },
-      { text: 'John Doe', memberId: null, score: 0 },
-    ]);
-    expect(audit.create).toHaveBeenLastCalledWith(
-      expect.objectContaining({
-        action: 'rollcall.ai.read_sheet',
-        details: expect.objectContaining({ names: 2, matched: 1 }),
-      }),
-    );
   });
 });

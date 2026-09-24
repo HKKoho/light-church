@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useRollCallT } from '../messages';
+import { useRollCallT } from './messages';
 
 const START = 30 * 60;
 

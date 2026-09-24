@@ -1,8 +1,3 @@
-import type { RollCallSheetName } from '@clawix/shared';
-import { getAccessToken } from '@/lib/auth';
-
-const API_BASE = process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001';
-
 export const ROLL_CALL_API = '/api/v1/roll-call';
 export const groupApi = (groupId: string) => `${ROLL_CALL_API}/groups/${groupId}`;
 
@@ -10,25 +5,6 @@ export const todayIso = () => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 };
-
-/** Sends a sign-in sheet photo to the local model and returns the names it read. */
-export async function readSheet(groupId: string, photo: File): Promise<RollCallSheetName[]> {
-  const token = await getAccessToken();
-  if (!token) throw new Error('Not authenticated');
-  const form = new FormData();
-  form.append('file', photo, photo.name);
-  const res = await fetch(`${API_BASE}${groupApi(groupId)}/read-sheet`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${token}` },
-    body: form,
-  });
-  const body = (await res.json().catch(() => ({ message: res.statusText }))) as {
-    data?: RollCallSheetName[];
-    message?: string;
-  };
-  if (!res.ok || !body.data) throw new Error(body.message ?? res.statusText);
-  return body.data;
-}
 
 const csvCell = (v: string | number) => {
   const s = String(v);
@@ -124,3 +100,51 @@ export function nameKey(name: string): string {
     .filter(Boolean);
   return (words.every((w) => /^[a-z0-9]+$/.test(w)) ? [...words].sort() : words).join('');
 }
+
+export interface PersonInput {
+  name: string;
+  sex?: 'male' | 'female' | '';
+  birthYear?: number | null;
+}
+
+const SEX_WORDS: Record<string, 'male' | 'female'> = {
+  m: 'male',
+  male: 'male',
+  man: 'male',
+  男: 'male',
+  f: 'female',
+  female: 'female',
+  woman: 'female',
+  女: 'female',
+};
+
+/** "陳大文, 男, 1985" / "Mary Lee, F, 34" — sex and birth year (or age) are optional. */
+export function parsePerson(
+  cells: readonly string[],
+  year = new Date().getFullYear(),
+): PersonInput | null {
+  const name = cells[0]?.trim() ?? '';
+  if (!name) return null;
+  const person: PersonInput = { name };
+  for (const raw of cells.slice(1)) {
+    const cell = raw.trim().toLowerCase();
+    const sex = SEX_WORDS[cell];
+    if (sex) person.sex = sex;
+    else if (/^\d{4}$/.test(cell) && Number(cell) >= 1900 && Number(cell) <= year)
+      person.birthYear = Number(cell);
+    else if (/^\d{1,3}$/.test(cell) && Number(cell) <= 120) person.birthYear = year - Number(cell);
+  }
+  return person;
+}
+
+const HEADER = /^(name|姓名|名字)$/i;
+
+/** People from typed lines or a CSV (an optional header row is skipped). */
+export function parsePeople(text: string): PersonInput[] {
+  const rows = parseCsv(text);
+  const body = HEADER.test(rows[0]?.[0]?.trim() ?? '') ? rows.slice(1) : rows;
+  return body.map((r) => parsePerson(r)).filter((p): p is PersonInput => p !== null);
+}
+
+export const ageOf = (birthYear: number | null, year = new Date().getFullYear()) =>
+  birthYear === null ? null : year - birthYear;

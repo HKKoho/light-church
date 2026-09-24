@@ -8,6 +8,9 @@ import {
 import { ROLL_CALL_MANAGER_ROLES, createLogger } from '@clawix/shared';
 import type {
   CreateRollCallSessionInput,
+  RollCallAnalysis,
+  RollCallMemberInput,
+  RollCallSex,
   RollCallGroupDetail,
   RollCallGroupSummary,
   RollCallInsights,
@@ -26,7 +29,8 @@ import {
   type RollCallGroupRow,
   type RollCallSessionRow,
 } from '../db/roll-call.repository.js';
-import { computeInsights } from './roll-call-insights.js';
+import { analyse } from './roll-call-analysis.js';
+import { computeInsights, needsFollowUp, type InsightSession } from './roll-call-insights.js';
 import { normalizeName } from './roll-call-names.js';
 
 const logger = createLogger('roll-call');
@@ -50,14 +54,30 @@ export const toMemberInfo = (m: RollCallMember): RollCallMemberInfo => ({
   name: m.name,
   note: m.note,
   active: m.active,
+  sex: (m.sex === 'male' || m.sex === 'female' ? m.sex : '') as RollCallSex,
+  birthYear: m.birthYear,
+  followedUpAt: m.followedUpAt ? m.followedUpAt.toISOString() : null,
+  followUpNote: m.followUpNote,
 });
 
-const toSummary = (g: RollCallGroupRow): RollCallGroupSummary => ({
+const toInsightSession = (s: RollCallSessionRow): InsightSession => ({
+  date: fromDbDate(s.date),
+  guestCount: s.guestCount,
+  presentIds: new Set(s.marks.map((m) => m.memberId)),
+});
+
+const toInsightMember = (m: RollCallMember) => ({
+  ...toMemberInfo(m),
+  followedUpAt: m.followedUpAt ? fromDbDate(m.followedUpAt) : null,
+});
+
+const toSummary = (g: RollCallGroupRow, followUpCount = 0): RollCallGroupSummary => ({
   id: g.id,
   name: g.name,
   description: g.description,
   memberCount: g._count.members,
   lastSessionDate: g.sessions[0] ? fromDbDate(g.sessions[0].date) : null,
+  followUpCount,
 });
 
 const toSession = (s: RollCallSessionRow): RollCallSessionDetail => ({
@@ -73,8 +93,23 @@ const toSession = (s: RollCallSessionRow): RollCallSessionDetail => ({
 export class RollCallService {
   constructor(private readonly repo: RollCallRepository) {}
 
-  async listGroups(): Promise<RollCallGroupSummary[]> {
-    return (await this.repo.listGroups()).map(toSummary);
+  async listGroups(actor: Actor): Promise<RollCallGroupSummary[]> {
+    const groups = await this.repo.listGroups();
+    if (!canManage(actor)) return groups.map((g) => toSummary(g));
+    return Promise.all(
+      groups.map(async (g) => {
+        const { alerts } = await this.computeFor(g.id);
+        return toSummary(g, alerts.filter(needsFollowUp).length);
+      }),
+    );
+  }
+
+  private async computeFor(groupId: string) {
+    const [members, sessions] = await Promise.all([
+      this.repo.listMembers(groupId),
+      this.repo.listSessions(groupId),
+    ]);
+    return computeInsights(members.map(toInsightMember), sessions.map(toInsightSession));
   }
 
   async loadGroup(id: string): Promise<RollCallGroupRow> {
@@ -85,7 +120,7 @@ export class RollCallService {
 
   async getGroup(id: string, actor: Actor): Promise<RollCallGroupDetail> {
     const group = await this.loadGroup(id);
-    const members = await this.repo.listMembers(id);
+    const members = await this.mergeSameNames(id);
     return { ...toSummary(group), members: members.map(toMemberInfo), canManage: canManage(actor) };
   }
 
@@ -115,27 +150,70 @@ export class RollCallService {
   }
 
   /**
-   * Adds names to a group, skipping any already on the list (same spelling).
-   * Anyone taking the roll may add a newcomer; returns the matching members
-   * (new or existing) in input order.
+   * Members with the same name (same spelling after ignoring case, spacing,
+   * punctuation and English word order) are one person: they are merged
+   * automatically so nobody is counted twice. The earliest entry is kept and
+   * takes over the others' attendance and any details it lacks.
    */
-  async addMembers(groupId: string, names: readonly string[]): Promise<RollCallMemberInfo[]> {
+  async mergeSameNames(groupId: string): Promise<RollCallMember[]> {
+    const members = await this.repo.listMembers(groupId);
+    const byKey = new Map<string, RollCallMember[]>();
+    for (const m of members) {
+      const key = normalizeName(m.name);
+      byKey.set(key, [...(byKey.get(key) ?? []), m]);
+    }
+    const groups = [...byKey.values()].filter((list) => list.length > 1);
+    if (groups.length === 0) return members;
+    for (const list of groups) {
+      const [keep, ...rest] = [...list].sort(
+        (a, b) =>
+          Number(b.active) - Number(a.active) || a.createdAt.getTime() - b.createdAt.getTime(),
+      );
+      if (!keep) continue;
+      const fill = {
+        sex: keep.sex || rest.find((r) => r.sex)?.sex || '',
+        birthYear: keep.birthYear ?? rest.find((r) => r.birthYear !== null)?.birthYear ?? null,
+        note: keep.note || rest.find((r) => r.note)?.note || '',
+      };
+      await this.repo.updateMember(keep.id, fill);
+      for (const r of rest) await this.repo.mergeMembers(keep.id, r.id);
+      logger.info({ groupId, keepId: keep.id, merged: rest.length }, 'Merged same-name members');
+    }
+    return this.repo.listMembers(groupId);
+  }
+
+  /**
+   * Adds people to a group. A name already on the list (same spelling) is not
+   * added again — its blank details are filled in instead, and a removed
+   * member is restored. Anyone taking the roll may add a newcomer. Returns
+   * the matching members, new or existing, in input order.
+   */
+  async addMembers(
+    groupId: string,
+    input: readonly RollCallMemberInput[],
+  ): Promise<RollCallMemberInfo[]> {
     await this.loadGroup(groupId);
-    const existing = await this.repo.listMembers(groupId);
-    const byKey = new Map(existing.map((m) => [normalizeName(m.name), m]));
-    const fresh: string[] = [];
-    for (const name of names) {
-      const key = normalizeName(name);
-      if (key && !byKey.has(key) && !fresh.some((f) => normalizeName(f) === key)) fresh.push(name);
+    const byKey = new Map(
+      (await this.mergeSameNames(groupId)).map((m) => [normalizeName(m.name), m]),
+    );
+    const fresh: RollCallMemberInput[] = [];
+    for (const person of input) {
+      const key = normalizeName(person.name);
+      if (key && !byKey.has(key) && !fresh.some((f) => normalizeName(f.name) === key))
+        fresh.push(person);
     }
     const created = fresh.length > 0 ? await this.repo.addMembers(groupId, fresh) : [];
     for (const m of created) byKey.set(normalizeName(m.name), m);
-    // A returning inactive member is re-activated when their name is added again.
     const result: RollCallMember[] = [];
-    for (const name of names) {
-      const m = byKey.get(normalizeName(name));
-      if (!m || result.includes(m)) continue;
-      result.push(m.active ? m : await this.repo.updateMember(m.id, { active: true }));
+    for (const person of input) {
+      const m = byKey.get(normalizeName(person.name));
+      if (!m || result.some((r) => r.id === m.id)) continue;
+      const patch = {
+        ...(m.active ? {} : { active: true }),
+        ...(!m.sex && person.sex ? { sex: person.sex } : {}),
+        ...(m.birthYear === null && person.birthYear ? { birthYear: person.birthYear } : {}),
+      };
+      result.push(Object.keys(patch).length > 0 ? await this.repo.updateMember(m.id, patch) : m);
     }
     return result.map(toMemberInfo);
   }
@@ -154,7 +232,30 @@ export class RollCallService {
   ): Promise<RollCallMemberInfo> {
     assertManager(actor);
     await this.loadMember(groupId, memberId);
-    return toMemberInfo(await this.repo.updateMember(memberId, input));
+    const updated = await this.repo.updateMember(memberId, input);
+    if (input.name === undefined) return toMemberInfo(updated);
+    // Renaming someone to a name already on the list merges the two.
+    const key = normalizeName(updated.name);
+    const members = await this.mergeSameNames(groupId);
+    const survivor = members.find((m) => normalizeName(m.name) === key) ?? updated;
+    return toMemberInfo(survivor);
+  }
+
+  /** Records that someone reached out; clears the member's absence reminder. */
+  async followUp(
+    groupId: string,
+    memberId: string,
+    note: string,
+    actor: Actor,
+  ): Promise<RollCallMemberInfo> {
+    assertManager(actor);
+    await this.loadMember(groupId, memberId);
+    const member = await this.repo.updateMember(memberId, {
+      followedUpAt: new Date(),
+      followUpNote: note,
+    });
+    logger.info({ groupId, memberId, userId: actor.id }, 'Recorded pastoral follow-up');
+    return toMemberInfo(member);
   }
 
   async mergeMembers(
@@ -219,17 +320,16 @@ export class RollCallService {
   async insights(groupId: string, actor: Actor): Promise<RollCallInsights> {
     assertManager(actor);
     await this.loadGroup(groupId);
+    return this.computeFor(groupId);
+  }
+
+  async analysis(groupId: string, actor: Actor): Promise<RollCallAnalysis> {
+    assertManager(actor);
+    await this.loadGroup(groupId);
     const [members, sessions] = await Promise.all([
       this.repo.listMembers(groupId),
       this.repo.listSessions(groupId),
     ]);
-    return computeInsights(
-      members,
-      sessions.map((s) => ({
-        date: fromDbDate(s.date),
-        guestCount: s.guestCount,
-        presentIds: new Set(s.marks.map((m) => m.memberId)),
-      })),
-    );
+    return analyse(members.map(toMemberInfo), sessions.map(toInsightSession));
   }
 }
