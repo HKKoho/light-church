@@ -6,8 +6,18 @@
 // can't write there. Tools that are already installed are left alone so an
 // admin's replacements survive; `force` overwrites them with the repo versions.
 import { execFileSync } from 'node:child_process';
-import { readdirSync } from 'node:fs';
+import {
+  cpSync,
+  existsSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fillToolPlaceholders, toolEnv } from './tool-placeholders.mjs';
 
 const TARGET = '/data/AITools';
 
@@ -29,8 +39,24 @@ export function installAiTools({ root, container = 'lightchurch-api', force = fa
     }
     if (exists && !force) return { name, action: 'skip' };
     if (exists) docker('exec', container, 'rm', '-rf', dest);
-    // No trailing slash on the source: docker cp then creates <TARGET>/<name>.
-    docker('cp', join(root, 'ai-tools', name), `${container}:${TARGET}`);
+    // tool.json may carry ${VAR:-default} placeholders (e.g. a link tool's URL):
+    // fill them in a temp copy so the container gets real values.
+    let src = join(root, 'ai-tools', name);
+    let tmp = null;
+    const toolJson = join(src, 'tool.json');
+    if (existsSync(toolJson) && readFileSync(toolJson, 'utf8').includes('${')) {
+      tmp = mkdtempSync(join(tmpdir(), 'ai-tool-'));
+      cpSync(src, join(tmp, name), { recursive: true });
+      const filled = fillToolPlaceholders(readFileSync(toolJson, 'utf8'), toolEnv(root));
+      writeFileSync(join(tmp, name, 'tool.json'), filled);
+      src = join(tmp, name);
+    }
+    try {
+      // No trailing slash on the source: docker cp then creates <TARGET>/<name>.
+      docker('cp', src, `${container}:${TARGET}`);
+    } finally {
+      if (tmp) rmSync(tmp, { recursive: true, force: true });
+    }
     return { name, action: exists ? 'update' : 'add' };
   });
 }

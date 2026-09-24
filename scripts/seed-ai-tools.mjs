@@ -15,20 +15,10 @@
  */
 import { cp, mkdir, readdir, readFile, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { readDotEnv } from './lib/stack-preflight.mjs';
+import { fillToolPlaceholders, toolEnv } from './lib/tool-placeholders.mjs';
 
 const force = process.argv.includes('--force');
-const env = { ...readDotEnv(path.resolve('.env')), ...process.env };
-
-/** Replaces ${VAR} and ${VAR:-default} with values from env. */
-function fillPlaceholders(text) {
-  return text.replace(/\$\{([A-Z0-9_]+)(?::-([^}]*))?\}/g, (match, name, fallback) => {
-    const value = env[name] || fallback;
-    // Values land inside JSON strings — escape quotes/backslashes.
-    if (value !== undefined) return JSON.stringify(value).slice(1, -1);
-    throw new Error(`${name} is not set (needed by ${match})`);
-  });
-}
+const env = toolEnv(process.cwd());
 const source = path.resolve('ai-tools');
 const target = path.resolve(process.env.WORKSPACE_BASE_PATH ?? './data', 'AITools');
 
@@ -49,7 +39,7 @@ for (const entry of entries) {
   await cp(path.join(source, entry.name), dest, { recursive: true, force: true });
   const toolJson = path.join(dest, 'tool.json');
   const raw = await readFile(toolJson, 'utf8').catch(() => null);
-  if (raw !== null && raw.includes('${')) await writeFile(toolJson, fillPlaceholders(raw));
+  if (raw !== null && raw.includes('${')) await writeFile(toolJson, fillToolPlaceholders(raw, env));
   console.log(`${exists ? 'update' : 'add   '} ${entry.name}`);
 }
 console.log(`AI Tools directory: ${target}`);
