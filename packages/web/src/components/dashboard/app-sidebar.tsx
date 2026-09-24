@@ -30,6 +30,7 @@ import {
   Moon,
   Newspaper,
   Package,
+  Plug,
   Radio,
   ScrollText,
   Settings2,
@@ -50,7 +51,6 @@ import anime from 'animejs';
 import { EASING } from '@/lib/anime';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { useGovernanceModel } from '@/hooks/use-governance-model';
-import { Phase2RoadmapCard } from '@/components/dashboard/phase2-roadmap-card';
 import {
   SidebarNavGroup,
   navButtonClass,
@@ -64,7 +64,6 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarGroup,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -156,6 +155,7 @@ const settingsItems: readonly NavItem[] = [
   { key: 'providers', href: '/settings/providers', icon: Bot },
   { key: 'congregationProfile', href: '/settings/congregation-profile', icon: UsersRound },
   { key: 'packs', href: '/settings/packs', icon: Package },
+  { key: 'connectors', href: '/settings/connectors', icon: Plug },
 ];
 
 const messages = {
@@ -203,6 +203,7 @@ const messages = {
       providers: 'Providers',
       congregationProfile: 'Congregation Profile',
       packs: 'Ministry Packs',
+      connectors: 'Connectors',
     },
     lightMode: 'Light mode',
     darkMode: 'Dark mode',
@@ -259,6 +260,7 @@ const messages = {
       providers: '供應商',
       congregationProfile: '會眾背景設定',
       packs: '事工套件',
+      connectors: '連接器',
     },
     lightMode: '淺色模式',
     darkMode: '深色模式',
@@ -466,10 +468,6 @@ export function AppSidebar() {
             isActive={isActive}
           />
         )}
-
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <Phase2RoadmapCard />
-        </SidebarGroup>
       </SidebarContent>
 
       <SidebarFooter>

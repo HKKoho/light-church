@@ -7,6 +7,9 @@ import { AiToolsModule } from './ai-tools/index.js';
 import { BulletinArchiveModule } from './bulletin-archive/index.js';
 import { ActivitiesModule } from './activities/index.js';
 import { RollCallModule } from './roll-call/index.js';
+import { AiSurveyModule } from './ai-survey/ai-survey.module.js';
+import { ConnectorsModule } from './connectors/connectors.module.js';
+import { QrRegistrationModule } from './qr-registration/qr-registration.module.js';
 import { DashboardModule } from './dashboard/index.js';
 import { AgentsModule } from './agents/index.js';
 import { AuditModule } from './audit/index.js';
@@ -78,6 +81,9 @@ import { TalkingFaceModule } from './talkingface/talkingface.module.js';
     BulletinArchiveModule,
     ActivitiesModule,
     RollCallModule,
+    ConnectorsModule,
+    AiSurveyModule,
+    QrRegistrationModule,
     CongregationProfileModule,
     ClientModule,
     TalkingFaceModule,

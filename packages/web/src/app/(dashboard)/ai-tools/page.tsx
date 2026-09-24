@@ -57,6 +57,16 @@ const messages = {
         description:
           'Plan a mission trip, camp or retreat together — details, schedule, daily devotionals, songs, photos, files and notes. Leaders edit; the whole team views.',
       },
+      aiSurvey: {
+        name: 'AI Survey',
+        description:
+          'Type a topic and AI drafts a questionnaire. Review it, then publish it as a Google Form link.',
+      },
+      qrRegistration: {
+        name: 'QR Registration',
+        description:
+          'Turn any event and its registration link into a QR-code page published on Vercel, ready to share or print.',
+      },
     },
     loadError: 'Failed to load AI tools',
     open: 'Open',
@@ -93,6 +103,14 @@ const messages = {
         name: '訪宣/營會指南',
         description:
           '一同籌備訪宣、營會或退修會——資料、行程、每日靈修、詩歌、相片、檔案及筆記。領袖編輯，全隊檢視。',
+      },
+      aiSurvey: {
+        name: 'AI 問卷',
+        description: '輸入主題，AI 會草擬問卷。檢閱後發佈為 Google 表單連結。',
+      },
+      qrRegistration: {
+        name: 'QR 報名',
+        description: '把任何活動及其報名連結製作成附 QR 碼的網頁，發佈到 Vercel，方便分享或列印。',
       },
     },
     loadError: '無法載入 AI 工具',

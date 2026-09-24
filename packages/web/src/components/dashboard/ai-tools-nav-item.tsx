@@ -25,12 +25,20 @@ const messages = {
       gameBuilder: 'Game Builder',
       missionCamp: 'Mission/Camp Companion',
       rollCall: 'Roll Call',
+      aiSurvey: 'AI Survey',
+      qrRegistration: 'QR Registration',
     },
   },
   'zh-TW': {
     aiTools: 'AI 工具',
     toggle: '顯示或隱藏 AI 工具',
-    builtIn: { gameBuilder: '遊戲工坊', missionCamp: '訪宣/營會指南', rollCall: '點名' },
+    builtIn: {
+      gameBuilder: '遊戲工坊',
+      missionCamp: '訪宣/營會指南',
+      rollCall: '點名',
+      aiSurvey: 'AI 問卷',
+      qrRegistration: 'QR 報名',
+    },
   },
 } satisfies Messages<{
   aiTools: string;

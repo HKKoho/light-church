@@ -139,6 +139,25 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
   bulletins last for the session. Its AI "analyse past bulletins" call gets a
   clear "not yet enabled" reply from the tool shim until the AI stage below.
 - Defaults live in `ai-tools/`; install with `node scripts/seed-ai-tools.mjs`.
+- **AI Survey / AI 問卷** — a _built-in_ AI Tool at `/ai-survey`. A topic (and
+  optional audience) goes to the church's default cloud provider through
+  `engine/one-shot/one-shot-llm.service.ts` (token usage recorded as
+  `ai-tool:ai-survey`), which drafts a questionnaire. The user edits it, then
+  publishes it as a Google Form created by the church's service account and
+  shared with the publisher's email (`connectors/google-forms.client.ts`).
+  The result is the questionnaire link plus an edit link.
+- **QR Registration / QR 報名** — a _built-in_ AI Tool at `/qr-registration`.
+  Event details + a registration link become a static page with a QR code
+  (`qr-registration/qr-page.ts`), previewable and downloadable, and published
+  to Vercel as its own project so its `*.vercel.app` link stays public
+  (`connectors/vercel.client.ts`).
+- **Settings → Connectors** (`super_admin`): the Google service-account key and
+  the Vercel token (+ optional team ID and project prefix), AES-256-GCM
+  encrypted in `SystemSettings.settings.connectors`; env fallbacks
+  `GOOGLE_SERVICE_ACCOUNT_JSON`, `VERCEL_TOKEN`, `VERCEL_TEAM_ID`,
+  `VERCEL_PROJECT_NAME`. `AI_TOOLS_MODEL` overrides the model AI Survey uses.
+  Both tools are for `super_admin`, `senior_pastor`, `pastor`, `admin_staff` and
+  `ministry_leader`, and every generate/publish is audit-logged.
 
 **Bulletin archive (done):** past-bulletin PDFs uploaded in the tool are
 archived in Postgres (`BulletinArchive`: file bytes, church, name, size,
@@ -311,6 +330,3 @@ corpus with citations; the attribution rule is enforced and tested.
 
 - `app-sidebar.tsx` is over the 400-LOC limit. Next time it's touched, move its
   i18n messages into a separate file.
-- The sidebar's existing _Phase 2 Roadmap_ card (`phase2-roadmap-card.tsx`)
-  refers to the **development backlog** in `docs/PHASE2.md`, not to adoption
-  Phase 2. Rename it (e.g. "Dev backlog") to avoid confusion.

@@ -210,3 +210,22 @@ export {
   type RollCallBreakdownRow,
   type RollCallAnalysis,
 } from './roll-call.schema.js';
+
+export {
+  AI_PUBLISH_ROLES,
+  SURVEY_QUESTION_TYPES,
+  surveyQuestionSchema,
+  generateSurveySchema,
+  surveyDraftSchema,
+  qrRegistrationSchema,
+  updateConnectorsSchema,
+  type ConnectorStatus,
+  type GenerateSurveyInput,
+  type PublishedQrPage,
+  type PublishedSurvey,
+  type QrRegistrationInput,
+  type SurveyDraft,
+  type SurveyQuestion,
+  type SurveyQuestionType,
+  type UpdateConnectorsInput,
+} from './ai-publish.schema.js';
