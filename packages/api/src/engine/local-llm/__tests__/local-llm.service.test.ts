@@ -53,9 +53,7 @@ describe('LocalLlmService', () => {
     vi.stubEnv('LOCAL_LLM_MODEL', 'qwen2.5vl');
     vi.stubGlobal(
       'fetch',
-      vi.fn(
-        async () => new Response(JSON.stringify({ models: [{ name: 'qwen2.5vl:7b' }] })),
-      ),
+      vi.fn(async () => new Response(JSON.stringify({ models: [{ name: 'qwen2.5vl:7b' }] }))),
     );
     const status = await new LocalLlmService().status();
     expect(status).toMatchObject({ available: false, model: 'qwen2.5vl' });
@@ -66,9 +64,7 @@ describe('LocalLlmService', () => {
     vi.stubEnv('LOCAL_LLM_URL', 'http://localhost:11434');
     vi.stubGlobal(
       'fetch',
-      vi.fn(
-        async () => new Response(JSON.stringify({ models: [{ name: 'qwen2.5vl:7b' }] })),
-      ),
+      vi.fn(async () => new Response(JSON.stringify({ models: [{ name: 'qwen2.5vl:7b' }] }))),
     );
     expect(await new LocalLlmService().status()).toEqual({
       available: true,
