@@ -93,6 +93,11 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
 - **Mission/Camp Companion / 訪宣/營會指南** (`mission-camp-companion`) —
   `reference/CampMissionHdBk` as a link tool to its live deployment (its 151 MB
   of media rules out bundling).
+- **Finance Pipeline / 財務流程** (`finance-pipeline`) — `reference/finance-pipeline-main`
+  (SecureFin: bank-transaction RPA, AI classification, review, Excel/warehouse
+  export) as a link tool to its separately hosted app (`FINANCE_PIPELINE_URL`).
+  It keeps its own server, database and AI keys; bringing it inside Light
+  Church (real login, Postgres, AI via the engine) would be a separate project.
 - **Sunday Service Bulletin / 主日崇拜週刊** (`sunday-service-bulletin`) —
   `reference/SundayServices` bundled as one file; rebuild with
   `scripts/ai-tool-builds/sunday-service-bulletin/build.sh`. The build adds an

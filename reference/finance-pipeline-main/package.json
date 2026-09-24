@@ -1,0 +1,59 @@
+{
+  "name": "finpipeline",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Intelligent Financial Data Pipeline \u2014 AIbyML.com",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "layer1-rpa",
+    "layer2-ai",
+    "layer3-client",
+    "layer4-ai-assistant",
+    "layer5-warehouse"
+  ],
+  "scripts": {
+    "dev": "tsx server.ts",
+    "start": "NODE_ENV=production tsx server.ts",
+    "dev:layer1": "tsx layer1-rpa/src/index.ts",
+    "dev:layer2": "tsx layer2-ai/src/index.ts",
+    "dev:layer3": "tsx layer3-client/src/index.ts",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/genai": "^1.0.0",
+    "better-sqlite3": "^11.0.0",
+    "exceljs": "^4.4.0",
+    "express": "^4.21.0",
+    "lucide-react": "^0.469.0",
+    "motion": "^12.0.0",
+    "multer": "^2.0.2",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "uuid": "^14.0.2"
+  },
+  "overrides": {
+    "exceljs": {
+      "uuid": "^14.0.2"
+    }
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.0.0",
+    "@types/better-sqlite3": "^7.6.0",
+    "@types/express": "^4.17.0",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/uuid": "^9.0.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "tailwindcss": "^4.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vite": "^6.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

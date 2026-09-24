@@ -1,0 +1,5 @@
+{
+  "name": "SecureFin Pipeline",
+  "description": "A 5-Layer AI-augmented financial data pipeline for automated bank data extraction, LLM classification, client reporting, AI-assisted verification (FinPilot), and multi-target warehouse export.",
+  "requestFramePermissions": []
+}

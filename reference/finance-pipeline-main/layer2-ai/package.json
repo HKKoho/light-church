@@ -1,0 +1,21 @@
+{
+  "name": "@finpipeline/layer2-ai",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@finpipeline/shared": "*",
+    "@anthropic-ai/sdk": "^0.39.0",
+    "pg": "^8.11.0",
+    "uuid": "^14.0.2"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.0",
+    "@types/uuid": "^9.0.0",
+    "tsx": "^4.7.0"
+  }
+}
