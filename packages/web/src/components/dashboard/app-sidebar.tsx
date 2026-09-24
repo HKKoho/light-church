@@ -224,7 +224,7 @@ const messages = {
     groupGovernance: '治理、保證與責任',
     groupAdmin: '系統管理',
     groupCuration: '資料與領域知識整理',
-    toBeConstructed: '建構中',
+    toBeConstructed: '準備好使用更進階的 AI 服務了嗎？',
     nav: {
       conversations: '對話',
       talkingFace: '會說話的頭像',
