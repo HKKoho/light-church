@@ -92,3 +92,77 @@ export function bestMatch<T extends NamedItem>(
   }
   return best;
 }
+
+/** How a Chinese name may be written in other forms (from the local model). */
+export interface NameForms {
+  readonly traditional: string;
+  readonly romanised: readonly string[];
+}
+
+const latinWords = (s: string) =>
+  s
+    .normalize('NFKC')
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter(Boolean);
+
+/**
+ * 0–1 likelihood that an English-letter name is a romanisation of a Chinese
+ * name: the same words in any order (e.g. "Chan Tai Man" / "Tai-man Chan"),
+ * the romanised words plus an English name ("Peter Chan Tai Man"), or a
+ * near-spelling. Sharing only a surname never counts.
+ */
+export function romanisedSimilarity(romanised: string, latin: string): number {
+  const r = latinWords(romanised);
+  const l = latinWords(latin);
+  if (r.length < 2 || l.length < 2) return 0;
+  const key = (ws: readonly string[]) => [...ws].sort().join('');
+  if (key(r) === key(l)) return 0.95;
+  // "Tai Man" is often written "Taiman" / "Tai-man": compare with the given name joined.
+  if (r.join('') === l.join('') || key([r[0] ?? '', r.slice(1).join('')]) === key(l)) return 0.9;
+  if (r.every((w) => l.includes(w))) return 0.85;
+  const score = nameSimilarity(r.join(' '), l.join(' '));
+  return score >= 0.85 ? score * 0.9 : 0;
+}
+
+/**
+ * Cross-script and traditional/simplified pairs, matched on the server from
+ * the forms the local model gave for each Chinese name.
+ */
+export function findCrossScriptDuplicates<T extends NamedItem>(
+  chinese: readonly { item: T; forms: NameForms }[],
+  latin: readonly T[],
+): (NamePair<T> & { reason: string })[] {
+  const pairs: (NamePair<T> & { reason: string })[] = [];
+  for (let i = 0; i < chinese.length; i++) {
+    const a = chinese[i];
+    if (!a) continue;
+    for (const b of chinese.slice(i + 1)) {
+      if (
+        a.forms.traditional &&
+        a.forms.traditional === b.forms.traditional &&
+        a.item.name !== b.item.name
+      ) {
+        pairs.push({
+          a: a.item,
+          b: b.item,
+          score: 0.9,
+          reason: 'Traditional / simplified characters',
+        });
+      }
+    }
+    for (const b of latin) {
+      let best = 0;
+      let via = '';
+      for (const r of a.forms.romanised) {
+        const score = romanisedSimilarity(r, b.name);
+        if (score > best) {
+          best = score;
+          via = r;
+        }
+      }
+      if (best > 0) pairs.push({ a: a.item, b, score: best, reason: `${a.item.name} → ${via}` });
+    }
+  }
+  return pairs.sort((p, q) => q.score - p.score);
+}

@@ -175,23 +175,28 @@ describe('RollCallAiService', () => {
     expect(llm.json).not.toHaveBeenCalled();
   });
 
-  it('adds the local model’s cross-script pairs, ignoring bad indices', async () => {
+  it('matches the local model’s romanisations on the server, so it cannot invent pairs', async () => {
     await ai.setEnabled(true, admin);
+    await ai['rollCall'].addMembers('g1', ['Peter Wong', '陈大文']);
     llm.json.mockResolvedValueOnce({
-      pairs: [
-        { a: 0, b: 1, reason: 'Cantonese romanisation' },
-        { a: 2, b: 3 },
-        { a: 0, b: 99 },
-        { a: 1, b: 1 },
+      names: [
+        { i: 0, cantonese: 'Chan Tai Man', mandarin: 'Chen Da Wen', traditional: '陳大文' },
+        { i: 1, cantonese: 'Chan Tai Man', mandarin: 'Chen Da Wen', traditional: '陳大文' },
+        { i: 99, cantonese: 'Peter Wong' },
       ],
     });
     const pairs = await ai.duplicates('g1', true, leader);
     expect(pairs.map((p) => [p.a.name, p.b.name, p.source])).toEqual([
       ['Mary Lee', 'Mary Lea', 'local'],
+      ['陳大文', '陈大文', 'local'],
       ['陳大文', 'Chan Tai Man', 'ai'],
+      ['陈大文', 'Chan Tai Man', 'ai'],
     ]);
-    const logged = JSON.stringify(audit.create.mock.calls);
-    expect(logged).not.toContain('陳大文');
+    // Only Chinese names are sent, and the audit log holds counts, not names.
+    const prompt = String(llm.json.mock.calls[0]?.[0]);
+    expect(prompt).toContain('陳大文');
+    expect(prompt).not.toContain('Mary Lee');
+    expect(JSON.stringify(audit.create.mock.calls)).not.toContain('陳大文');
   });
 
   it('reads a sign-in sheet and matches names to members', async () => {

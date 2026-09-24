@@ -16,7 +16,7 @@ import { RollCallRepository } from '../db/roll-call.repository.js';
 import { SystemSettingsRepository } from '../db/system-settings.repository.js';
 import { LocalLlmService } from '../engine/local-llm/local-llm.service.js';
 import { assertManager, toMemberInfo, type Actor, RollCallService } from './roll-call.service.js';
-import { bestMatch, findDuplicates } from './roll-call-names.js';
+import { bestMatch, findCrossScriptDuplicates, findDuplicates } from './roll-call-names.js';
 
 /** Key in SystemSettings.settings; written only through setEnabled(). */
 const SETTING_KEY = 'rollCallLocalAi';
@@ -30,15 +30,16 @@ List every person's name written on it, exactly as written, in Chinese or Englis
 Ignore headings, dates, phone numbers, signatures you cannot read, and other text.
 Reply with JSON only: {"names": ["name 1", "name 2"]}`;
 
-const duplicatesPrompt = (
-  names: readonly string[],
-) => `Here is a numbered list of people in one church group.
-Find pairs that are probably the SAME person written differently: Chinese vs English
-(Cantonese or Mandarin romanisation, e.g. 陳大文 / Chan Tai Man), traditional vs
-simplified characters, an English name added or dropped (e.g. Peter Chan / 陳大文 Peter),
-nicknames, or typos. Do not pair people who merely share a surname.
+const formsPrompt = (names: readonly string[]) => `For each numbered Chinese name below, give:
+- "cantonese": its Hong Kong Cantonese romanisation as on an HKID card (陳大文 → Chan Tai Man)
+- "mandarin": its Mandarin pinyin without tones (陳大文 → Chen Da Wen)
+- "traditional": the name in traditional Chinese characters
 ${names.map((n, i) => `${i}. ${n}`).join('\n')}
-Reply with JSON only: {"pairs": [{"a": 0, "b": 5, "reason": "short reason"}]}`;
+Reply with JSON only: {"names": [{"i": 0, "cantonese": "", "mandarin": "", "traditional": ""}]}`;
+
+const isChinese = (name: string) => /\p{Script=Han}/u.test(name) && !/[A-Za-z]/.test(name);
+const isLatin = (name: string) => /[A-Za-z]/.test(name) && !/\p{Script=Han}/u.test(name);
+const str = (v: unknown) => (typeof v === 'string' ? v.trim().slice(0, 100) : '');
 
 @Injectable()
 export class RollCallAiService {
@@ -98,28 +99,37 @@ export class RollCallAiService {
     if (!useAi) return result;
 
     await this.assertEnabled();
+    // Only Chinese names go to the model, which just romanises them; the
+    // matching itself happens here, so it cannot invent pairs.
+    const active = members.filter((m) => m.active);
+    const chinese = active.filter((m) => isChinese(m.name)).slice(0, MAX_AI_NAMES);
+    if (chinese.length === 0) return result;
+    const reply = await this.llm.json(formsPrompt(chinese.map((m) => m.name)));
+    const rows = Array.isArray(reply['names']) ? (reply['names'] as unknown[]) : [];
+    const withForms = rows.flatMap((raw) => {
+      const r = raw as Record<string, unknown>;
+      const item = typeof r['i'] === 'number' ? chinese[r['i']] : undefined;
+      if (!item) return [];
+      const romanised = [str(r['cantonese']), str(r['mandarin'])].filter(Boolean);
+      return [{ item, forms: { traditional: str(r['traditional']), romanised } }];
+    });
     const seen = new Set(result.map((p) => [p.a.id, p.b.id].sort().join('|')));
-    const batch = members.filter((m) => m.active).slice(0, MAX_AI_NAMES);
-    const reply = await this.llm.json(duplicatesPrompt(batch.map((m) => m.name)));
-    const pairs = Array.isArray(reply['pairs']) ? (reply['pairs'] as unknown[]) : [];
-    for (const raw of pairs) {
-      const p = raw as { a?: unknown; b?: unknown; reason?: unknown };
-      const a = typeof p.a === 'number' ? batch[p.a] : undefined;
-      const b = typeof p.b === 'number' ? batch[p.b] : undefined;
-      if (!a || !b || a.id === b.id) continue;
-      const key = [a.id, b.id].sort().join('|');
+    const found = findCrossScriptDuplicates(
+      withForms,
+      active.filter((m) => isLatin(m.name)),
+    );
+    for (const p of found) {
+      const key = [p.a.id, p.b.id].sort().join('|');
       if (seen.has(key)) continue;
       seen.add(key);
-      const reason =
-        typeof p.reason === 'string' ? p.reason.slice(0, 200) : 'Suggested by the local AI';
-      result.push({ a, b, score: 0.6, source: 'ai', reason });
+      result.push({ ...p, source: 'ai' });
     }
     await this.audit.create({
       userId: actor.id,
       action: 'rollcall.ai.duplicates',
       resource: 'RollCallGroup',
       resourceId: groupId,
-      details: { model: this.llm.model, names: batch.length, suggestions: pairs.length },
+      details: { model: this.llm.model, names: chinese.length, suggestions: found.length },
     });
     return result;
   }
