@@ -512,6 +512,8 @@ async function main() {
       env = upsertEnvLine(env, 'JWT_SECRET', secret(48));
       env = upsertEnvLine(env, 'PROVIDER_ENCRYPTION_KEY', secret(32));
       env = upsertEnvLine(env, 'POSTGRES_PASSWORD', secret(16));
+      // The API's everyday database login (rows only) — see infra/docker/api/db-roles.cjs.
+      env = upsertEnvLine(env, 'POSTGRES_APP_PASSWORD', secret(24));
       env = upsertEnvLine(env, 'POSTGRES_USER', 'clawix');
       env = upsertEnvLine(env, 'POSTGRES_DB', 'clawix');
       env = upsertEnvLine(env, 'CORS_ALLOWED_ORIGINS', answers.corsOrigins);

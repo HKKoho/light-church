@@ -44,6 +44,18 @@ if [ -f /app/dist/bootstrap.js ]; then
   node /app/dist/bootstrap.js
 fi
 
+# Least privilege: when POSTGRES_APP_PASSWORD is set, the API runs as the
+# lightchurch_app login (rows only — no DDL, append-only audit log) instead of
+# the owner login used for migrations above. The owner credentials are then
+# removed from the environment the API process inherits.
+if [ -n "${POSTGRES_APP_PASSWORD:-}" ] && [ -n "${DATABASE_APP_URL:-}" ]; then
+  node /app/db-roles.cjs
+  export DATABASE_URL="$DATABASE_APP_URL"
+else
+  echo "WARNING: POSTGRES_APP_PASSWORD is not set — the API is using the database owner login."
+fi
+unset DATABASE_APP_URL POSTGRES_APP_PASSWORD POSTGRES_PASSWORD
+
 # Start the application
 echo "Starting Clawix API..."
 exec node dist/main.js

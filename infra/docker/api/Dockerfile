@@ -88,6 +88,7 @@ RUN mkdir -p /data /app/skills
 
 # Copy entrypoint script
 COPY infra/docker/api/entrypoint.sh /app/entrypoint.sh
+COPY infra/docker/api/db-roles.cjs /app/db-roles.cjs
 RUN chmod +x /app/entrypoint.sh
 
 # Note: We run as root to access Docker socket, but the app itself

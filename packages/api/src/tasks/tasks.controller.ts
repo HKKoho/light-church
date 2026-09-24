@@ -17,8 +17,8 @@ export class TasksController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const data = await this.service.findById(id);
+  async findOne(@Param('id') id: string, @Req() req: any) {
+    const data = await this.service.findById(id, req.user.sub);
     return { success: true, data };
   }
 

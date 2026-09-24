@@ -23,6 +23,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installAiTools } from './lib/ai-tools-install.mjs';
+import { ensureEnvSecret, jwtSecretProblem, readEnvValue } from './lib/env-secrets.mjs';
 import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -116,6 +117,22 @@ async function main() {
     step('git pull');
     runVisible('git pull --ff-only');
     ok('Pulled');
+  }
+
+  if (deployMode === 'production') {
+    step('Secrets');
+    const jwtProblem = jwtSecretProblem(readEnvValue(ENV_FILE, 'JWT_SECRET'));
+    if (jwtProblem) {
+      fail(`${jwtProblem} — anyone who knows it could forge logins.`);
+      console.log('  Set a new one in .env (everyone will need to sign in again):');
+      console.log('    JWT_SECRET=$(openssl rand -hex 48)');
+      process.exit(1);
+    }
+    if (ensureEnvSecret(ENV_FILE, 'POSTGRES_APP_PASSWORD', 24)) {
+      ok('Added POSTGRES_APP_PASSWORD to .env — the API now uses a rows-only database login');
+    } else {
+      ok('Secrets look fine');
+    }
   }
 
   step('Pre-flight checks');

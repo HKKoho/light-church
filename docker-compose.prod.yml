@@ -57,7 +57,12 @@ services:
     env_file: .env
     environment:
       NODE_ENV: production
+      # Owner login: used only by entrypoint.sh for migrations and bootstrap.
       DATABASE_URL: postgresql://${POSTGRES_USER:-clawix}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@postgres:5432/${POSTGRES_DB:-clawix}?schema=public
+      # Everyday login the API runs as (rows only, append-only audit log) —
+      # see infra/docker/api/db-roles.cjs. Empty password = keep using the owner.
+      POSTGRES_APP_PASSWORD: ${POSTGRES_APP_PASSWORD:-}
+      DATABASE_APP_URL: postgresql://lightchurch_app:${POSTGRES_APP_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-clawix}?schema=public
       REDIS_URL: redis://redis:6379
       PORT: '3003'
       HOST: '0.0.0.0'
