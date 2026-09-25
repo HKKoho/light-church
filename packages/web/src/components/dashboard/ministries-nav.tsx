@@ -26,6 +26,10 @@ interface MinistryCategory {
   readonly itemKeys: readonly string[];
   /** Rendered after a divider — e.g. Phase 3b governance items. */
   readonly extraItemKeys?: readonly string[];
+  /** Keys shown in this dropdown only to super admins and `restrictedRoles`. */
+  readonly restrictedItemKeys?: readonly string[];
+  /** Roles besides super_admin that also see `restrictedItemKeys`. */
+  readonly restrictedRoles?: readonly string[];
 }
 
 const categories: readonly MinistryCategory[] = [
@@ -34,13 +38,21 @@ const categories: readonly MinistryCategory[] = [
     itemKeys: ['comms', 'scripture', 'fieldOps', 'outreach', 'programs'],
     // Phase 3c (Data & Domain Curation) — moved here from the sidebar.
     extraItemKeys: ['curation'],
+    restrictedItemKeys: ['fieldOps', 'programs', 'curation'],
   },
-  { key: 'careGovernance', itemKeys: ['mne', 'pastoralCare', 'prayer', 'incidents'] },
+  {
+    key: 'careGovernance',
+    itemKeys: ['mne', 'pastoralCare', 'prayer', 'incidents'],
+    restrictedItemKeys: ['mne', 'pastoralCare'],
+    restrictedRoles: ['senior_pastor', 'pastor'],
+  },
   {
     key: 'financeStewardship',
     itemKeys: ['donors', 'finance', 'consent'],
     // Phase 3b (Governance, Assurance & Liability) — moved here from the sidebar.
     extraItemKeys: ['dashboard', 'tokenUsage', 'auditLogs', 'escalations'],
+    restrictedItemKeys: ['donors', 'finance', 'dashboard', 'tokenUsage', 'auditLogs'],
+    restrictedRoles: ['senior_pastor', 'pastor', 'deacon'],
   },
 ];
 
@@ -83,7 +95,7 @@ const messages = {
     },
     nav: {
       programs: '其他事工',
-      donors: '財務管理',
+      donors: '執事管理',
       mne: '國度成效',
       comms: '宣揚福音',
       fieldOps: '宣教工場',
@@ -112,15 +124,23 @@ export function MinistriesNav({ className }: { className?: string }) {
   const { user } = useAuth();
 
   const isActive = (href: string) => pathname.startsWith(href);
+  const isSuperAdmin = user?.role === 'super_admin';
 
   return (
     <nav className={cn('flex items-center gap-1', className)}>
       {categories.map((category) => {
+        const seesRestricted =
+          isSuperAdmin || (!!user && !!category.restrictedRoles?.includes(user.role));
         const resolve = (keys: readonly string[]) =>
           keys
             .map((key) => itemsByKey.get(key))
             .filter((item): item is NavItem => item !== undefined)
-            .filter((item) => !item.adminOnly || user?.role === 'super_admin');
+            .filter(
+              (item) =>
+                isSuperAdmin ||
+                (!item.adminOnly &&
+                  (seesRestricted || !category.restrictedItemKeys?.includes(item.key))),
+            );
         const items = resolve(category.itemKeys);
         const extraItems = resolve(category.extraItemKeys ?? []);
         const categoryActive = [...items, ...extraItems].some((item) => isActive(item.href));

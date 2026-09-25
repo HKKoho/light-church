@@ -55,6 +55,8 @@ enum UserRole {
   // Finance administrator: operational access plus the Finance Pipeline AI Tool
   // (single sign-on into the SecureFin pipeline).
   finadmin
+  // Deacon: operational access plus the full Finance & Stewardship header menu.
+  deacon
   ministry_leader
   volunteer
   guest

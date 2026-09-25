@@ -85,6 +85,7 @@ const ROLE_ORDER = [
   'pastor',
   'admin_staff',
   'finadmin',
+  'deacon',
   'ministry_leader',
   'volunteer',
   'guest',
@@ -169,6 +170,7 @@ const OPERATIONAL = new Set<RoleKey>([
   'pastor',
   'admin_staff',
   'finadmin',
+  'deacon',
   'ministry_leader',
   'volunteer',
 ]);
@@ -235,6 +237,7 @@ const roleIcons: Record<RoleKey, typeof ShieldCheck> = {
   pastor: Shield,
   admin_staff: Shield,
   finadmin: Shield,
+  deacon: Shield,
   ministry_leader: Shield,
   volunteer: Eye,
   guest: Eye,
@@ -301,6 +304,7 @@ const messages = {
       pastor: 'Pastor',
       admin_staff: 'Admin Staff',
       finadmin: 'Finance Admin',
+      deacon: 'Deacon',
       ministry_leader: 'Ministry Leader',
       volunteer: 'Volunteer',
       guest: 'Guest',
@@ -316,6 +320,8 @@ const messages = {
         'Build & operate: create agents, write skills, run agents, schedule tasks, monitor usage, manage channels, SDK integration.',
       finadmin:
         'Runs agents within their own department and opens the Finance Pipeline (bank transactions, classification, reports) with single sign-on.',
+      deacon:
+        'Runs agents within their own department and sees the full Finance & Stewardship menu (stewardship, finance, governance dashboards).',
       ministry_leader:
         'Operates within their own department’s workspace folders: creates and runs agents, submits skills, manages that department’s content.',
       volunteer:
@@ -458,6 +464,7 @@ const messages = {
       pastor: '牧師',
       admin_staff: '行政同工',
       finadmin: '財務管理員',
+      deacon: '執事',
       ministry_leader: '事工負責人',
       volunteer: '志工',
       guest: '訪客',
@@ -471,6 +478,7 @@ const messages = {
       admin_staff:
         '建置與營運：建立代理、撰寫技能、執行代理、排程任務、監控用量、管理頻道、SDK 整合。',
       finadmin: '在自己部門內執行代理，並可透過單一登入開啟財務流程（銀行交易、分類、報表）。',
+      deacon: '在自己部門內執行代理，並可檢視完整的財務治理選單（執事管理、財務、治理儀表板）。',
       ministry_leader:
         '僅限於自己負責的事工類別工作區資料夾：建立與執行代理、提交技能、管理該類別內容。',
       volunteer: '可在自己負責的事工類別內執行代理與檢視內容，無法建立或編輯代理。',
