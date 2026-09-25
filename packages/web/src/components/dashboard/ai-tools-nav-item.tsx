@@ -17,6 +17,13 @@ import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from './built-in-ai-tools';
 import { navButtonClass } from './sidebar-nav-group';
 
+// Old uploaded tools in `<data>/AITools/` superseded by a built-in page
+// (/roll-call, /activities), so they never get their own sidebar entry.
+const HIDDEN_UPLOADED_TOOLS: ReadonlySet<string> = new Set([
+  'roll-call',
+  'mission-camp-companion',
+]);
+
 const messages = {
   en: {
     aiTools: 'AI Tools',
@@ -64,12 +71,14 @@ export function AiToolsNavItem() {
       label: t.builtIn[tool.key],
       icon: tool.icon,
     })),
-    ...tools.map((tool) => ({
-      key: `ai-tool:${tool.name}`,
-      href: `/ai-tools/${encodeURIComponent(tool.name)}`,
-      label: aiToolLabel(tool, lang),
-      icon: tool.kind === 'link' ? ExternalLink : Wand2,
-    })),
+    ...tools
+      .filter((tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name))
+      .map((tool) => ({
+        key: `ai-tool:${tool.name}`,
+        href: `/ai-tools/${encodeURIComponent(tool.name)}`,
+        label: aiToolLabel(tool, lang),
+        icon: tool.kind === 'link' ? ExternalLink : Wand2,
+      })),
   ];
 
   return (
