@@ -187,6 +187,8 @@ services:
       - '127.0.0.1:${LIGHTCHURCH_WEB_PORT:-3000}:3000'
     environment:
       NODE_ENV: production
+      # Server-rendered /churchweb pages call the API over the compose network.
+      API_INTERNAL_URL: http://api:3003
     depends_on:
       - api
 

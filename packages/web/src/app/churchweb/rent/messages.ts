@@ -1,11 +1,9 @@
 import { useT, type Messages } from '@/lib/i18n';
 
 const en = {
-  brand: 'Light Church',
   title: 'Rent a Church Place',
   subtitle:
     'Apply to use the church hall, lawn or rooms for your church, group or organisation. Our staff will review your application and contact you to confirm.',
-  switchLanguage: '中文',
   required: 'Required',
   sectionApplicant: 'Applicant',
   sectionVenue: 'Venue and time',
@@ -62,10 +60,8 @@ const en = {
 const messages = {
   en,
   'zh-TW': {
-    brand: '光教會',
     title: '租借教會場地',
     subtitle: '教會、團體或機構可申請借用禮堂、草地或房間。同工審核後會與您聯絡確認。',
-    switchLanguage: 'English',
     required: '必填',
     sectionApplicant: '申請機構資料',
     sectionVenue: '借用場地及時間',

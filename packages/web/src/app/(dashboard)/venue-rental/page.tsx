@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { Building2, Check, Copy, ExternalLink, Loader2 } from 'lucide-react';
 import {
+  CHURCH_SITE_BASE,
   VENUE_APPLICATION_STATUSES,
   VENUE_RENTAL_REVIEWER_ROLES,
   type VenueApplicationInfo,
@@ -19,6 +20,7 @@ import { useVenueRentalT } from './messages';
 type Filter = VenueApplicationStatus | 'all';
 const FILTERS: readonly Filter[] = ['pending', ...VENUE_APPLICATION_STATUSES.slice(1), 'all'];
 const BASE = '/api/v1/venue-rental/applications';
+const FORM_PATH = `${CHURCH_SITE_BASE}/rent`;
 
 export default function VenueRentalPage() {
   const t = useVenueRentalT();
@@ -29,9 +31,9 @@ export default function VenueRentalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
-  const [formUrl, setFormUrl] = useState('/rent');
+  const [formUrl, setFormUrl] = useState(FORM_PATH);
 
-  useEffect(() => setFormUrl(`${window.location.origin}/rent`), []);
+  useEffect(() => setFormUrl(`${window.location.origin}${FORM_PATH}`), []);
 
   const load = useCallback(async () => {
     if (!canReview) return;
@@ -88,7 +90,7 @@ export default function VenueRentalPage() {
           {copied ? t.copied : t.copyLink}
         </Button>
         <Button size="sm" variant="ghost" asChild>
-          <Link href="/rent" target="_blank">
+          <Link href={FORM_PATH} target="_blank">
             <ExternalLink className="size-4" />
             {t.openForm}
           </Link>

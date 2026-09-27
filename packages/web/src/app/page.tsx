@@ -1,3 +1,5 @@
+import { redirect } from 'next/navigation';
+import { CHURCH_SITE_BASE } from '@clawix/shared';
 import { SiteHeader } from '@/components/landing/site-header';
 import { HeroSection } from '@/components/landing/hero-section';
 import { WhySection } from '@/components/landing/why-section';
@@ -7,8 +9,12 @@ import { CapabilitiesSection } from '@/components/landing/capabilities-section';
 import { TrustSection } from '@/components/landing/trust-section';
 import { CtaSection } from '@/components/landing/cta-section';
 import { SiteFooter } from '@/components/landing/site-footer';
+import { getPublicSite } from '@/lib/church-site';
 
-export default function LandingPage() {
+/** Once staff publish the church website, visitors land on it instead. */
+export default async function LandingPage() {
+  if ((await getPublicSite())?.site.published) redirect(CHURCH_SITE_BASE);
+
   return (
     <div className="flex min-h-svh flex-col">
       <SiteHeader />
