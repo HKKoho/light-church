@@ -112,6 +112,8 @@ model User {
   activityAssets          ActivityAsset[]
   rollCallSimpleList      RollCallSimpleList?
   reviewedVenueApps       VenueApplication[]
+  siteEvents              SiteEvent[]
+  siteMedia               SiteMedia[]
 }
 
 // ============================================================================
@@ -795,4 +797,81 @@ model VenueApplication {
   reviewedBy User? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
 
   @@index([status, createdAt])
+}
+
+// ============================================================================
+// Church Website (AI Tool) — the church's public site at /churchweb
+// ============================================================================
+
+// One church per install, so one row (id "default"). Filled by importing the
+// church's existing website, then edited by staff. `nav` is SiteNavItem[],
+// `contact` is SiteContact, `serviceTimes` is SiteServiceTime[] (shared).
+model ChurchSite {
+  id           String    @id @default("default")
+  sourceUrl    String?
+  churchName   String    @default("")
+  tagline      String    @default("")
+  logoUrl      String    @default("")
+  nav          Json      @default("[]")
+  contact      Json      @default("{}")
+  serviceTimes Json      @default("[]")
+  published    Boolean   @default(false)
+  importStatus String    @default("idle") // idle | running | done | failed
+  importError  String?
+  importedAt   DateTime?
+  updatedAt    DateTime  @updatedAt
+}
+
+// A content page at /churchweb/<slug>. Imported pages keep their sourceUrl;
+// `editedAt` is set when staff change a page so a re-import never overwrites it.
+model SitePage {
+  id         String    @id @default(cuid())
+  slug       String    @unique
+  title      String
+  markdown   String
+  sourceUrl  String?
+  visibility String    @default("public") // public | members | hidden
+  sortOrder  Int       @default(0)
+  editedAt   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([visibility, sortOrder])
+}
+
+model SiteEvent {
+  id              String   @id @default(cuid())
+  title           String
+  date            String // YYYY-MM-DD
+  time            String   @default("")
+  location        String   @default("")
+  description     String   @default("")
+  registrationUrl String   @default("")
+  visibility      String   @default("public")
+  createdById     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([visibility, date])
+}
+
+// A sermon, recording or document published on the site (linked, not uploaded).
+model SiteMedia {
+  id          String   @id @default(cuid())
+  title       String
+  kind        String // video | audio | document | link
+  url         String
+  speaker     String   @default("")
+  date        String // YYYY-MM-DD
+  description String   @default("")
+  visibility  String   @default("public")
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
+
+  @@index([visibility, date])
 }
