@@ -14,15 +14,6 @@ const en = {
     events: 'Events',
     media: 'Media',
     wisdom: 'Wisdom in Bible',
-    getInBible: 'Get in Bible',
-    culture: 'Christianity Culture',
-  },
-  // Link tabs
-  open: 'Open',
-  links: {
-    getInBible:
-      'Start reading Scripture — guided entry points for newcomers and new believers. Manage its content in the Get in Bible admin.',
-    culture: 'Explore Christianity and culture — faith, history, arts and everyday life.',
   },
   // Import
   importIntro:
@@ -112,14 +103,6 @@ const messages = {
       events: '活動',
       media: '影音',
       wisdom: '聖經中的智慧',
-      getInBible: '進入聖經',
-      culture: '基督教文化',
-    },
-    open: '開啟',
-    links: {
-      getInBible:
-        '開始閱讀聖經——為慕道者及初信者預備的入門引導。請在「進入聖經」管理後台編輯內容。',
-      culture: '探索基督教與文化——信仰、歷史、藝術與日常生活。',
     },
     importIntro:
       '輸入教會現有網站的網址。Light Church 會複製其選單、頁面、圖片、聯絡資料及聚會時間（最多 40 頁）。只可匯入教會擁有或獲准使用的網站。',

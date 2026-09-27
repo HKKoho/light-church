@@ -4,10 +4,15 @@ import { useT, type Messages } from '@/lib/i18n';
 const en = {
   aiToolsTitle: 'AI Tools',
   aiToolsIntro:
-    'Tools for growing in faith together. Sign in with your church account to use them.',
+    'Tools for growing in faith together. Church tools ask you to sign in with your church account; external links open in a new tab.',
   wisdomName: 'Wisdom in Bible',
   wisdomDescription:
     'Bring your life’s questions to Proverbs, Ecclesiastes and Job — three voices of biblical wisdom, side by side.',
+  getInBibleName: 'Get in Bible',
+  getInBibleDescription:
+    'Start reading Scripture — guided entry points for newcomers and new believers.',
+  cultureName: 'Christianity Culture',
+  cultureDescription: 'Explore Christianity and culture — faith, history, arts and everyday life.',
   open: 'Open',
   wisdomIntro:
     'Each lesson starts from a life question, then reads it through three perspectives: Proverbs (how life should be ordered), Ecclesiastes (how life often is) and Job (how life sometimes collapses).',
@@ -52,9 +57,13 @@ const messages = {
   en,
   'zh-TW': {
     aiToolsTitle: 'AI 工具',
-    aiToolsIntro: '一同在信仰中成長的工具。請以教會帳戶登入使用。',
+    aiToolsIntro: '一同在信仰中成長的工具。教會工具需以教會帳戶登入；外部連結會在新分頁開啟。',
     wisdomName: '聖經中的智慧',
     wisdomDescription: '把人生課題帶到箴言、傳道書與約伯記——三種聖經智慧的聲音並讀。',
+    getInBibleName: '進入聖經',
+    getInBibleDescription: '開始閱讀聖經——為慕道者及初信者預備的入門引導。',
+    cultureName: '基督教文化',
+    cultureDescription: '探索基督教與文化——信仰、歷史、藝術與日常生活。',
     open: '開啟',
     wisdomIntro:
       '每課由一個人生課題出發，再以三個視角閱讀：箴言（理應如何）、傳道書（實際常如何）、約伯記（有時完全崩潰）。',

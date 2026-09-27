@@ -18,7 +18,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authFetch } from '@/lib/auth';
 import { EventsTab, MediaTab } from './content-tabs';
 import { ImportTab } from './import-tab';
-import { LinkTab } from './link-tab';
 import { useChurchWebT } from './messages';
 import { PagesTab } from './pages-tab';
 import { ErrorBanner, errorMessage } from './shared';
@@ -26,7 +25,7 @@ import { SiteTab } from './site-tab';
 import { WisdomCourseManager } from '../wisdom-in-bible/course-manager';
 
 const ADMIN_TABS: readonly string[] = ['import', 'site', 'pages'];
-const EDITOR_TABS: readonly string[] = ['events', 'media', 'wisdom', 'getInBible', 'culture'];
+const EDITOR_TABS: readonly string[] = ['events', 'media', 'wisdom'];
 
 function ChurchWebsiteContent() {
   const t = useChurchWebT();
@@ -103,8 +102,6 @@ function ChurchWebsiteContent() {
             <TabsTrigger value="events">{t.tabs.events}</TabsTrigger>
             <TabsTrigger value="media">{t.tabs.media}</TabsTrigger>
             <TabsTrigger value="wisdom">{t.tabs.wisdom}</TabsTrigger>
-            <TabsTrigger value="getInBible">{t.tabs.getInBible}</TabsTrigger>
-            <TabsTrigger value="culture">{t.tabs.culture}</TabsTrigger>
           </TabsList>
 
           {isAdmin && (
@@ -136,12 +133,6 @@ function ChurchWebsiteContent() {
           </TabsContent>
           <TabsContent value="wisdom" className="mt-4">
             <WisdomCourseManager />
-          </TabsContent>
-          <TabsContent value="getInBible" className="mt-4">
-            <LinkTab tab="getInBible" />
-          </TabsContent>
-          <TabsContent value="culture" className="mt-4">
-            <LinkTab tab="culture" />
           </TabsContent>
         </Tabs>
       )}
