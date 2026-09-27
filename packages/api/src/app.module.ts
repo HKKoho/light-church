@@ -12,6 +12,7 @@ import { ConnectorsModule } from './connectors/connectors.module.js';
 import { QrRegistrationModule } from './qr-registration/qr-registration.module.js';
 import { VenueRentalModule } from './venue-rental/venue-rental.module.js';
 import { ChurchSiteModule } from './church-site/church-site.module.js';
+import { WisdomModule } from './wisdom/wisdom.module.js';
 import { DashboardModule } from './dashboard/index.js';
 import { AgentsModule } from './agents/index.js';
 import { AuditModule } from './audit/index.js';
@@ -88,6 +89,7 @@ import { TalkingFaceModule } from './talkingface/talkingface.module.js';
     QrRegistrationModule,
     VenueRentalModule,
     ChurchSiteModule,
+    WisdomModule,
     CongregationProfileModule,
     ClientModule,
     TalkingFaceModule,

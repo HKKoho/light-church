@@ -48,6 +48,7 @@ export function SiteHeader({ churchName, logoUrl, nav }: Props) {
     { label: t.events, href: `${CHURCH_SITE_BASE}/events`, children: [] },
     { label: t.media, href: `${CHURCH_SITE_BASE}/media`, children: [] },
     { label: t.rent, href: `${CHURCH_SITE_BASE}/rent`, children: [] },
+    { label: t.aiTools, href: `${CHURCH_SITE_BASE}/ai-tools`, children: [] },
     { label: t.members, href: `${CHURCH_SITE_BASE}/members`, children: [] },
   ];
   const home = nav.length ? [] : [{ label: t.home, href: CHURCH_SITE_BASE, children: [] }];

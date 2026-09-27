@@ -114,6 +114,7 @@ model User {
   reviewedVenueApps       VenueApplication[]
   siteEvents              SiteEvent[]
   siteMedia               SiteMedia[]
+  wisdomResponses         WisdomResponse[]
 }
 
 // ============================================================================
@@ -874,4 +875,62 @@ model SiteMedia {
   createdBy User? @relation(fields: [createdById], references: [id], onDelete: SetNull)
 
   @@index([visibility, date])
+}
+
+// ── Wisdom in Bible ────────────────────────────────────────────────────
+// A course of cycles and modules: each module asks life questions, sets
+// three Scripture perspectives (Proverbs, Ecclesiastes, Job) side by side,
+// then guides the tension, discussion and a summary. Staff edit it in the
+// dashboard; signed-in members take it on the church website.
+
+model WisdomCycle {
+  id          String   @id @default(cuid())
+  title       String
+  description String   @default("")
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  modules WisdomModule[]
+
+  @@index([sortOrder])
+}
+
+model WisdomModule {
+  id                   String   @id @default(cuid())
+  cycleId              String
+  title                String
+  subtitle             String   @default("")
+  sortOrder            Int      @default(0)
+  status               String   @default("draft") // draft | published | archived
+  lifeQuestions        Json     @default("[]") // [{ id, text, type, options, mediaUrl, imageUrl, imageAlt }]
+  perspectives         Json     @default("{}") // { PROVERBS | ECCLESIASTES | JOB: { book, theme, description, imageUrl, imageAlt, audioUrl } }
+  tensionGuide         String   @default("")
+  tensionGuideAudioUrl String   @default("")
+  discussionPrompts    Json     @default("[]") // string[]
+  summary              String   @default("")
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  cycle     WisdomCycle      @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+  responses WisdomResponse[]
+
+  @@index([cycleId, sortOrder])
+}
+
+// One member's answers to one module; `completedAt` marks it finished.
+model WisdomResponse {
+  id          String    @id @default(cuid())
+  moduleId    String
+  userId      String
+  answers     Json      @default("{}") // { "<questionId>": text, "d0": text, "summary": text }
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  module WisdomModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+  @@index([moduleId])
 }

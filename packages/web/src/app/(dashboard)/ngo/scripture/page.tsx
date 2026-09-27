@@ -8,6 +8,7 @@ import { authFetch } from '@/lib/auth';
 import { Button } from '@/components/ui/button';
 import { useT, type Messages } from '@/lib/i18n';
 import { FolderColumns, type FolderDef } from '../folder-columns';
+import { ScriptureCards } from './scripture-cards';
 
 const FOLDERS: readonly FolderDef[] = [
   { path: '/scripture/translation', label: 'translation' },
@@ -92,6 +93,8 @@ export default function ScripturePage() {
           {t.descAfter}
         </p>
       </header>
+
+      <ScriptureCards />
 
       {error && (
         <div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">

@@ -23,6 +23,7 @@ import { RollCallRepository } from './roll-call.repository.js';
 import { VenueApplicationRepository } from './venue-application.repository.js';
 import { ChurchSiteRepository } from './church-site.repository.js';
 import { SiteContentRepository } from './site-content.repository.js';
+import { WisdomRepository } from './wisdom.repository.js';
 
 const repositories = [
   PolicyRepository,
@@ -48,6 +49,7 @@ const repositories = [
   VenueApplicationRepository,
   ChurchSiteRepository,
   SiteContentRepository,
+  WisdomRepository,
 ];
 
 @Global()
