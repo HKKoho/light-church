@@ -21,6 +21,7 @@ import { BulletinArchiveRepository } from './bulletin-archive.repository.js';
 import { ActivityRepository } from './activity.repository.js';
 import { RollCallRepository } from './roll-call.repository.js';
 import { VenueApplicationRepository } from './venue-application.repository.js';
+import { ChurchSiteRepository } from './church-site.repository.js';
 
 const repositories = [
   PolicyRepository,
@@ -44,6 +45,7 @@ const repositories = [
   ActivityRepository,
   RollCallRepository,
   VenueApplicationRepository,
+  ChurchSiteRepository,
 ];
 
 @Global()
