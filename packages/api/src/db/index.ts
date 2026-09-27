@@ -22,3 +22,4 @@ export { ActivityRepository } from './activity.repository.js';
 export { RollCallRepository } from './roll-call.repository.js';
 export { VenueApplicationRepository } from './venue-application.repository.js';
 export { ChurchSiteRepository } from './church-site.repository.js';
+export { SiteContentRepository } from './site-content.repository.js';
