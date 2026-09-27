@@ -7,7 +7,23 @@ const en = {
     'Import your church’s existing website, then run it from here at /churchweb, with events, sermons, venue rental and a members area.',
   noAccess: 'The church website is managed by pastors, ministry leaders and admin staff.',
   viewSite: 'View site',
-  tabs: { import: 'Import', site: 'Site', pages: 'Pages', events: 'Events', media: 'Media' },
+  tabs: {
+    import: 'Import',
+    site: 'Site',
+    pages: 'Pages',
+    events: 'Events',
+    media: 'Media',
+    wisdom: 'Wisdom in Bible',
+    getInBible: 'Get in Bible',
+    culture: 'Christianity Culture',
+  },
+  // Link tabs
+  open: 'Open',
+  links: {
+    getInBible:
+      'Start reading Scripture — guided entry points for newcomers and new believers. Manage its content in the Get in Bible admin.',
+    culture: 'Explore Christianity and culture — faith, history, arts and everyday life.',
+  },
   // Import
   importIntro:
     'Enter the address of the church’s current website. Light Church copies its menu, pages, images, contacts and service times (up to 40 pages). Only import a site your church owns or may use.',
@@ -89,7 +105,22 @@ const messages = {
     subtitle: '匯入教會現有網站，之後在此管理 /churchweb，並加入活動、講道、場地租借及會友專區。',
     noAccess: '教會網站由牧者、事工領袖及行政同工管理。',
     viewSite: '瀏覽網站',
-    tabs: { import: '匯入', site: '網站', pages: '頁面', events: '活動', media: '影音' },
+    tabs: {
+      import: '匯入',
+      site: '網站',
+      pages: '頁面',
+      events: '活動',
+      media: '影音',
+      wisdom: '聖經中的智慧',
+      getInBible: '進入聖經',
+      culture: '基督教文化',
+    },
+    open: '開啟',
+    links: {
+      getInBible:
+        '開始閱讀聖經——為慕道者及初信者預備的入門引導。請在「進入聖經」管理後台編輯內容。',
+      culture: '探索基督教與文化——信仰、歷史、藝術與日常生活。',
+    },
     importIntro:
       '輸入教會現有網站的網址。Light Church 會複製其選單、頁面、圖片、聯絡資料及聚會時間（最多 40 頁）。只可匯入教會擁有或獲准使用的網站。',
     importUrl: '網站網址',

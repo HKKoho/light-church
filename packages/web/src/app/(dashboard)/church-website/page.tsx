@@ -1,7 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ExternalLink, Globe, Loader2 } from 'lucide-react';
 import {
   CHURCH_SITE_BASE,
@@ -17,16 +18,29 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authFetch } from '@/lib/auth';
 import { EventsTab, MediaTab } from './content-tabs';
 import { ImportTab } from './import-tab';
+import { LinkTab } from './link-tab';
 import { useChurchWebT } from './messages';
 import { PagesTab } from './pages-tab';
 import { ErrorBanner, errorMessage } from './shared';
 import { SiteTab } from './site-tab';
+import { WisdomCourseManager } from '../wisdom-in-bible/course-manager';
 
-export default function ChurchWebsitePage() {
+const ADMIN_TABS: readonly string[] = ['import', 'site', 'pages'];
+const EDITOR_TABS: readonly string[] = ['events', 'media', 'wisdom', 'getInBible', 'culture'];
+
+function ChurchWebsiteContent() {
   const t = useChurchWebT();
   const { user } = useAuth();
   const isAdmin = !!user && SITE_ADMIN_ROLES.includes(user.role);
   const isEditor = !!user && SITE_EDITOR_ROLES.includes(user.role);
+  // `?tab=` opens a tab directly (e.g. /church-website?tab=wisdom).
+  const requested = useSearchParams().get('tab') ?? '';
+  const defaultTab =
+    EDITOR_TABS.includes(requested) || (isAdmin && ADMIN_TABS.includes(requested))
+      ? requested
+      : isAdmin
+        ? 'import'
+        : 'events';
   const [site, setSite] = useState<ChurchSiteInfo | null>(null);
   const [pages, setPages] = useState<readonly SitePageSummary[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -77,8 +91,8 @@ export default function ChurchWebsitePage() {
       {!isEditor ? (
         <p className="text-sm text-muted-foreground">{t.noAccess}</p>
       ) : (
-        <Tabs defaultValue={isAdmin ? 'import' : 'events'}>
-          <TabsList>
+        <Tabs defaultValue={defaultTab}>
+          <TabsList className="h-auto flex-wrap">
             {isAdmin && (
               <>
                 <TabsTrigger value="import">{t.tabs.import}</TabsTrigger>
@@ -88,6 +102,9 @@ export default function ChurchWebsitePage() {
             )}
             <TabsTrigger value="events">{t.tabs.events}</TabsTrigger>
             <TabsTrigger value="media">{t.tabs.media}</TabsTrigger>
+            <TabsTrigger value="wisdom">{t.tabs.wisdom}</TabsTrigger>
+            <TabsTrigger value="getInBible">{t.tabs.getInBible}</TabsTrigger>
+            <TabsTrigger value="culture">{t.tabs.culture}</TabsTrigger>
           </TabsList>
 
           {isAdmin && (
@@ -117,8 +134,25 @@ export default function ChurchWebsitePage() {
           <TabsContent value="media" className="mt-4">
             <MediaTab />
           </TabsContent>
+          <TabsContent value="wisdom" className="mt-4">
+            <WisdomCourseManager />
+          </TabsContent>
+          <TabsContent value="getInBible" className="mt-4">
+            <LinkTab tab="getInBible" />
+          </TabsContent>
+          <TabsContent value="culture" className="mt-4">
+            <LinkTab tab="culture" />
+          </TabsContent>
         </Tabs>
       )}
     </div>
+  );
+}
+
+export default function ChurchWebsitePage() {
+  return (
+    <Suspense fallback={<Loader2 className="m-6 size-6 animate-spin text-muted-foreground" />}>
+      <ChurchWebsiteContent />
+    </Suspense>
   );
 }

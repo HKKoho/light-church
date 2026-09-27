@@ -28,6 +28,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
 import { useWisdomT } from '../../messages';
+import { WISDOM_COURSE_HREF } from '../../routes';
 import { DeleteButton, ErrorBanner, Field, errorMessage } from '../../shared';
 import {
   PerspectivesEditor,
@@ -174,7 +175,7 @@ export default function WisdomModulePage() {
   const remove = async () => {
     try {
       await authFetch(`${API}/modules/${id}`, { method: 'DELETE' });
-      router.push('/wisdom-in-bible');
+      router.push(WISDOM_COURSE_HREF);
     } catch (err) {
       setError(errorMessage(err, t.failed));
     }
@@ -201,7 +202,7 @@ export default function WisdomModulePage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6">
       <Link
-        href="/wisdom-in-bible"
+        href={WISDOM_COURSE_HREF}
         className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" />

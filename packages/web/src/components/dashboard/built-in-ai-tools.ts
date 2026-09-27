@@ -4,7 +4,6 @@ import {
   ClipboardList,
   Gamepad2,
   Globe,
-  Lightbulb,
   QrCode,
   Tent,
   type LucideIcon,
@@ -23,8 +22,7 @@ export interface BuiltInAiTool {
     | 'aiSurvey'
     | 'qrRegistration'
     | 'venueRental'
-    | 'churchWebsite'
-    | 'wisdomInBible';
+    | 'churchWebsite';
   readonly href: string;
   readonly icon: LucideIcon;
 }
@@ -37,7 +35,6 @@ export const BUILT_IN_AI_TOOLS: readonly BuiltInAiTool[] = [
   { key: 'qrRegistration', href: '/qr-registration', icon: QrCode },
   { key: 'venueRental', href: '/venue-rental', icon: Building2 },
   { key: 'churchWebsite', href: '/church-website', icon: Globe },
-  { key: 'wisdomInBible', href: '/wisdom-in-bible', icon: Lightbulb },
 ];
 
 // Uploaded tools (`<data>/AITools/<name>/`) listed ahead of the built-ins, in

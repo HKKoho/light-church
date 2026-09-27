@@ -82,11 +82,6 @@ const messages = {
         description:
           'Import your church’s existing website and run it at /churchweb, with events, sermons, venue rental and a members area.',
       },
-      wisdomInBible: {
-        name: 'Wisdom in Bible',
-        description:
-          'A course reading life’s questions through Proverbs, Ecclesiastes and Job. Edit it here; members take it on the church website.',
-      },
     },
     loadError: 'Failed to load AI tools',
     open: 'Open',
@@ -139,10 +134,6 @@ const messages = {
       churchWebsite: {
         name: '教會網站',
         description: '匯入教會現有網站並在 /churchweb 運作，加入活動、講道、場地租借及會友專區。',
-      },
-      wisdomInBible: {
-        name: '聖經中的智慧',
-        description: '以箴言、傳道書與約伯記並讀人生課題的課程。在此編輯；會友在教會網站學習。',
       },
     },
     loadError: '無法載入 AI 工具',

@@ -5,13 +5,14 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT, type Messages } from '@/lib/i18n';
+import { WISDOM_COURSE_HREF } from '../../wisdom-in-bible/routes';
 
 type CardKey = 'getInBible' | 'wisdomInBible' | 'theologyPlatform';
 
 /** Outside links open in a new tab; Light Church pages open in place. */
 const CARDS: readonly { key: CardKey; icon: LucideIcon; href: string }[] = [
-  { key: 'getInBible', icon: BookOpen, href: 'https://getinbible.vercel.app/login' },
-  { key: 'wisdomInBible', icon: Lightbulb, href: '/wisdom-in-bible' },
+  { key: 'getInBible', icon: BookOpen, href: 'https://getinbible.vercel.app/admin' },
+  { key: 'wisdomInBible', icon: Lightbulb, href: WISDOM_COURSE_HREF },
   {
     key: 'theologyPlatform',
     icon: GraduationCap,

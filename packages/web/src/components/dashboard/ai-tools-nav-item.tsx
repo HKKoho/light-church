@@ -34,7 +34,6 @@ const messages = {
       qrRegistration: 'QR Registration',
       venueRental: 'Rent Church Place',
       churchWebsite: 'Church Website',
-      wisdomInBible: 'Wisdom in Bible',
     },
   },
   'zh-TW': {
@@ -48,7 +47,6 @@ const messages = {
       qrRegistration: 'QR 報名',
       venueRental: '租借教會場地',
       churchWebsite: '教會網站',
-      wisdomInBible: '聖經中的智慧',
     },
   },
 } satisfies Messages<{
