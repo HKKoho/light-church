@@ -38,8 +38,11 @@ export function SessionFields({ sessions, errors, onChange }: Props) {
         {t.sessions} <span className="text-destructive">*</span>
       </Label>
       {sessions.map((s, i) => (
-        <div key={i} className="grid grid-cols-[1fr_1fr_1fr_auto] items-start gap-2">
-          <div>
+        <div
+          key={i}
+          className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1fr)_auto]"
+        >
+          <div className="col-span-3 sm:col-span-1">
             <span className="text-xs text-muted-foreground">{t.date(i + 1)}</span>
             <Input
               type="date"

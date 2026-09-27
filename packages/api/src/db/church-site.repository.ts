@@ -23,13 +23,20 @@ const summarySelect = {
 export class ChurchSiteRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** The one site row, created empty on first use. */
-  getSite(): Promise<ChurchSite> {
-    return this.prisma.churchSite.upsert({
-      where: { id: SITE_ID },
-      create: { id: SITE_ID },
-      update: {},
-    });
+  /**
+   * The one site row, created empty on first use. The public site's layout
+   * and page read it in parallel, so two first requests can race to create
+   * it: the loser just reads the winner's row.
+   */
+  async getSite(): Promise<ChurchSite> {
+    const existing = await this.prisma.churchSite.findUnique({ where: { id: SITE_ID } });
+    if (existing) return existing;
+    try {
+      return await this.prisma.churchSite.create({ data: { id: SITE_ID } });
+    } catch (err) {
+      if ((err as { code?: string }).code !== 'P2002') throw err;
+      return this.prisma.churchSite.findUniqueOrThrow({ where: { id: SITE_ID } });
+    }
   }
 
   updateSite(data: Prisma.ChurchSiteUpdateInput): Promise<ChurchSite> {

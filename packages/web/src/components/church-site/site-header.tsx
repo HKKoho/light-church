@@ -63,7 +63,7 @@ export function SiteHeader({ churchName, logoUrl, nav }: Props) {
             <img
               src={logoUrl}
               alt={churchName}
-              className="h-10 w-auto max-w-[220px] object-contain"
+              className="h-10 w-auto max-w-[220px] rounded-md bg-white object-contain p-1"
             />
           ) : (
             <span className="truncate">{churchName}</span>

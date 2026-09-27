@@ -242,6 +242,18 @@ function siteNameOf(doc: Document): string {
   return (parts.length > 1 ? parts[parts.length - 1] : doc.title)?.trim() ?? '';
 }
 
+/** Longer than this, a meta description is usually page text dumped by an SEO plugin. */
+const MAX_TAGLINE = 160;
+
+function shortDescription(doc: Document): string {
+  const text = (
+    doc.querySelector('meta[name="description"]')?.getAttribute('content') ??
+    doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ??
+    ''
+  ).trim();
+  return text.length <= MAX_TAGLINE ? text : '';
+}
+
 export interface SiteMeta {
   readonly churchName: string;
   readonly tagline: string;
@@ -267,14 +279,9 @@ export function extractMeta(html: string, url: string): SiteMeta {
     ),
   ];
   return {
-    churchName: siteNameOf(doc).slice(0, 120),
-    tagline: (
-      doc.querySelector('meta[name="description"]')?.getAttribute('content') ??
-      doc.querySelector('meta[property="og:description"]')?.getAttribute('content') ??
-      ''
-    )
-      .trim()
-      .slice(0, 300),
+    // "Name - Longer name" (common in site_name) → the first, shorter form.
+    churchName: (siteNameOf(doc).split(/\s+[-|–—]\s+/)[0] ?? '').trim().slice(0, 120),
+    tagline: shortDescription(doc),
     logoUrl: logoSrc && !logoSrc.startsWith('data:') ? new URL(logoSrc, url).href : '',
     emails: pick('mailto:').slice(0, 5),
     phones: pick('tel:').slice(0, 5),

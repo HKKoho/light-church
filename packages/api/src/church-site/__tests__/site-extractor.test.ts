@@ -150,3 +150,15 @@ describe('dropRepeatedBlocks', () => {
     );
   });
 });
+
+describe('extractMeta fallbacks', () => {
+  it('shortens a doubled site name and drops a dumped description', () => {
+    const html = `<html><head><title>Home</title>
+      <meta property="og:site_name" content="茶果嶺浸信會 CKLBC - 茶果嶺浸信會 Cha Kwo Ling Baptist Church">
+      <meta name="description" content="${'認識茶浸 主日崇拜直播 '.repeat(20)}">
+      </head><body></body></html>`;
+    const meta = extractMeta(html, home);
+    expect(meta.churchName).toBe('茶果嶺浸信會 CKLBC');
+    expect(meta.tagline).toBe('');
+  });
+});
