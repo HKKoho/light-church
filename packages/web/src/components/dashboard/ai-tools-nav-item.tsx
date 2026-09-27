@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { AiToolSummary } from '@clawix/shared';
 import { ChevronRight, ExternalLink, Sparkles, Wand2 } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -14,15 +15,12 @@ import {
 } from '@/components/ui/sidebar';
 import { aiToolLabel, useAiTools } from '@/hooks/use-ai-tools';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
-import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from './built-in-ai-tools';
+import { BUILT_IN_AI_TOOLS, splitUploadedTools, type BuiltInAiTool } from './built-in-ai-tools';
 import { navButtonClass } from './sidebar-nav-group';
 
 // Old uploaded tools in `<data>/AITools/` superseded by a built-in page
 // (/roll-call, /activities), so they never get their own sidebar entry.
-const HIDDEN_UPLOADED_TOOLS: ReadonlySet<string> = new Set([
-  'roll-call',
-  'mission-camp-companion',
-]);
+const HIDDEN_UPLOADED_TOOLS: ReadonlySet<string> = new Set(['roll-call', 'mission-camp-companion']);
 
 const messages = {
   en: {
@@ -34,6 +32,7 @@ const messages = {
       rollCall: 'Roll Call',
       aiSurvey: 'AI Survey',
       qrRegistration: 'QR Registration',
+      venueRental: 'Rent Church Place',
     },
   },
   'zh-TW': {
@@ -45,6 +44,7 @@ const messages = {
       rollCall: '點名',
       aiSurvey: 'AI 問卷',
       qrRegistration: 'QR 報名',
+      venueRental: '租借教會場地',
     },
   },
 } satisfies Messages<{
@@ -55,8 +55,8 @@ const messages = {
 
 /**
  * Phase 1 sidebar entry: "AI Tools" opens the overview page; the chevron
- * expands a dropdown listing every tool (built-in first, then the church's
- * uploaded tools by their display name in the current language).
+ * expands a dropdown listing every tool: the leading uploaded tools (Sunday
+ * Service Bulletin, SecureFin Pipeline), the built-ins, then the other uploads.
  */
 export function AiToolsNavItem() {
   const t = useT(messages);
@@ -64,21 +64,24 @@ export function AiToolsNavItem() {
   const pathname = usePathname();
   const { tools } = useAiTools();
 
+  const uploaded = splitUploadedTools(
+    tools.filter((tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name)),
+  );
+  const toItem = (tool: AiToolSummary) => ({
+    key: `ai-tool:${tool.name}`,
+    href: `/ai-tools/${encodeURIComponent(tool.name)}`,
+    label: aiToolLabel(tool, lang),
+    icon: tool.kind === 'link' ? ExternalLink : Wand2,
+  });
   const items = [
+    ...uploaded.leading.map(toItem),
     ...BUILT_IN_AI_TOOLS.map((tool) => ({
       key: tool.key,
       href: tool.href,
       label: t.builtIn[tool.key],
       icon: tool.icon,
     })),
-    ...tools
-      .filter((tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name))
-      .map((tool) => ({
-        key: `ai-tool:${tool.name}`,
-        href: `/ai-tools/${encodeURIComponent(tool.name)}`,
-        label: aiToolLabel(tool, lang),
-        icon: tool.kind === 'link' ? ExternalLink : Wand2,
-      })),
+    ...uploaded.rest.map(toItem),
   ];
 
   return (

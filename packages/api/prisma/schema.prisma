@@ -111,6 +111,7 @@ model User {
   updatedActivities       Activity[]          @relation("ActivityUpdatedBy")
   activityAssets          ActivityAsset[]
   rollCallSimpleList      RollCallSimpleList?
+  reviewedVenueApps       VenueApplication[]
 }
 
 // ============================================================================
@@ -758,4 +759,40 @@ model RollCallSimpleList {
   updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// Rent Church Place (AI Tool) — public venue-rental applications
+// ============================================================================
+
+// Submitted by anyone from the public /rent form (no account); reviewed by
+// staff in VENUE_RENTAL_REVIEWER_ROLES. Choice fields hold the form's Chinese
+// values (e.g. venueType "禮堂"); `sessions` is [{ date, start, end }].
+model VenueApplication {
+  id              String    @id @default(cuid())
+  organization    String
+  contactPerson   String
+  contactTitle    String
+  mobile          String
+  email           String
+  venueType       String
+  roomCount       Int?
+  sessions        Json
+  activityNature  String
+  activityMode    String
+  activityFee     Decimal?  @db.Decimal(10, 2)
+  targetAudience  String[]
+  attendanceRange String
+  description     String
+  repName         String
+  repTitle        String
+  status          String    @default("pending") // pending | approved | rejected
+  adminNotes      String?
+  reviewedById    String?
+  reviewedAt      DateTime?
+  createdAt       DateTime  @default(now())
+
+  reviewedBy User? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)
+
+  @@index([status, createdAt])
 }

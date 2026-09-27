@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useRef, useState } from 'react';
+import type { AiToolSummary } from '@clawix/shared';
 import { ExternalLink, Loader2, Sparkles, Trash2, Upload, Wand2 } from 'lucide-react';
 import { useAuth } from '@/components/auth-provider';
 import { Button } from '@/components/ui/button';
@@ -28,7 +29,11 @@ import {
   aiToolLabel,
   useAiTools,
 } from '@/hooks/use-ai-tools';
-import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from '@/components/dashboard/built-in-ai-tools';
+import {
+  BUILT_IN_AI_TOOLS,
+  splitUploadedTools,
+  type BuiltInAiTool,
+} from '@/components/dashboard/built-in-ai-tools';
 
 // Roll Call stays in the sidebar dropdown but has no card on this page.
 type BuiltInCardKey = Exclude<BuiltInAiTool['key'], 'rollCall'>;
@@ -66,6 +71,11 @@ const messages = {
         name: 'QR Registration',
         description:
           'Turn any event and its registration link into a QR-code page published on Vercel, ready to share or print.',
+      },
+      venueRental: {
+        name: 'Rent Church Place',
+        description:
+          'Groups apply to rent the hall, lawn or rooms on a public form; review and approve their applications here.',
       },
     },
     loadError: 'Failed to load AI tools',
@@ -111,6 +121,10 @@ const messages = {
       qrRegistration: {
         name: 'QR 報名',
         description: '把任何活動及其報名連結製作成附 QR 碼的網頁，發佈到 Vercel，方便分享或列印。',
+      },
+      venueRental: {
+        name: '租借教會場地',
+        description: '團體透過公開表格申請借用禮堂、草地或房間；在此審批申請。',
       },
     },
     loadError: '無法載入 AI 工具',
@@ -257,6 +271,60 @@ export default function AiToolsPage() {
     }
   };
 
+  // Sunday Service Bulletin and SecureFin Pipeline lead, then the built-ins.
+  const uploaded = splitUploadedTools(tools);
+  const renderToolCard = (tool: AiToolSummary) => (
+    <Card key={tool.name} className="gap-3 py-4">
+      <CardHeader className="px-4">
+        <CardTitle className="flex items-center gap-2 text-sm">
+          {tool.kind === 'link' ? (
+            <ExternalLink className="size-4 shrink-0 text-muted-foreground" />
+          ) : (
+            <Wand2 className="size-4 shrink-0 text-muted-foreground" />
+          )}
+          <span className="truncate">{aiToolLabel(tool, lang)}</span>
+        </CardTitle>
+        {aiToolDescription(tool, lang) && (
+          <CardDescription className="line-clamp-2 text-xs">
+            {aiToolDescription(tool, lang)}
+          </CardDescription>
+        )}
+      </CardHeader>
+      <CardContent className="flex items-center gap-2 px-4">
+        <Button asChild size="sm">
+          <Link href={`/ai-tools/${encodeURIComponent(tool.name)}`}>{t.open}</Link>
+        </Button>
+        {tool.kind === 'link' && <Badge variant="secondary">{t.external}</Badge>}
+        {isAdmin && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size="sm"
+                variant="ghost"
+                className="ml-auto text-muted-foreground hover:text-destructive"
+                aria-label={`${t.remove} ${aiToolLabel(tool, lang)}`}
+              >
+                <Trash2 className="size-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>{t.removeConfirmTitle(aiToolLabel(tool, lang))}</AlertDialogTitle>
+                <AlertDialogDescription>{t.removeConfirmBody}</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
+                <AlertDialogAction onClick={() => void remove(tool.name)}>
+                  {t.remove}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="flex flex-col gap-6 p-6">
       <div>
@@ -274,6 +342,7 @@ export default function AiToolsPage() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        {!isLoading && uploaded.leading.map(renderToolCard)}
         {BUILT_IN_CARDS.map((tool) => (
           <Card key={tool.key} className="gap-3 py-4">
             <CardHeader className="px-4">
@@ -293,60 +362,7 @@ export default function AiToolsPage() {
             </CardContent>
           </Card>
         ))}
-        {!isLoading &&
-          tools.map((tool) => (
-            <Card key={tool.name} className="gap-3 py-4">
-              <CardHeader className="px-4">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  {tool.kind === 'link' ? (
-                    <ExternalLink className="size-4 shrink-0 text-muted-foreground" />
-                  ) : (
-                    <Wand2 className="size-4 shrink-0 text-muted-foreground" />
-                  )}
-                  <span className="truncate">{aiToolLabel(tool, lang)}</span>
-                </CardTitle>
-                {aiToolDescription(tool, lang) && (
-                  <CardDescription className="line-clamp-2 text-xs">
-                    {aiToolDescription(tool, lang)}
-                  </CardDescription>
-                )}
-              </CardHeader>
-              <CardContent className="flex items-center gap-2 px-4">
-                <Button asChild size="sm">
-                  <Link href={`/ai-tools/${encodeURIComponent(tool.name)}`}>{t.open}</Link>
-                </Button>
-                {tool.kind === 'link' && <Badge variant="secondary">{t.external}</Badge>}
-                {isAdmin && (
-                  <AlertDialog>
-                    <AlertDialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="ml-auto text-muted-foreground hover:text-destructive"
-                        aria-label={`${t.remove} ${aiToolLabel(tool, lang)}`}
-                      >
-                        <Trash2 className="size-4" />
-                      </Button>
-                    </AlertDialogTrigger>
-                    <AlertDialogContent>
-                      <AlertDialogHeader>
-                        <AlertDialogTitle>
-                          {t.removeConfirmTitle(aiToolLabel(tool, lang))}
-                        </AlertDialogTitle>
-                        <AlertDialogDescription>{t.removeConfirmBody}</AlertDialogDescription>
-                      </AlertDialogHeader>
-                      <AlertDialogFooter>
-                        <AlertDialogCancel>{t.cancel}</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => void remove(tool.name)}>
-                          {t.remove}
-                        </AlertDialogAction>
-                      </AlertDialogFooter>
-                    </AlertDialogContent>
-                  </AlertDialog>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+        {!isLoading && uploaded.rest.map(renderToolCard)}
       </div>
 
       {isLoading ? (

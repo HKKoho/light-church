@@ -229,3 +229,27 @@ export {
   type SurveyQuestionType,
   type UpdateConnectorsInput,
 } from './ai-publish.schema.js';
+
+export {
+  VENUE_RENTAL_REVIEWER_ROLES,
+  VENUE_TYPES,
+  VENUE_ACTIVITY_NATURES,
+  VENUE_ACTIVITY_MODES,
+  VENUE_AUDIENCES,
+  VENUE_ATTENDANCE_RANGES,
+  VENUE_TITLES,
+  VENUE_APPLICATION_STATUSES,
+  VENUE_ROOM_TYPE,
+  VENUE_PAID_MODE,
+  MAX_VENUE_SESSIONS,
+  MAX_VENUE_ROOMS,
+  venueSessionSchema,
+  venueApplicationSchema,
+  reviewVenueApplicationSchema,
+  type VenueSession,
+  type VenueApplicationInput,
+  type VenueApplicationData,
+  type ReviewVenueApplicationInput,
+  type VenueApplicationStatus,
+  type VenueApplicationInfo,
+} from './venue-rental.schema.js';

@@ -20,3 +20,4 @@ export { CongregationProfileRepository } from './congregation-profile.repository
 export { BulletinArchiveRepository } from './bulletin-archive.repository.js';
 export { ActivityRepository } from './activity.repository.js';
 export { RollCallRepository } from './roll-call.repository.js';
+export { VenueApplicationRepository } from './venue-application.repository.js';

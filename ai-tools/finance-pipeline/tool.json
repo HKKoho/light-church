@@ -1,7 +1,7 @@
 {
   "displayName": {
-    "en": "Finance Pipeline",
-    "zh-TW": "財務流程"
+    "en": "SecureFin Pipeline",
+    "zh-TW": "SecureFin 財務流程"
   },
   "description": {
     "en": "Extract bank transactions, classify them with AI, review them and export Excel reports. Opens the SecureFin Pipeline, signed in with your Light Church account (Finance Admin role).",
