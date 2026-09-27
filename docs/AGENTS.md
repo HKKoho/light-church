@@ -93,7 +93,7 @@ The **Public Agents** table columns:
 | Column      | Meaning                                                                                                             |
 | ----------- | ------------------------------------------------------------------------------------------------------------------- |
 | **Agent**   | Agent name and internal identifier                                                                                  |
-| **Model**   | Provider / model name (e.g., `anthropic / claude-sonnet-4-6`, `openai / gpt-4o`, `gemini / gemini-3-flash-preview`) |
+| **Model**   | Provider / model name (e.g., `anthropic / claude-sonnet-4-6`, `openai / gpt-5`, `gemini / gemini-3-flash-preview`) |
 | **Role**    | `primary` or `worker` badge                                                                                         |
 | **Type**    | `Public` (visible to all users)                                                                                     |
 | **Enabled** | Toggle switch; primary agents show "Always on"                                                                      |
@@ -119,7 +119,7 @@ Public agents are available to all users and serve as the shared pool of officia
    | **Description**        | No       | Up to 2000 characters. Shown in the UI and injected into the primary agent's context so it knows what each worker does. |
    | **System Prompt**      | Yes      | 1–50 000 characters. Defines the agent's persona, instructions, and capabilities.                                       |
    | **Provider**           | Yes      | Select from configured providers (e.g., `anthropic`, `openai`, `gemini`, `zai-coding`, `kimi-code`).                    |
-   | **Model**              | Yes      | Model identifier (e.g., `claude-sonnet-4-6`, `gpt-4o`, `gemini-3-flash-preview`). Must match the selected provider.     |
+   | **Model**              | Yes      | Model identifier (e.g., `claude-sonnet-4-6`, `gpt-5`, `gemini-3-flash-preview`). Must match the selected provider.     |
    | **API Base URL**       | No       | Override the provider's default endpoint. Leave blank for the provider's built-in default.                              |
    | **Max Tokens per Run** | No       | Hard cap on tokens consumed per single run. Default: 100 000.                                                           |
 
@@ -326,7 +326,7 @@ curl -X POST http://localhost:3001/api/v1/agents/sub-agents \
     "description": "Analyses CSV data and produces structured reports",
     "systemPrompt": "You are a data analyst specialist...",
     "provider": "openai",
-    "model": "gpt-4o",
+    "model": "gpt-5",
     "maxTokensPerRun": 50000
   }'
 ```

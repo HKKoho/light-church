@@ -62,7 +62,7 @@ provider_env_key() {
 provider_default_model() {
   case "$1" in
     anthropic)  echo "claude-sonnet-4-5" ;;
-    openai)     echo "gpt-4o" ;;
+    openai)     echo "gpt-5" ;;
     gemini)     echo "gemini-3-flash-preview" ;;
     zai-coding) echo "glm-4.7" ;;
     kimi-code)  echo "" ;;

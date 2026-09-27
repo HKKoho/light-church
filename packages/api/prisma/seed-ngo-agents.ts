@@ -30,7 +30,7 @@ const CONTAINER_CONFIG = {
 };
 
 const provider = process.env['DEFAULT_PROVIDER'] ?? 'openai';
-const model = process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-4o';
+const model = process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-5';
 
 async function main() {
   console.log('\n=== Clawix NGO Agent Seed ===\n');

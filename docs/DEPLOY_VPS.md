@@ -109,8 +109,8 @@ When prompted:
 This step also builds the `clawix-agent:latest` Docker image and starts everything via
 `docker-compose.prod.yml`. First run takes a few minutes.
 
-> **Cost tip:** the installer defaults to `gpt-4o`. For pastoral-care/prayer-request
-> conversations, a cheaper model (e.g. Claude Haiku or `gpt-4o-mini`) will matter far
+> **Cost tip:** the installer defaults to `gpt-5`. For pastoral-care/prayer-request
+> conversations, a cheaper model (e.g. Claude Haiku or `gpt-5-mini`) will matter far
 > more for your monthly bill than which VPS tier you picked — change
 > `DEFAULT_LLM_MODEL` in `.env` and re-run `node scripts/update.mjs` if you want that.
 

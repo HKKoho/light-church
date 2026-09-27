@@ -15,6 +15,7 @@ vi.mock('@clawix/shared', async (importOriginal) => {
 });
 
 import {
+  isReasoningModel,
   mapFinishReason,
   mapToolChoice,
   parseToolCalls,
@@ -190,5 +191,19 @@ describe('openai-utils', () => {
         function: { name: 'get_weather' },
       });
     });
+  });
+});
+
+describe('isReasoningModel', () => {
+  it('covers the o-series and the gpt-5 family', () => {
+    for (const m of ['o1', 'o3-mini', 'o4-mini', 'gpt-5', 'gpt-5-mini', 'gpt-5.1-codex', 'GPT-5']) {
+      expect(isReasoningModel(m)).toBe(true);
+    }
+  });
+
+  it('leaves classic chat models alone', () => {
+    for (const m of ['gpt-4.1', 'gpt-4.1-mini', 'gpt-4o', 'glm-4.7']) {
+      expect(isReasoningModel(m)).toBe(false);
+    }
   });
 });

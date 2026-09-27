@@ -32,7 +32,7 @@ const MAX_CONSOLIDATION_ROUNDS = 5;
 const MAX_CONSECUTIVE_FAILURES = 3;
 const MEMORY_SUMMARY_PREFIX = '[MEMORY SUMMARY]';
 const CONSOLIDATION_PROVIDER = 'openai';
-const CONSOLIDATION_MODEL = 'gpt-4o-mini';
+const CONSOLIDATION_MODEL = 'gpt-5-mini';
 
 const logger = createLogger('engine:memory-consolidation');
 

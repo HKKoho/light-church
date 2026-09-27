@@ -49,7 +49,7 @@ const OPENAI_SPEC: ProviderSpec = {
   displayName: 'OpenAI',
   modelPrefixes: ['gpt-', 'o1-', 'o3-', 'o4-', 'codex-'],
   envKey: 'OPENAI_API_KEY',
-  defaultModel: 'gpt-4o',
+  defaultModel: 'gpt-5',
   supportsTools: true,
   supportsThinking: false,
   pricing: [
@@ -62,7 +62,10 @@ const OPENAI_SPEC: ProviderSpec = {
     { model: 'o3', inputPerMillion: 10, outputPerMillion: 40 },
     { model: 'o3-mini', inputPerMillion: 1.1, outputPerMillion: 4.4 },
     { model: 'o4-mini', inputPerMillion: 1.1, outputPerMillion: 4.4 },
-    // Responses API models (auto-detected by provider factory)
+    // gpt-5 family (Responses API, auto-detected by provider factory)
+    { model: 'gpt-5', inputPerMillion: 1.25, outputPerMillion: 10 },
+    { model: 'gpt-5-mini', inputPerMillion: 0.25, outputPerMillion: 2 },
+    { model: 'gpt-5-nano', inputPerMillion: 0.05, outputPerMillion: 0.4 },
     { model: 'gpt-5-codex', inputPerMillion: 2, outputPerMillion: 8 },
     { model: 'gpt-5.3-codex', inputPerMillion: 2, outputPerMillion: 8 },
     { model: 'gpt-5.2-codex', inputPerMillion: 2, outputPerMillion: 8 },

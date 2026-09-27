@@ -53,7 +53,7 @@ Clawixea ships with first-class support for five provider types. A `custom` type
 ### OpenAI
 
 - **Provider ID:** `openai`
-- **Models:** `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`, `gpt-4o`, `gpt-4o-mini`, `o3`, `o3-mini`, `o4-mini`, `codex-*`, `gpt-5.*`
+- **Models:** `gpt-5` (default), `gpt-5-mini`, `gpt-5-nano`, `gpt-4.1`, `gpt-4.1-mini`, `gpt-4.1-nano`, `o3`, `o3-mini`, `o4-mini`, `codex-*`, `gpt-5.*`
 - **Capabilities:** Tool calling. Note: `codex-*` and `gpt-5.*` models use the **Responses API** automatically instead of the Chat Completions API.
 - **Default endpoint:** OpenAI SDK default (no Base URL needed)
 - **Environment seed variable:** `OPENAI_API_KEY`

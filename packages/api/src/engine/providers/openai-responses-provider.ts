@@ -21,6 +21,7 @@ import {
   toResponsesTool,
   parseResponsesOutput,
 } from './openai-responses-utils.js';
+import { isReasoningModel } from './openai-utils.js';
 
 const DEFAULT_MAX_TOKENS = 16384;
 
@@ -63,9 +64,11 @@ export class OpenAIResponsesProvider implements LLMProvider {
           input,
           ...(instructions ? { instructions } : {}),
           ...(tools ? { tools } : {}),
-          ...(options?.settings?.temperature !== undefined && {
-            temperature: options.settings.temperature,
-          }),
+          // gpt-5 / codex reasoning models reject a non-default temperature.
+          ...(!isReasoningModel(model) &&
+            options?.settings?.temperature !== undefined && {
+              temperature: options.settings.temperature,
+            }),
           max_output_tokens: maxTokens,
         },
         options?.abortSignal ? { signal: options.abortSignal } : undefined,

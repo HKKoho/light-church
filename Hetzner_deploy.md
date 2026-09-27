@@ -127,9 +127,9 @@ The installer is interactive. Answer the prompts like this:
 | Extra CORS origins            | leave blank                                                    |
 | Admin email / password / name | your admin login                                               |
 
-> **Cost tip:** the installer defaults to `gpt-4o` for OpenAI (or
+> **Cost tip:** the installer defaults to `gpt-5` for OpenAI (or
 > `claude-sonnet-4-5` for Anthropic). For most conversational use, a cheaper
-> model (e.g. Claude Haiku or `gpt-4o-mini`) will matter far more for your
+> model (e.g. Claude Haiku or `gpt-5-mini`) will matter far more for your
 > monthly bill than which VPS tier you picked. You can change
 > `DEFAULT_LLM_MODEL` in `.env` later and re-run
 > `node scripts/update.mjs -- --pull` to apply it.

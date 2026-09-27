@@ -273,26 +273,40 @@ describe('OpenAIProvider', () => {
       });
     });
 
-    it('uses default model and max_tokens', async () => {
+    it('defaults to gpt-5 with max_completion_tokens', async () => {
       stubSimpleResponse();
 
       await provider.chat([{ role: 'user', content: 'Hi' }]);
 
       const callArgs = getCallArgs();
-      expect(callArgs['model']).toBe('gpt-4o');
-      expect(callArgs['max_tokens']).toBe(4096);
+      expect(callArgs['model']).toBe('gpt-5');
+      expect(callArgs['max_completion_tokens']).toBe(4096);
+      expect(callArgs).not.toHaveProperty('max_tokens');
+    });
+
+    it('drops temperature and top_p for gpt-5 models, which reject them', async () => {
+      stubSimpleResponse();
+
+      await provider.chat([{ role: 'user', content: 'Hi' }], {
+        model: 'gpt-5-mini',
+        settings: { temperature: 0.2, topP: 0.9 },
+      });
+
+      const callArgs = getCallArgs();
+      expect(callArgs).not.toHaveProperty('temperature');
+      expect(callArgs).not.toHaveProperty('top_p');
     });
 
     it('accepts custom model and settings via options', async () => {
       stubSimpleResponse();
 
       await provider.chat([{ role: 'user', content: 'Hi' }], {
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         settings: { temperature: 0.5, maxTokens: 2048, topP: 0.9 },
       });
 
       const callArgs = getCallArgs();
-      expect(callArgs['model']).toBe('gpt-4o-mini');
+      expect(callArgs['model']).toBe('gpt-4.1-mini');
       expect(callArgs['max_tokens']).toBe(2048);
       expect(callArgs['temperature']).toBe(0.5);
       expect(callArgs['top_p']).toBe(0.9);

@@ -196,7 +196,7 @@ Click **⋯** → **Edit**. API Key field: leave blank to keep the existing key;
 | Provider ID  | Models                                                     | Env seed var         |
 | ------------ | ---------------------------------------------------------- | -------------------- |
 | `anthropic`  | `claude-opus-4-*`, `claude-sonnet-4-*`, `claude-haiku-4-*` | `ANTHROPIC_API_KEY`  |
-| `openai`     | `gpt-4.1`, `gpt-4o`, `gpt-4o-mini`, `o3`, `codex-*`        | `OPENAI_API_KEY`     |
+| `openai`     | `gpt-5`, `gpt-5-mini`, `gpt-4.1`, `o3`, `codex-*`         | `OPENAI_API_KEY`     |
 | `zai-coding` | `glm-*`                                                    | `ZAI_CODING_API_KEY` |
 | `gemini`     | `gemini-3-pro-preview`, `gemini-3-flash-preview`, etc.     | `GEMINI_API_KEY`     |
 | `kimi-code`  | (various)                                                  | `KIMI_CODE_API_KEY`  |

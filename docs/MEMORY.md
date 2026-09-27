@@ -368,7 +368,7 @@ flowchart TD
 
 **Key facts about consolidation:**
 
-- Performed by a separate LLM call using `CONSOLIDATION_MODEL` (default: `gpt-4o-mini`)
+- Performed by a separate LLM call using `CONSOLIDATION_MODEL` (default: `gpt-5-mini`)
 - Up to **5 consolidation rounds** per session
 - Archived messages remain in the database — they are soft-deleted, not erased
 - The consolidation output is a new `save_memory` call that updates `MEMORY.md`

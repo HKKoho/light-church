@@ -124,7 +124,7 @@ describe('OpenAIResponsesProvider', () => {
     );
   });
 
-  it('passes temperature setting when provided', async () => {
+  it('omits temperature for gpt-5 reasoning models, which reject it', async () => {
     mockCreate.mockResolvedValue({
       output: [],
       usage: { input_tokens: 5, output_tokens: 0, total_tokens: 5 },
@@ -136,10 +136,7 @@ describe('OpenAIResponsesProvider', () => {
       settings: { temperature: 0.7 },
     });
 
-    expect(mockCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ temperature: 0.7 }),
-      undefined,
-    );
+    expect(mockCreate.mock.calls[0]![0]).not.toHaveProperty('temperature');
   });
 
   it('handles empty output gracefully', async () => {

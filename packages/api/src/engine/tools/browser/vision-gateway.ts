@@ -18,6 +18,7 @@ import OpenAI from 'openai';
 import { createLogger, type LLMUsage } from '@clawix/shared';
 
 import type { BudgetTracker } from '../../budget-tracker.js';
+import { isReasoningModel } from '../../providers/openai-utils.js';
 
 const logger = createLogger('engine:tools:browser:vision-gateway');
 
@@ -214,7 +215,9 @@ async function callOpenAIVision(opts: VisionCallOptions): Promise<VisionCallResu
 
   const response = await client.chat.completions.create({
     model: opts.model,
-    max_tokens: DEFAULT_MAX_TOKENS,
+    ...(isReasoningModel(opts.model)
+      ? { max_completion_tokens: DEFAULT_MAX_TOKENS }
+      : { max_tokens: DEFAULT_MAX_TOKENS }),
     messages: [
       {
         role: 'user',

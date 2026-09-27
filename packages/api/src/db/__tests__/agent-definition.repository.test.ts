@@ -155,7 +155,7 @@ describe('AgentDefinitionRepository', () => {
       name: 'default-worker',
       role: 'worker',
       provider: 'openai',
-      model: 'gpt-4o',
+      model: 'gpt-5',
     };
 
     it('returns existing row unchanged when its provider is enabled', async () => {
@@ -184,7 +184,7 @@ describe('AgentDefinitionRepository', () => {
         provider: 'anthropic',
         model: 'claude-haiku-4-5-20251001',
       };
-      const healedWorker = { ...staleWorker, provider: 'openai', model: 'gpt-4o' };
+      const healedWorker = { ...staleWorker, provider: 'openai', model: 'gpt-5' };
       mockPrisma.agentDefinition.findFirst.mockResolvedValue(staleWorker);
       // First lookup: anthropic is not configured.
       mockPrisma.providerConfig.findFirst.mockResolvedValueOnce(null);
@@ -202,7 +202,7 @@ describe('AgentDefinitionRepository', () => {
       expect(result).toEqual(healedWorker);
       expect(mockPrisma.agentDefinition.update).toHaveBeenCalledWith({
         where: { id: staleWorker.id },
-        data: { provider: 'openai', model: 'gpt-4o' },
+        data: { provider: 'openai', model: 'gpt-5' },
       });
       expect(mockPrisma.agentDefinition.create).not.toHaveBeenCalled();
     });
@@ -227,7 +227,7 @@ describe('AgentDefinitionRepository', () => {
           name: 'default-worker',
           role: 'worker',
           provider: 'openai',
-          model: 'gpt-4o',
+          model: 'gpt-5',
         }),
       });
     });

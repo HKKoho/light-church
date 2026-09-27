@@ -72,7 +72,7 @@ OPENAI_API_KEY=sk-xxx            # GPT models
 ZAI_CODING_API_KEY=xxx           # Z.AI Coding Plan (glm-4.7)
 
 DEFAULT_PROVIDER=openai          # anthropic | openai | zai-coding | custom
-DEFAULT_LLM_MODEL=gpt-4o
+DEFAULT_LLM_MODEL=gpt-5
 
 # Required: encryption key for stored provider keys (AES-256-GCM)
 # Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"

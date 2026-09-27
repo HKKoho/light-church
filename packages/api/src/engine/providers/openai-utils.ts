@@ -18,6 +18,15 @@ import { createLogger } from '@clawix/shared';
 
 const log = createLogger('engine:openai-utils');
 
+/**
+ * OpenAI reasoning models — the o-series and the gpt-5 family (incl. codex).
+ * They take `max_completion_tokens` instead of `max_tokens` and reject any
+ * non-default `temperature` / `top_p`.
+ */
+export function isReasoningModel(model: string): boolean {
+  return /^(o[1-9]|gpt-5)/i.test(model);
+}
+
 /** Map OpenAI finish reasons to our normalized {@link FinishReason}. */
 export function mapFinishReason(reason: string | null | undefined): FinishReason {
   switch (reason) {

@@ -42,13 +42,13 @@ describe('OneShotLlmService', () => {
   it('calls the default provider and records token usage', async () => {
     const { service, create, chat, tokenCounter } = makeService({ defaultProvider: 'openai' });
     expect(await service.complete({ ...req, temperature: 0.2 })).toBe('{"ok":true}');
-    expect(create).toHaveBeenCalledWith('openai', 'key', undefined, 'gpt-4o');
+    expect(create).toHaveBeenCalledWith('openai', 'key', undefined, 'gpt-5');
     expect(chat).toHaveBeenCalledWith(
       [
         { role: 'system', content: 'sys' },
         { role: 'user', content: 'hi' },
       ],
-      { model: 'gpt-4o', settings: { temperature: 0.2 } },
+      { model: 'gpt-5', settings: { temperature: 0.2 } },
     );
     expect(tokenCounter.recordUsage).toHaveBeenCalledWith(
       expect.objectContaining({ agentRunId: 'ai-tool:test', userId: 'u1', providerName: 'openai' }),

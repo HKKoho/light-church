@@ -185,7 +185,7 @@ async function main() {
     step('Providers');
     console.log('  Select one or more LLM providers (comma-separated, e.g. 1,2).');
     console.log('  1) Anthropic           (default model: claude-sonnet-4-5)');
-    console.log('  2) OpenAI              (default model: gpt-4o)');
+    console.log('  2) OpenAI              (default model: gpt-5)');
     console.log('  3) Z.AI Coding Plan    (default model: glm-4.7)');
     console.log('  4) Kimi Coding Plan    (model entered below)');
     console.log('  5) Google Gemini       (default model: gemini-3-flash-preview)');
@@ -209,7 +209,7 @@ async function main() {
         id: 'openai',
         displayName: 'OpenAI',
         envKey: 'OPENAI_API_KEY',
-        defaultModel: 'gpt-4o',
+        defaultModel: 'gpt-5',
       },
       3: {
         id: 'zai-coding',

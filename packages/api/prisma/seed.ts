@@ -19,7 +19,7 @@ if (!connectionString) {
 }
 
 const defaultProvider = process.env['DEFAULT_PROVIDER'] ?? 'openai';
-const defaultModel = process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-4o';
+const defaultModel = process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-5';
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({ connectionString }),

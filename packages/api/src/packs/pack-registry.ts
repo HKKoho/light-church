@@ -45,6 +45,6 @@ export function agentContainerConfig() {
 export function agentProviderDefaults(): { provider: string; model: string } {
   return {
     provider: process.env['DEFAULT_PROVIDER'] ?? 'openai',
-    model: process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-4o',
+    model: process.env['DEFAULT_LLM_MODEL'] ?? 'gpt-5',
   };
 }

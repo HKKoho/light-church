@@ -19,9 +19,10 @@ import {
   parseToolCalls,
   toOpenAIMessage,
   toOpenAITool,
+  isReasoningModel,
 } from './openai-utils.js';
 
-const DEFAULT_MODEL = 'gpt-4o';
+const DEFAULT_MODEL = 'gpt-5';
 const DEFAULT_MAX_TOKENS = 4096;
 
 const log = createLogger('engine:openai');
@@ -30,12 +31,8 @@ const log = createLogger('engine:openai');
  * Returns true for o-series models (o1, o3, o4, etc.) that require
  * max_completion_tokens instead of max_tokens.
  */
-function isReasoningModel(model: string): boolean {
-  return /^o[1-9]/.test(model);
-}
-
 /**
- * LLM provider for OpenAI models (GPT-4o, GPT-4o-mini, etc.).
+ * LLM provider for OpenAI Chat Completions models (GPT-5, GPT-4.1, o-series…).
  *
  * Wraps the official `openai` SDK and normalizes responses to the
  * shared {@link LLMResponse} format used throughout Clawix.
@@ -59,19 +56,22 @@ export class OpenAIProvider implements LLMProvider {
 
     const toolChoiceParam = mapToolChoice(options?.toolChoice);
 
-    // o-series reasoning models use max_completion_tokens instead of max_tokens
-    const useCompletionTokens = isReasoningModel(model);
+    // Reasoning models (o-series, gpt-5) use max_completion_tokens instead of
+    // max_tokens and accept only the default temperature / top_p.
+    const reasoning = isReasoningModel(model);
 
     const requestBody: OpenAI.ChatCompletionCreateParamsNonStreaming = {
       model,
       messages: messages.map(toOpenAIMessage),
-      ...(useCompletionTokens ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }),
-      ...(options?.settings?.temperature !== undefined && {
-        temperature: options.settings.temperature,
-      }),
-      ...(options?.settings?.topP !== undefined && {
-        top_p: options.settings.topP,
-      }),
+      ...(reasoning ? { max_completion_tokens: maxTokens } : { max_tokens: maxTokens }),
+      ...(!reasoning &&
+        options?.settings?.temperature !== undefined && {
+          temperature: options.settings.temperature,
+        }),
+      ...(!reasoning &&
+        options?.settings?.topP !== undefined && {
+          top_p: options.settings.topP,
+        }),
       ...(options?.settings?.stopSequences && {
         stop: options.settings.stopSequences as string[],
       }),

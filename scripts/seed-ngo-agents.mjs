@@ -50,7 +50,7 @@ try {
       ...process.env,
       DATABASE_URL,
       DEFAULT_PROVIDER: env['DEFAULT_PROVIDER'] || process.env['DEFAULT_PROVIDER'] || 'openai',
-      DEFAULT_LLM_MODEL: env['DEFAULT_LLM_MODEL'] || process.env['DEFAULT_LLM_MODEL'] || 'gpt-4o',
+      DEFAULT_LLM_MODEL: env['DEFAULT_LLM_MODEL'] || process.env['DEFAULT_LLM_MODEL'] || 'gpt-5',
       AGENT_CONTAINER_IMAGE: env['AGENT_CONTAINER_IMAGE'] || 'clawix-agent:latest',
     },
   });
