@@ -1,4 +1,3 @@
-[dotenv@17.3.1] injecting env (30) from ../../.env -- tip: ⚙️  enable debug logging with { debug: true }
 -- CreateTable
 CREATE TABLE "VenueApplication" (
     "id" TEXT NOT NULL,

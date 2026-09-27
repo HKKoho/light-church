@@ -1,4 +1,3 @@
-[dotenv@17.3.1] injecting env (30) from ../../.env -- tip: 🛡️ auth for agents: https://vestauth.com
 -- CreateTable
 CREATE TABLE "ChurchSite" (
     "id" TEXT NOT NULL DEFAULT 'default',
