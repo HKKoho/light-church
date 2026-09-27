@@ -50,7 +50,7 @@ const navHref = z
   .string()
   .trim()
   .max(2000)
-  .refine((h) => h.startsWith(`${CHURCH_SITE_BASE}`) || /^https?:\/\//i.test(h), 'Invalid link');
+  .refine((h) => h.startsWith(CHURCH_SITE_BASE) || /^https?:\/\//i.test(h), 'Invalid link');
 
 const navLink = z.object({ label: text(80), href: navHref });
 export const siteNavItemSchema = navLink.extend({
