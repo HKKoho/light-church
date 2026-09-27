@@ -33,6 +33,7 @@ const messages = {
       aiSurvey: 'AI Survey',
       qrRegistration: 'QR Registration',
       venueRental: 'Rent Church Place',
+      churchWebsite: 'Church Website',
     },
   },
   'zh-TW': {
@@ -45,6 +46,7 @@ const messages = {
       aiSurvey: 'AI 問卷',
       qrRegistration: 'QR 報名',
       venueRental: '租借教會場地',
+      churchWebsite: '教會網站',
     },
   },
 } satisfies Messages<{

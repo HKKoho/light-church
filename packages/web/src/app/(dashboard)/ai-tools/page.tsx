@@ -77,6 +77,11 @@ const messages = {
         description:
           'Groups apply to rent the hall, lawn or rooms on a public form; review and approve their applications here.',
       },
+      churchWebsite: {
+        name: 'Church Website',
+        description:
+          'Import your church’s existing website and run it at /churchweb, with events, sermons, venue rental and a members area.',
+      },
     },
     loadError: 'Failed to load AI tools',
     open: 'Open',
@@ -125,6 +130,10 @@ const messages = {
       venueRental: {
         name: '租借教會場地',
         description: '團體透過公開表格申請借用禮堂、草地或房間；在此審批申請。',
+      },
+      churchWebsite: {
+        name: '教會網站',
+        description: '匯入教會現有網站並在 /churchweb 運作，加入活動、講道、場地租借及會友專區。',
       },
     },
     loadError: '無法載入 AI 工具',
