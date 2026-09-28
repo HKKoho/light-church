@@ -27,6 +27,10 @@ const en = {
   notSetUp: 'This church website has not been set up yet.',
   membersTitle: 'Members area',
   membersIntro: 'Resources, events and recordings for church members.',
+  readingCampaign: 'Bible reading campaign',
+  readingCampaignDescription:
+    'Join the church Bible reading campaign on Get in Bible — sign in there to take part and track your reading.',
+  joinCampaign: 'Join the campaign',
   signInPrompt: 'Please sign in with your church account to see the members area.',
   signIn: 'Sign in',
   membersPages: 'Members pages',
@@ -65,6 +69,10 @@ const messages = {
     notSetUp: '教會網站尚未設定。',
     membersTitle: '會友專區',
     membersIntro: '給會友的資源、活動及錄影。',
+    readingCampaign: '讀經運動',
+    readingCampaignDescription:
+      '在「進入聖經」參與教會的讀經運動——登入後即可參加並記錄你的讀經進度。',
+    joinCampaign: '參加讀經運動',
     signInPrompt: '請以教會帳戶登入以瀏覽會友專區。',
     signIn: '登入',
     membersPages: '會友頁面',

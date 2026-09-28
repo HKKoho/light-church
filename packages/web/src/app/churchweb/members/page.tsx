@@ -2,7 +2,16 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { CalendarDays, FileText, Loader2, LogIn, MapPin, Tent } from 'lucide-react';
+import {
+  BookOpen,
+  CalendarDays,
+  ExternalLink,
+  FileText,
+  Loader2,
+  LogIn,
+  MapPin,
+  Tent,
+} from 'lucide-react';
 import {
   CHURCH_SITE_BASE,
   COMPANION_MEMBER_PATH,
@@ -17,6 +26,30 @@ import { Button } from '@/components/ui/button';
 import { authFetch } from '@/lib/auth';
 
 const HERE = `${CHURCH_SITE_BASE}/members`;
+const READING_CAMPAIGN_URL = 'https://getinbible.vercel.app/login';
+
+/** The Get in Bible reading campaign: members sign in there to take part. */
+function ReadingCampaignCard() {
+  const t = useSiteT();
+  return (
+    <article className="flex flex-col gap-2 rounded-lg border border-amber-500/40 bg-card p-5">
+      <h2 className="flex items-center gap-2 text-lg font-semibold">
+        <BookOpen className="size-5 shrink-0 text-amber-500" />
+        {t.readingCampaign}
+      </h2>
+      <p className="text-sm text-muted-foreground">{t.readingCampaignDescription}</p>
+      <a
+        href={READING_CAMPAIGN_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-1 inline-flex w-fit items-center gap-1 rounded-md bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+      >
+        {t.joinCampaign}
+        <ExternalLink className="size-3.5" />
+      </a>
+    </article>
+  );
+}
 
 /** A Mission/Camp activity listed with the members events, linking to its companion. */
 function CompanionCard({ activity }: { activity: ActivitySummary }) {
@@ -85,6 +118,8 @@ export default function MembersPage() {
         <h1 className="text-3xl font-bold tracking-tight">{t.membersTitle}</h1>
         <p className="mt-2 text-muted-foreground">{t.membersIntro}</p>
       </div>
+
+      <ReadingCampaignCard />
 
       {isLoading || (user && !data && !failed) ? (
         <Loader2 className="size-6 animate-spin text-muted-foreground" />
