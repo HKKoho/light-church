@@ -71,10 +71,10 @@ export const SUNDAY_RELATION_MESSAGES: Partial<Record<SundayRelation, { title: s
   },
   coming: {
     title: '本主日即將舉行 — 待審批',
-    body: '此為即將到來的主日程序表，請牧師／傳道及執事盡快完成審閱，以便及時發送。',
+    body: '此為即將到來的主日程序表，請幹事及主任牧師／傳道盡快完成審閱，以便及時發送。',
   },
   next: {
-    title: '下主日程序表 — 幹事準備中',
-    body: '此為下週主日的程序表，幹事可開始撰寫內容，準備好後提交牧師審閱。',
+    title: '下主日程序表 — 助理準備中',
+    body: '此為下週主日的程序表，助理可開始撰寫內容，準備好後提交幹事審閱。',
   },
 };

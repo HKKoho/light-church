@@ -148,7 +148,7 @@ export const Header: React.FC<HeaderProps> = ({
           disabled={selectedService?.status !== 'finalized'}
           title={
             selectedService?.status !== 'finalized'
-              ? '需先完成牧師審閱及執事複核，方可發送'
+              ? '需先完成幹事審閱及主任牧師／傳道複核，方可發送'
               : '定稿並發送'
           }
           className="px-2 sm:px-4 py-1.5 bg-slate-900 text-white rounded-lg text-sm font-semibold hover:bg-slate-800 flex items-center gap-1.5 shadow-xs transition-colors shrink-0 whitespace-nowrap disabled:bg-slate-300 disabled:cursor-not-allowed disabled:hover:bg-slate-300"

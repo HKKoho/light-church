@@ -56,6 +56,15 @@ export interface RosterScheduleEntry {
 // A worship song catalog entry, as used by the hymn-matching AI assistant.
 // The built-in HYMN_LIBRARY (data/initialData.ts) seeds this; uploaded songs
 // (SidebarLeft's "上載詩歌庫") extend/override it by number.
+// One Sunday of the uploaded year-long preaching plan (講道名單和題目).
+export interface SermonPlanEntry {
+  date: string; // ISO 'YYYY-MM-DD'
+  preacher: string;
+  title: string;
+  scripture: string;
+  series: string;
+}
+
 export interface HymnLibraryEntry {
   number: string;
   title: string;

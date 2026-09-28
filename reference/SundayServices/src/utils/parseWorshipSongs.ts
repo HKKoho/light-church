@@ -1,10 +1,11 @@
-// Imports worship songs into the hymn-matching library from either a
-// spreadsheet (columns 編號 / 標題 / 標籤 / 風格) or a JSON array of
+// Imports worship songs into the hymn-matching library from a spreadsheet
+// or a Word (.docx) table (columns 編號 / 標題 / 標籤 / 風格), or a JSON array of
 // {number, title, tags, style} — the JSON form doubles as a simple
 // interchange format so another system or script can feed songs in without
 // a network API.
 
 import * as XLSX from 'xlsx';
+import JSZip from 'jszip';
 import { HymnLibraryEntry } from '../types/bulletin';
 
 const HEADER_ALIASES: Record<'number' | 'title' | 'tags' | 'style', string[]> = {
@@ -72,10 +73,11 @@ function parseWorshipSongsExcel(buffer: ArrayBuffer): HymnLibraryEntry[] {
   const sheet = findSongSheet(workbook);
   if (!sheet) return [];
 
-  const [headerRow, ...dataRows] = XLSX.utils.sheet_to_json<unknown[]>(sheet, {
-    header: 1,
-    blankrows: false,
-  });
+  return rowsToEntries(XLSX.utils.sheet_to_json<unknown[]>(sheet, { header: 1, blankrows: false }));
+}
+
+function rowsToEntries(rows: unknown[][]): HymnLibraryEntry[] {
+  const [headerRow, ...dataRows] = rows;
   if (!headerRow) return [];
   const cols = buildColumnIndex(headerRow);
 
@@ -91,6 +93,39 @@ function parseWorshipSongsExcel(buffer: ArrayBuffer): HymnLibraryEntry[] {
     .filter((e): e is HymnLibraryEntry => e !== null);
 }
 
+const W_NS = 'http://schemas.openxmlformats.org/wordprocessingml/2006/main';
+
+function paragraphText(el: Element): string {
+  return Array.from(el.getElementsByTagNameNS(W_NS, 't'))
+    .map((t) => t.textContent ?? '')
+    .join('')
+    .trim();
+}
+
+// Uses the first table whose header row names a 標題 column; without one,
+// each non-empty paragraph is a song, e.g. "123 奇異恩典" or "奇異恩典".
+async function parseWorshipSongsDocx(buffer: ArrayBuffer): Promise<HymnLibraryEntry[]> {
+  const zip = await JSZip.loadAsync(buffer);
+  const xml = await zip.file('word/document.xml')?.async('string');
+  if (!xml) return [];
+  const doc = new DOMParser().parseFromString(xml, 'application/xml');
+
+  for (const table of Array.from(doc.getElementsByTagNameNS(W_NS, 'tbl'))) {
+    const rows = Array.from(table.getElementsByTagNameNS(W_NS, 'tr')).map((tr) =>
+      Array.from(tr.getElementsByTagNameNS(W_NS, 'tc')).map(paragraphText)
+    );
+    if (rows[0] && buildColumnIndex(rows[0]).title !== undefined) return rowsToEntries(rows);
+  }
+
+  return Array.from(doc.getElementsByTagNameNS(W_NS, 'p'))
+    .map(paragraphText)
+    .map((line) => {
+      const m = /^(\d+[A-Za-z]?)[\s.、．]+(.+)$/.exec(line);
+      return normalizeEntry(m ? { number: m[1], title: m[2] } : { title: line });
+    })
+    .filter((e): e is HymnLibraryEntry => e !== null);
+}
+
 async function parseWorshipSongsJson(file: File): Promise<HymnLibraryEntry[]> {
   const data = JSON.parse(await file.text());
   if (!Array.isArray(data)) return [];
@@ -100,5 +135,6 @@ async function parseWorshipSongsJson(file: File): Promise<HymnLibraryEntry[]> {
 export async function parseWorshipSongsFile(file: File): Promise<HymnLibraryEntry[]> {
   const isJson = file.name.toLowerCase().endsWith('.json') || file.type.includes('json');
   if (isJson) return parseWorshipSongsJson(file);
+  if (file.name.toLowerCase().endsWith('.docx')) return parseWorshipSongsDocx(await file.arrayBuffer());
   return parseWorshipSongsExcel(await file.arrayBuffer());
 }

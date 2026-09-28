@@ -1,6 +1,6 @@
 // Imports a multi-week service-people arrangement schedule from an .xlsx
 // workbook — a much longer-lived document than the per-bulletin roster
-// import in parseBulletinExcel.ts, meant to be uploaded once (or whenever
+// Excel import, meant to be uploaded once (or whenever
 // the arrangement changes) and cover as many future Sundays as have already
 // been planned.
 //

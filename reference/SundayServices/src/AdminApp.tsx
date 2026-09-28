@@ -26,15 +26,15 @@ import {
   ConfigurationRules,
   AutomationToggles,
   EditorialRole,
-  TextBlock,
-  RosterRow,
   RosterScheduleEntry,
+  SermonPlanEntry,
   HymnLibraryEntry,
 } from './types/bulletin';
 
 import { getPublishedServices, publishService } from './utils/publishStore';
 import { findLastBulletin, deriveNextBulletin, ensureUpcomingBulletins } from './utils/deriveNextBulletin';
 import { consumePendingBulletinAnalysis } from './utils/bulletinAnalysis';
+import { loadSermonPlan, saveSermonPlan, applySermonPlanToService } from './utils/sermonPlan';
 import { loadRosterSchedule, saveRosterSchedule, applyRosterScheduleToServices, applyRosterScheduleToService } from './utils/rosterSchedule';
 import { loadUploadedHymns, saveUploadedHymns, mergeHymnLibraries } from './utils/hymnLibrary';
 
@@ -58,6 +58,7 @@ export default function AdminApp() {
   const [showFinalizeModal, setShowFinalizeModal] = useState<boolean>(false);
 
   const [rosterSchedule, setRosterSchedule] = useState<RosterScheduleEntry[]>(() => loadRosterSchedule());
+  const [sermonPlan, setSermonPlan] = useState<SermonPlanEntry[]>(() => loadSermonPlan());
   const [uploadedHymns, setUploadedHymns] = useState<HymnLibraryEntry[]>(() => loadUploadedHymns());
   const hymnLibrary = useMemo(() => mergeHymnLibraries(HYMN_LIBRARY, uploadedHymns), [uploadedHymns]);
 
@@ -75,12 +76,17 @@ export default function AdminApp() {
   // The coming/next Sunday should always have a draft ready to open, even if
   // no one has clicked "+" yet — derive them forward from the latest known
   // bulletin the same way the officer's manual "+" button does. Any
-  // newly-derived draft is also pre-filled from the uploaded roster schedule
+  // newly-derived draft is also pre-filled from the uploaded roster schedule and sermon plan
   // (if any) — existing bulletins are left untouched here so a reload never
   // clobbers a manual edit; re-uploading the schedule is what re-applies it
   // to bulletins that already exist (see handleImportRosterSchedule).
   useEffect(() => {
-    setServices((prev) => ensureUpcomingBulletins(prev, new Date(), rosterSchedule));
+    setServices((prev) => {
+      const existing = new Set(prev.map((s) => s.id));
+      return ensureUpcomingBulletins(prev, new Date(), rosterSchedule).map((s) =>
+        existing.has(s.id) ? s : applySermonPlanToService(s, sermonPlan)
+      );
+    });
   }, []);
 
   // Surface the Gemini analysis of the officer's just-uploaded past bulletins
@@ -112,14 +118,6 @@ export default function AdminApp() {
     );
   };
 
-  const handleImportExcelToActiveService = (data: { hymnLyrics: TextBlock[]; serviceRoster: RosterRow[] }) => {
-    handleUpdateActiveService({
-      ...activeService,
-      hymnLyrics: data.hymnLyrics.length > 0 ? data.hymnLyrics : activeService.hymnLyrics,
-      serviceRoster: data.serviceRoster.length > 0 ? data.serviceRoster : activeService.serviceRoster,
-    });
-  };
-
   // Explicit re-upload of the schedule is the one moment it's expected to
   // overwrite already-existing bulletins' rosters — the officer just fed in
   // the new source of truth and wants it applied now.
@@ -127,6 +125,14 @@ export default function AdminApp() {
     setRosterSchedule(entries);
     saveRosterSchedule(entries);
     setServices((prev) => applyRosterScheduleToServices(prev, entries));
+  };
+
+  // Like the roster schedule, an explicit upload re-applies the plan to
+  // bulletins that already exist.
+  const handleImportSermonPlan = (entries: SermonPlanEntry[]) => {
+    setSermonPlan(entries);
+    saveSermonPlan(entries);
+    setServices((prev) => prev.map((s) => applySermonPlanToService(s, entries)));
   };
 
   const handleImportWorshipSongs = (entries: HymnLibraryEntry[]) => {
@@ -151,7 +157,10 @@ export default function AdminApp() {
     // its roster/content carried over and ready for edit — never a blank
     // or hardcoded template.
     const lastBulletin = findLastBulletin(services);
-    const draft = applyRosterScheduleToService(deriveNextBulletin(lastBulletin), rosterSchedule);
+    const draft = applySermonPlanToService(
+      applyRosterScheduleToService(deriveNextBulletin(lastBulletin), rosterSchedule),
+      sermonPlan
+    );
 
     const titlePrompt = prompt('請確認新崇拜場次名稱：', draft.title);
     if (!titlePrompt) return;
@@ -283,7 +292,7 @@ export default function AdminApp() {
         id: 'wf-' + Date.now(),
         type: 'info',
         title: '已提交審閱',
-        message: `「${activeService.title}」已提交予牧師／傳道審閱。`,
+        message: `「${activeService.title}」已提交予幹事審閱。`,
       },
       ...prev,
     ]);
@@ -296,8 +305,8 @@ export default function AdminApp() {
         {
           id: 'wf-' + Date.now(),
           type: 'info',
-          title: '牧師已審閱通過',
-          message: `「${activeService.title}」已轉交執事作最後複核。`,
+          title: '幹事已審閱通過',
+          message: `「${activeService.title}」已轉交主任牧師／傳道作最後複核。`,
         },
         ...prev,
       ]);
@@ -307,7 +316,7 @@ export default function AdminApp() {
         {
           id: 'wf-' + Date.now(),
           type: 'info',
-          title: '執事已複核定稿',
+          title: '主任牧師／傳道已複核定稿',
           message: `「${activeService.title}」已完成審批，可以發送。`,
         },
         ...prev,
@@ -317,7 +326,7 @@ export default function AdminApp() {
 
   const handleWorkflowReject = () => {
     const reason = (prompt('請輸入退回原因（可留空）：') || '').trim();
-    const stageLabel = activeService.status === 'pastor_review' ? '牧師／傳道' : '執事';
+    const stageLabel = activeService.status === 'pastor_review' ? '幹事' : '主任牧師／傳道';
     handleUpdateActiveService({ ...activeService, status: 'draft' });
     setAlerts((prev) => [
       {
@@ -326,7 +335,7 @@ export default function AdminApp() {
         title: '已退回重編',
         message: reason
           ? `${stageLabel}退回重編：${reason}`
-          : `${stageLabel}已將程序表退回，請幹事重新編輯後再提交審閱。`,
+          : `${stageLabel}已將程序表退回，請助理重新編輯後再提交審閱。`,
       },
       ...prev,
     ]);
@@ -347,9 +356,10 @@ export default function AdminApp() {
         isOpen={leftDrawerOpen}
         onClose={() => setLeftDrawerOpen(false)}
         activeService={activeService}
-        onImportExcel={handleImportExcelToActiveService}
         onImportRosterSchedule={handleImportRosterSchedule}
         onImportWorshipSongs={handleImportWorshipSongs}
+        sermonPlan={sermonPlan}
+        onImportSermonPlan={handleImportSermonPlan}
         onRestoreBackup={handleRestoreBackup}
       />
 

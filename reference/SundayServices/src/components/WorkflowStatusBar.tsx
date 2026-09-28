@@ -31,13 +31,13 @@ export const WorkflowStatusBar: React.FC<WorkflowStatusBarProps> = ({
             onClick={onSubmitForReview}
             className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-colors"
           >
-            <Send className="w-3.5 h-3.5" /> 提交牧師審閱
+            <Send className="w-3.5 h-3.5" /> 提交幹事審閱
           </button>
         );
       }
       return (
         <span className="text-xs text-slate-500 flex items-center gap-1.5">
-          <Clock className="w-3.5 h-3.5" /> 等待幹事提交審閱
+          <Clock className="w-3.5 h-3.5" /> 等待助理提交審閱
         </span>
       );
     }
@@ -63,7 +63,7 @@ export const WorkflowStatusBar: React.FC<WorkflowStatusBarProps> = ({
       }
       return (
         <span className="text-xs text-slate-500 flex items-center gap-1.5">
-          <Clock className="w-3.5 h-3.5" /> 待牧師／傳道審閱中
+          <Clock className="w-3.5 h-3.5" /> 待幹事審閱中
         </span>
       );
     }
@@ -89,7 +89,7 @@ export const WorkflowStatusBar: React.FC<WorkflowStatusBarProps> = ({
       }
       return (
         <span className="text-xs text-slate-500 flex items-center gap-1.5">
-          <Clock className="w-3.5 h-3.5" /> 待執事複核中
+          <Clock className="w-3.5 h-3.5" /> 待主任牧師／傳道複核中
         </span>
       );
     }

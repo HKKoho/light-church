@@ -151,7 +151,7 @@ export const VoiceOfficerAssistant: React.FC<VoiceOfficerAssistantProps> = ({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        title="幹事語音助理：語音輸入並自動分類"
+        title="語音助理：語音輸入並自動分類"
         className="absolute bottom-6 right-6 w-12 h-12 rounded-full bg-purple-600 hover:bg-purple-500 text-white shadow-lg flex items-center justify-center transition-colors z-30"
       >
         <Mic className="w-5 h-5" />
@@ -163,7 +163,7 @@ export const VoiceOfficerAssistant: React.FC<VoiceOfficerAssistantProps> = ({
     <div className="absolute bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:w-80 bg-white border border-slate-200 rounded-xl shadow-2xl z-30 overflow-hidden max-h-[calc(100%-3rem)] overflow-y-auto">
       <div className="px-4 py-3 bg-purple-600 text-white flex items-center justify-between">
         <span className="text-xs font-bold flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5" /> 幹事語音助理
+          <Sparkles className="w-3.5 h-3.5" /> 語音助理
         </span>
         <button
           onClick={() => {
