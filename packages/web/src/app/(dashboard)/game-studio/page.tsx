@@ -1,8 +1,9 @@
 'use client';
 
-import { Gamepad2, MessageSquare } from 'lucide-react';
+import { ExternalLink, Gamepad2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { VISUAL4STORY_URL } from '@/lib/external-tools';
 import { useT, type Messages } from '@/lib/i18n';
 
 const messages = {
@@ -21,6 +22,9 @@ const messages = {
     step3Body:
       'Once approved, the agent builds the game. It appears in your Workspace under projector/, marked Projector — click it to play.',
     cta: 'Start a conversation',
+    visual: 'Visual4Story',
+    visualHint:
+      'Build characters, scenes and storyboard visuals in Visual4Story (opens in a new tab)',
   },
   'zh-TW': {
     title: '遊戲工坊',
@@ -35,6 +39,8 @@ const messages = {
     step3Body:
       '核准後，代理會製作遊戲，完成後會出現在工作區的 projector/ 資料夾中並標示為「投影」——點擊即可遊玩。',
     cta: '開始對話',
+    visual: 'Visual4Story',
+    visualHint: '在 Visual4Story 製作角色、場景及故事板圖像（在新分頁開啟）',
   },
 } satisfies Messages<{
   title: string;
@@ -47,6 +53,8 @@ const messages = {
   step3: string;
   step3Body: string;
   cta: string;
+  visual: string;
+  visualHint: string;
 }>;
 
 export default function GameStudioPage() {
@@ -67,12 +75,20 @@ export default function GameStudioPage() {
               {t.subtitle}
             </span>
           </div>
-          <Button asChild>
-            <Link href="/conversations">
-              <MessageSquare className="mr-2 size-4" />
-              {t.cta}
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" asChild title={t.visualHint}>
+              <a href={VISUAL4STORY_URL} target="_blank" rel="noopener noreferrer">
+                <ExternalLink className="mr-2 size-4" />
+                {t.visual}
+              </a>
+            </Button>
+            <Button asChild>
+              <Link href="/conversations">
+                <MessageSquare className="mr-2 size-4" />
+                {t.cta}
+              </Link>
+            </Button>
+          </div>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">{t.description}</p>
       </header>
