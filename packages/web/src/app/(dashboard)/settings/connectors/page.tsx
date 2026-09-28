@@ -28,7 +28,7 @@ const en = {
   googleAs: (email: string) => `Creating forms as ${email}`,
   vercelTitle: 'Vercel',
   vercelHint:
-    'Used by QR Registration. Create an access token in Vercel (Account Settings → Tokens). Each event is published as its own project.',
+    'Used by Event Planning. Create an access token in Vercel (Account Settings → Tokens). Each event is published as its own project.',
   vercelToken: 'Access token',
   vercelTeam: 'Team ID (optional)',
   vercelProject: 'Project name prefix',
@@ -53,7 +53,7 @@ const messages = {
     googleAs: (email: string) => `以 ${email} 建立表單`,
     vercelTitle: 'Vercel',
     vercelHint:
-      '供 QR 報名使用。在 Vercel（Account Settings → Tokens）建立存取權杖。每個活動會發佈為獨立專案。',
+      '供活動策劃使用。在 Vercel（Account Settings → Tokens）建立存取權杖。每個活動會發佈為獨立專案。',
     vercelToken: '存取權杖',
     vercelTeam: '團隊 ID（選填）',
     vercelProject: '專案名稱前綴',

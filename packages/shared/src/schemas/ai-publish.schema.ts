@@ -74,6 +74,28 @@ export const qrRegistrationSchema = z.object({
 });
 export type QrRegistrationInput = z.infer<typeof qrRegistrationSchema>;
 
+/** Social-media sizes for an Event Planning post: square, portrait, story, banner. */
+export const EVENT_POST_ASPECTS = ['1:1', '3:4', '9:16', '16:9'] as const;
+export const EVENT_POST_STYLES = ['warm', 'modern', 'watercolor', 'bold', 'minimal'] as const;
+export type EventPostAspect = (typeof EVENT_POST_ASPECTS)[number];
+export type EventPostStyle = (typeof EVENT_POST_STYLES)[number];
+
+/** The event details plus how the post should look. The registration link is optional here. */
+export const eventPostSchema = qrRegistrationSchema.extend({
+  registrationUrl: httpsUrl.or(z.literal('')).default(''),
+  aspectRatio: z.enum(EVENT_POST_ASPECTS).default('1:1'),
+  style: z.enum(EVENT_POST_STYLES).default('warm'),
+  instructions: text(1000).default(''),
+});
+export type EventPostInput = z.infer<typeof eventPostSchema>;
+
+export interface EventPostImage {
+  readonly imageBase64: string;
+  readonly mimeType: string;
+  /** A short caption for sharing, when the model wrote one. */
+  readonly caption: string;
+}
+
 export interface PublishedQrPage {
   readonly url: string;
   readonly deploymentId: string;

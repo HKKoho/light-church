@@ -4,6 +4,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { ConnectorSettingsService } from '../../connectors/connector-settings.service.js';
 import { VercelClient } from '../../connectors/vercel.client.js';
 import type { AuditLogRepository } from '../../db/audit-log.repository.js';
+import type { OneShotImageService } from '../../engine/one-shot/one-shot-image.service.js';
+import { buildEventPostPrompt } from '../event-post.js';
 import { buildQrPage, escapeHtml } from '../qr-page.js';
 import { QrRegistrationService } from '../qr-registration.service.js';
 
@@ -26,12 +28,22 @@ function makeService(vercel: boolean) {
     ),
   };
   const audit = { create: vi.fn(async () => ({})) };
+  const images = {
+    generate: vi.fn(async () => ({
+      imageBase64: 'aW1n',
+      mimeType: 'image/png',
+      text: 'Join us!',
+      usage: { inputTokens: 1, outputTokens: 2, totalTokens: 3 },
+    })),
+  };
   return {
     service: new QrRegistrationService(
       connectors as unknown as ConnectorSettingsService,
       audit as unknown as AuditLogRepository,
+      images as unknown as OneShotImageService,
     ),
     audit,
+    images,
   };
 }
 
@@ -89,5 +101,56 @@ describe('QrRegistrationService', () => {
     expect(audit.create).toHaveBeenCalledWith(
       expect.objectContaining({ action: 'qr-registration.publish', resourceId: 'dpl' }),
     );
+  });
+});
+
+const postInput = {
+  ...input,
+  aspectRatio: '9:16' as const,
+  style: 'bold' as const,
+  instructions: 'Use ocean colours',
+};
+
+describe('buildEventPostPrompt', () => {
+  it('includes the event facts, style, QR space and extra instructions', () => {
+    const prompt = buildEventPostPrompt(postInput);
+    expect(prompt).toContain('vertical phone story');
+    expect(prompt).toContain('Event: Youth Camp <2026>');
+    expect(prompt).toContain('Place: Cheung Chau');
+    expect(prompt).not.toContain('Time:');
+    expect(prompt).toContain('bold and energetic');
+    expect(prompt).toContain('QR code');
+    expect(prompt).toContain('Also: Use ocean colours');
+  });
+
+  it('asks for Chinese text and skips the QR space without a link', () => {
+    const prompt = buildEventPostPrompt({ ...postInput, language: 'zh-TW', registrationUrl: '' });
+    expect(prompt).toContain('Traditional Chinese');
+    expect(prompt).not.toContain('QR code');
+  });
+});
+
+describe('QrRegistrationService.designPost', () => {
+  it('asks Gemini for the post and audits it', async () => {
+    const { service, audit, images } = makeService(false);
+    expect(await service.designPost(postInput, leader)).toEqual({
+      imageBase64: 'aW1n',
+      mimeType: 'image/png',
+      caption: 'Join us!',
+    });
+    expect(images.generate).toHaveBeenCalledWith(
+      expect.objectContaining({ aspectRatio: '9:16', userId: 'u1' }),
+    );
+    expect(audit.create).toHaveBeenCalledWith(
+      expect.objectContaining({ action: 'event-planning.post' }),
+    );
+  });
+
+  it('is for ministry leaders and staff only', async () => {
+    const { service, images } = makeService(false);
+    await expect(service.designPost(postInput, { id: 'v', role: 'volunteer' })).rejects.toThrow(
+      /ministry leaders/,
+    );
+    expect(images.generate).not.toHaveBeenCalled();
   });
 });

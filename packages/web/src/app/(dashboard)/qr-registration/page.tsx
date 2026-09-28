@@ -19,6 +19,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
 import { useLanguage } from '@/lib/i18n';
 import { useQrT } from './messages';
+import { PostDesigner } from './post-designer';
+import { SiteEventPoster } from './site-event-poster';
 
 const API = '/api/v1/qr-registration';
 
@@ -194,6 +196,14 @@ export default function QrRegistrationPage() {
           </Card>
 
           {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <PostDesigner event={input} ready={input.eventName.trim() !== ''} />
+
+          <SiteEventPoster
+            key={`${input.eventName}|${input.date}`}
+            event={input}
+            pageUrl={published?.url ?? null}
+          />
 
           {published && (
             <Card className="border-emerald-500/50">

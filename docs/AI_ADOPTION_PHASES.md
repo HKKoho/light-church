@@ -146,7 +146,7 @@ Tool folders use plain ids; `tool.json` gives per-language `displayName` and
   publishes it as a Google Form created by the church's service account and
   shared with the publisher's email (`connectors/google-forms.client.ts`).
   The result is the questionnaire link plus an edit link.
-- **QR Registration / QR 報名** — a _built-in_ AI Tool at `/qr-registration`.
+- **Event Planning / 活動策劃** (formerly QR Registration) — a _built-in_ AI Tool at `/qr-registration`.
   Event details + a registration link become a static page with a QR code
   (`qr-registration/qr-page.ts`), previewable and downloadable, and published
   to Vercel as its own project so its `*.vercel.app` link stays public
