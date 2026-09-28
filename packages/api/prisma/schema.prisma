@@ -637,10 +637,32 @@ model BulletinArchive {
   uploadedById String?
   createdAt    DateTime @default(now())
 
-  uploadedBy User? @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  uploadedBy     User?           @relation(fields: [uploadedById], references: [id], onDelete: SetNull)
+  sundayBulletin SundayBulletin?
 
   @@unique([churchName, sha256])
   @@index([churchName, createdAt])
+}
+
+// Weekly bulletins edited in the Sunday Service Bulletin AI Tool, shared by
+// the whole church team. `data` is the tool's own bulletin JSON. Archived
+// bulletins are never returned to the editor but are kept here; a save never
+// un-archives one. `sourceArchiveId` marks a bulletin read by AI from an
+// uploaded past-bulletin PDF.
+model SundayBulletin {
+  id              String    @id
+  title           String
+  data            Json
+  sourceArchiveId String?   @unique
+  updatedById     String?
+  archivedAt      DateTime?
+  archivedById    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  sourceArchive BulletinArchive? @relation(fields: [sourceArchiveId], references: [id], onDelete: SetNull)
+
+  @@index([archivedAt, createdAt])
 }
 
 // ============================================================================

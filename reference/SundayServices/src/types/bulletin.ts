@@ -104,6 +104,8 @@ export interface ChurchService {
   serviceRoster: RosterRow[]; // 事奉芳名表（可分多組）
   attendance: AttendanceRow[]; // 上週聚會出席人數表
   attendanceNote?: string;
+  /** Set on auto-derived drafts; see utils/rebuildDrafts.ts. */
+  derivedFingerprint?: string;
 }
 
 export interface Volunteer {
@@ -121,7 +123,9 @@ export interface ValidationAlert {
   title: string;
   message: string;
   actionText?: string;
-  actionType?: 'shuffle_roster' | 'update_hymn' | 'resolve_conflict' | 'dismiss';
+  actionType?: 'shuffle_roster' | 'update_hymn' | 'resolve_conflict' | 'dismiss' | 'rebuild_drafts';
+  /** The bulletin the action is about (rebuild_drafts: the one to rebuild from). */
+  bulletinId?: string;
 }
 
 export interface ConfigurationRules {

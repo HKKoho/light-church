@@ -3,9 +3,12 @@ import { ConfigurationRules, AutomationToggles, EditorialRole, ChurchService, Ro
 import { RefreshCw, CheckCircle2, Sliders, ShieldCheck, X, Download, Upload, CalendarClock, Music } from 'lucide-react';
 import { ROLE_LABELS } from '../utils/workflow';
 import { downloadBulletinBackup, readBulletinBackup } from '../utils/bulletinBackup';
+import { readPdfBackupJson } from '../utils/bulletinPdfBackup';
 import { parseRosterScheduleFile } from '../utils/parseRosterSchedule';
+import { importRosterPdf } from '../utils/bulletinStore';
 import { parseWorshipSongsFile } from '../utils/parseWorshipSongs';
 import { SermonPlanCard } from './SermonPlanCard';
+import { PastBulletinImportResult, PastBulletinUpload, importPastBulletins } from './PastBulletinUpload';
 
 interface SidebarLeftProps {
   toggles: AutomationToggles;
@@ -20,6 +23,7 @@ interface SidebarLeftProps {
   onClose: () => void;
   activeService: ChurchService;
   onRestoreBackup: (service: ChurchService) => void;
+  onImportPastBulletins: (files: File[]) => Promise<PastBulletinImportResult>;
   onImportRosterSchedule: (entries: RosterScheduleEntry[]) => void;
   onImportWorshipSongs: (entries: HymnLibraryEntry[]) => void;
   sermonPlan: SermonPlanEntry[];
@@ -41,6 +45,7 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
   onClose,
   activeService,
   onRestoreBackup,
+  onImportPastBulletins,
   onImportRosterSchedule,
   onImportWorshipSongs,
   sermonPlan,
@@ -54,6 +59,12 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    // A printed bulletin rather than one of our backups: have AI read it.
+    const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+    if (isPdf && (await readPdfBackupJson(file)) === null) {
+      await importPastBulletins([file], onImportPastBulletins, setImportStatus);
+      return;
+    }
     try {
       const service = await readBulletinBackup(file);
       onRestoreBackup(service);
@@ -67,6 +78,10 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
     const file = e.target.files?.[0];
     e.target.value = '';
     if (!file) return;
+    if (file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf') {
+      await importRosterFromPdf(file);
+      return;
+    }
     try {
       const entries = await parseRosterScheduleFile(file);
       if (entries.length === 0) {
@@ -80,6 +95,26 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
       });
     } catch {
       setImportStatus({ message: '無法讀取排班表，請確認 Excel 格式正確。', error: true });
+    }
+  };
+
+  // A printed 司職表 PDF: AI matches its columns to this bulletin's roster rows.
+  const importRosterFromPdf = async (file: File) => {
+    setImportStatus({ message: `AI 正在讀取「${file.name}」，約需半分鐘…` });
+    try {
+      const { entries, notes } = await importRosterPdf(file, activeService);
+      onImportRosterSchedule(entries);
+      const weekCount = new Set(entries.map((e) => e.date)).size;
+      setImportStatus({
+        message:
+          `AI 已從司職表匯入 ${entries.length} 筆事奉排班（涵蓋 ${weekCount} 個主日），已自動套用至現有及未來程序表，請核對。` +
+          (notes.length > 0 ? `　注意：${notes.join('；')}` : ''),
+      });
+    } catch (err) {
+      setImportStatus({
+        message: `無法讀取司職表 PDF：${err instanceof Error ? err.message : String(err)}`,
+        error: true,
+      });
     }
   };
 
@@ -189,14 +224,16 @@ export const SidebarLeft: React.FC<SidebarLeftProps> = ({
                 <Download className="w-3.5 h-3.5" /> 下載本週週報備份
               </button>
 
+              <PastBulletinUpload onImport={onImportPastBulletins} onStatus={setImportStatus} />
+
               <label className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 py-2 rounded text-xs font-semibold transition-colors cursor-pointer">
                 <Upload className="w-3.5 h-3.5" /> 上載週報備份（PDF）
                 <input type="file" accept="application/pdf,.pdf,.json" className="hidden" onChange={handleBackupFileChange} />
               </label>
 
               <label className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 py-2 rounded text-xs font-semibold transition-colors cursor-pointer">
-                <CalendarClock className="w-3.5 h-3.5" /> 上載事奉排班表（Excel）
-                <input type="file" accept=".xlsx,.xls" className="hidden" onChange={handleRosterScheduleFileChange} />
+                <CalendarClock className="w-3.5 h-3.5" /> 上載事奉排班表（司職表 PDF／Excel）
+                <input type="file" accept=".pdf,application/pdf,.xlsx,.xls" className="hidden" onChange={handleRosterScheduleFileChange} />
               </label>
 
               <label className="w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-700 border border-slate-700/80 text-slate-200 py-2 rounded text-xs font-semibold transition-colors cursor-pointer">

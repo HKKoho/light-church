@@ -6,6 +6,10 @@ import { createLogger } from '@clawix/shared';
 import { AppModule } from './app.module.js';
 import { ACTIVITIES_PATH } from './activities/activities.controller.js';
 import { BULLETIN_ARCHIVE_PATH } from './bulletin-archive/bulletin-archive.controller.js';
+import {
+  SUNDAY_BULLETINS_IMPORT_PATH,
+  SUNDAY_ROSTER_IMPORT_PATH,
+} from './sunday-bulletins/sunday-bulletins.controller.js';
 import { registerSecurityPlugins } from './common/security.config.js';
 import { configureGlobalHttpDispatcher } from './common/http-dispatcher.js';
 import { secretProblems } from './common/secret-strength.js';
@@ -88,7 +92,11 @@ async function bootstrap() {
     .getHttpAdapter()
     .getInstance()
     .addHook('onRoute', (route) => {
-      if (route.url === BULLETIN_ARCHIVE_PATH && route.method === 'POST') {
+      const pdfUpload =
+        route.url === BULLETIN_ARCHIVE_PATH ||
+        route.url === SUNDAY_BULLETINS_IMPORT_PATH ||
+        route.url === SUNDAY_ROSTER_IMPORT_PATH;
+      if (pdfUpload && route.method === 'POST') {
         route.bodyLimit = 25 * 1024 * 1024;
       }
       // A long Mission/Camp activity (devotionals, lyrics) can exceed 1 MB.
@@ -96,6 +104,10 @@ async function bootstrap() {
         (route.url === ACTIVITIES_PATH && route.method === 'POST') ||
         (route.url === `${ACTIVITIES_PATH}/:id` && route.method === 'PUT');
       if (saveActivity) route.bodyLimit = 5 * 1024 * 1024;
+      // Saving several bulletins at once (each up to 512 KB).
+      if (route.url === '/api/v1/sunday-bulletins' && route.method === 'PUT') {
+        route.bodyLimit = 11 * 1024 * 1024;
+      }
     });
 
   // Security plugins must be registered BEFORE Swagger routes

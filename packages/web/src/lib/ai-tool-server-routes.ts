@@ -1,4 +1,10 @@
-import type { ArchiveBulletinsResult } from '@clawix/shared';
+import type {
+  ImportRosterResult,
+  ImportSundayBulletinsResult,
+  ResetSundayBulletinsResult,
+  SaveSundayBulletinsResult,
+  SundayBulletinList,
+} from '@clawix/shared';
 import { authFetch } from '@/lib/auth';
 import { TOOL_SERVER_UNAVAILABLE, type ToolFetchRequest } from './ai-tool-storage-bridge';
 
@@ -15,7 +21,7 @@ export interface ToolServerResponse {
   readonly notice?: ToolServerNotice;
 }
 
-export type ToolServerNotice = { readonly kind: 'bulletinsArchived' } & ArchiveBulletinsResult;
+export type ToolServerNotice = { readonly kind: 'bulletinsImported' } & ImportSundayBulletinsResult;
 
 type Handler = (body: string | null) => Promise<ToolServerResponse>;
 
@@ -24,26 +30,58 @@ const unavailable = (): ToolServerResponse => ({
   body: JSON.stringify({ error: TOOL_SERVER_UNAVAILABLE, message: TOOL_SERVER_UNAVAILABLE }),
 });
 
-const ARCHIVED_NOT_ANALYSED =
-  '過往週刊已存檔；AI 格式分析尚未在光教會啟用。 ' +
-  'Past bulletins were archived; AI format analysis is not yet enabled in Light Church.';
+const ok = (data: unknown): ToolServerResponse => ({ status: 200, body: JSON.stringify(data) });
+
+const BULLETINS_PATH = '/api/v1/sunday-bulletins';
 
 const ROUTES: Readonly<Record<string, Readonly<Record<string, Handler>>>> = {
   'sunday-service-bulletin': {
-    // The tool sends past-bulletin PDFs here for AI analysis. Archive them in
-    // Postgres (never shown in the weekly editor); analysis comes in a later
-    // phase, so answer non-OK — the tool then carries on into the editor.
-    'POST /api/analyze-bulletins': async (body) => {
+    // The church's shared weekly bulletins, kept in Postgres. Archived ones
+    // are never listed but stay in the database.
+    'GET /api/bulletins': async () =>
+      ok((await authFetch<{ data: SundayBulletinList }>(BULLETINS_PATH)).data),
+    'PUT /api/bulletins': async (body) => {
       if (body === null) return unavailable();
-      const res = await authFetch<{ success: boolean; data: ArchiveBulletinsResult }>(
-        '/api/v1/bulletin-archive',
+      const res = await authFetch<{ data: SaveSundayBulletinsResult }>(BULLETINS_PATH, {
+        method: 'PUT',
+        body,
+      });
+      return ok(res.data);
+    },
+    'POST /api/bulletins/archive': async (body) => {
+      const id = body === null ? '' : String((JSON.parse(body) as { id?: unknown }).id ?? '');
+      if (!/^[A-Za-z0-9_-]{1,100}$/.test(id)) {
+        return { status: 400, body: JSON.stringify({ error: 'Invalid bulletin id' }) };
+      }
+      await authFetch(`${BULLETINS_PATH}/${id}/archive`, { method: 'POST' });
+      return ok({ archived: id });
+    },
+    // The tool's Reset: archives every active bulletin (kept in Postgres).
+    'POST /api/bulletins/reset': async () => {
+      const res = await authFetch<{ data: ResetSundayBulletinsResult }>(`${BULLETINS_PATH}/reset`, {
+        method: 'POST',
+      });
+      return ok(res.data);
+    },
+    // Past-bulletin PDFs: archived in Postgres, then read by AI into
+    // bulletins in the background (the tool polls GET /api/bulletins).
+    'POST /api/import-bulletins': async (body) => {
+      if (body === null) return unavailable();
+      const res = await authFetch<{ data: ImportSundayBulletinsResult }>(
+        `${BULLETINS_PATH}/import`,
         { method: 'POST', body },
       );
-      return {
-        status: 503,
-        body: JSON.stringify({ error: ARCHIVED_NOT_ANALYSED }),
-        notice: { kind: 'bulletinsArchived', ...res.data },
-      };
+      return { ...ok(res.data), notice: { kind: 'bulletinsImported', ...res.data } };
+    },
+    // A printed duty roster (司職表) PDF, read by AI into roster schedule
+    // entries; the tool keeps them itself, nothing is stored.
+    'POST /api/import-roster': async (body) => {
+      if (body === null) return unavailable();
+      const res = await authFetch<{ data: ImportRosterResult }>(`${BULLETINS_PATH}/roster-import`, {
+        method: 'POST',
+        body,
+      });
+      return ok(res.data);
     },
   },
 };

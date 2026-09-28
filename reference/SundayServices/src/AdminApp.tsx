@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { ExternalLink, Sparkles } from 'lucide-react';
 import { SidebarLeft } from './components/SidebarLeft';
+import { DEFAULT_CHURCH_NAME } from './components/LandingPage';
 import { Header } from './components/Header';
 import { BulletinPreview } from './components/BulletinPreview';
 import { SidebarRight } from './components/SidebarRight';
@@ -31,16 +32,18 @@ import {
   HymnLibraryEntry,
 } from './types/bulletin';
 
-import { getPublishedServices, publishService } from './utils/publishStore';
+import { getPublishedServices, publishService, unpublishService } from './utils/publishStore';
 import { findLastBulletin, deriveNextBulletin, ensureUpcomingBulletins } from './utils/deriveNextBulletin';
+import { useSharedBulletins } from './utils/useSharedBulletins';
+import { classifyServiceDate } from './utils/sundayDates';
 import { consumePendingBulletinAnalysis } from './utils/bulletinAnalysis';
 import { loadSermonPlan, saveSermonPlan, applySermonPlanToService } from './utils/sermonPlan';
-import { loadRosterSchedule, saveRosterSchedule, applyRosterScheduleToServices, applyRosterScheduleToService } from './utils/rosterSchedule';
+import { loadRosterSchedule, saveRosterSchedule, applyRosterScheduleToService } from './utils/rosterSchedule';
+import { findDraftsToRebuild, isUntouchedDraft, markDerived, rebuildDrafts, updateKeepingUntouched } from './utils/rebuildDrafts';
 import { loadUploadedHymns, saveUploadedHymns, mergeHymnLibraries } from './utils/hymnLibrary';
 
 export default function AdminApp() {
-  const [services, setServices] = useState<ChurchService[]>(INITIAL_SERVICES);
-  const [selectedServiceId, setSelectedServiceId] = useState<string>('service-1');
+  const [selectedServiceId, setSelectedServiceId] = useState<string>('');
   const [volunteers, setVolunteers] = useState<Volunteer[]>(INITIAL_VOLUNTEERS);
   const [alerts, setAlerts] = useState<ValidationAlert[]>(INITIAL_ALERTS);
   const [rules, setRules] = useState<ConfigurationRules>(INITIAL_RULES);
@@ -62,17 +65,6 @@ export default function AdminApp() {
   const [uploadedHymns, setUploadedHymns] = useState<HymnLibraryEntry[]>(() => loadUploadedHymns());
   const hymnLibrary = useMemo(() => mergeHymnLibraries(HYMN_LIBRARY, uploadedHymns), [uploadedHymns]);
 
-  const activeService =
-    services.find((s) => s.id === selectedServiceId) || services[0];
-
-  // Seed the congregation-facing publish store with this week's bulletin on first run,
-  // so the congregation page isn't empty before staff ever open Finalize & Send.
-  useEffect(() => {
-    if (getPublishedServices().length === 0) {
-      publishService(INITIAL_SERVICES[0]);
-    }
-  }, []);
-
   // The coming/next Sunday should always have a draft ready to open, even if
   // no one has clicked "+" yet — derive them forward from the latest known
   // bulletin the same way the officer's manual "+" button does. Any
@@ -80,13 +72,69 @@ export default function AdminApp() {
   // (if any) — existing bulletins are left untouched here so a reload never
   // clobbers a manual edit; re-uploading the schedule is what re-applies it
   // to bulletins that already exist (see handleImportRosterSchedule).
+  const withUpcoming = (list: ChurchService[]) => {
+    const existing = new Set(list.map((s) => s.id));
+    return ensureUpcomingBulletins(list, new Date(), rosterSchedule).map((s) =>
+      existing.has(s.id) ? s : markDerived(applySermonPlanToService(s, sermonPlan))
+    );
+  };
+
+  // A bulletin AI just read from an uploaded PDF. Drafts already made for
+  // later Sundays were derived from an older bulletin; the alert offers to
+  // rebuild them from the newly imported one (handleRebuildDrafts).
+  const handleImported = (imported: ChurchService[], current: ChurchService[]) => {
+    const newest = findLastBulletin(imported);
+    const titles = imported.map((s) => `「${s.title}」`).join('、');
+    const rebuild = findDraftsToRebuild([...current, ...imported], newest.id);
+    const canRebuild = rebuild?.base.id === newest.id;
+    setAlerts((prev) => [
+      {
+        id: 'ai-import-' + Date.now(),
+        type: 'info',
+        title: 'AI 已從上載週刊建立程序表',
+        message:
+          `已匯入 ${titles}。` +
+          (canRebuild
+            ? `之後的 ${rebuild.drafts.map((s) => `「${s.title}」`).join('、')} 是以較舊的週刊建立的草稿。`
+            : ''),
+        ...(canRebuild
+          ? { actionType: 'rebuild_drafts' as const, actionText: '以新匯入的週刊重新建立', bulletinId: newest.id }
+          : {}),
+      },
+      ...prev,
+    ]);
+  };
+
+  const {
+    services,
+    setServices,
+    mode: storeMode,
+    pendingImports,
+    failedImports,
+    saveError,
+    archive: archiveBulletin,
+    importPdfs,
+  } = useSharedBulletins(INITIAL_SERVICES, withUpcoming, handleImported);
+
+  // Open on this Sunday's bulletin (or the latest) whenever the selection is
+  // missing — first load, or after the selected one was archived.
   useEffect(() => {
-    setServices((prev) => {
-      const existing = new Set(prev.map((s) => s.id));
-      return ensureUpcomingBulletins(prev, new Date(), rosterSchedule).map((s) =>
-        existing.has(s.id) ? s : applySermonPlanToService(s, sermonPlan)
-      );
-    });
+    if (services.length === 0 || services.some((s) => s.id === selectedServiceId)) return;
+    const coming = services.find((s) => classifyServiceDate(s.date) === 'coming');
+    setSelectedServiceId((coming ?? findLastBulletin(services)).id);
+  }, [services, selectedServiceId]);
+
+  const activeService =
+    services.find((s) => s.id === selectedServiceId) || services[0];
+
+  // The congregation page shows only what staff have published through
+  // Finalize & Send. Earlier versions seeded it with the built-in sample; take
+  // that back out of browsers that still have it.
+  useEffect(() => {
+    const sampleIds = new Set(INITIAL_SERVICES.map((s) => s.id));
+    getPublishedServices()
+      .filter((s) => sampleIds.has(s.id))
+      .forEach((s) => unpublishService(s.id));
   }, []);
 
   // Surface the Gemini analysis of the officer's just-uploaded past bulletins
@@ -124,7 +172,9 @@ export default function AdminApp() {
   const handleImportRosterSchedule = (entries: RosterScheduleEntry[]) => {
     setRosterSchedule(entries);
     saveRosterSchedule(entries);
-    setServices((prev) => applyRosterScheduleToServices(prev, entries));
+    setServices((prev) =>
+      prev.map((s) => updateKeepingUntouched(s, (x) => applyRosterScheduleToService(x, entries)))
+    );
   };
 
   // Like the roster schedule, an explicit upload re-applies the plan to
@@ -132,7 +182,9 @@ export default function AdminApp() {
   const handleImportSermonPlan = (entries: SermonPlanEntry[]) => {
     setSermonPlan(entries);
     saveSermonPlan(entries);
-    setServices((prev) => prev.map((s) => applySermonPlanToService(s, entries)));
+    setServices((prev) =>
+      prev.map((s) => updateKeepingUntouched(s, (x) => applySermonPlanToService(x, entries)))
+    );
   };
 
   const handleImportWorshipSongs = (entries: HymnLibraryEntry[]) => {
@@ -152,6 +204,17 @@ export default function AdminApp() {
     setSelectedServiceId(service.id);
   };
 
+  // Same church name the landing page archives uploads under.
+  const handleImportPastBulletins = (files: File[]) => {
+    let churchName: string | null = null;
+    try {
+      churchName = localStorage.getItem('churchName');
+    } catch {
+      // localStorage unavailable; fall back to the default name.
+    }
+    return importPdfs(churchName || DEFAULT_CHURCH_NAME, files);
+  };
+
   const handleAddNewService = () => {
     // Always start a new bulletin from the last one, one week forward, with
     // its roster/content carried over and ready for edit — never a blank
@@ -165,10 +228,33 @@ export default function AdminApp() {
     const titlePrompt = prompt('請確認新崇拜場次名稱：', draft.title);
     if (!titlePrompt) return;
 
-    const newService: ChurchService = { ...draft, title: titlePrompt };
+    const newService: ChurchService = markDerived({ ...draft, title: titlePrompt });
 
     setServices((prev) => [...prev, newService]);
     setSelectedServiceId(newService.id);
+  };
+
+  const handleArchiveService = async () => {
+    if (!activeService || services.length <= 1) return;
+    const ok = window.confirm(
+      `確定存檔「${activeService.title}」？\n\n存檔後不會再在此顯示，但仍保留在系統資料庫中。` +
+        '如存檔的是本主日或下主日的程序表，系統會以餘下最新的一份自動重新建立。'
+    );
+    if (!ok) return;
+    try {
+      await archiveBulletin(activeService.id);
+      setSelectedServiceId('');
+    } catch (err) {
+      setAlerts((prev) => [
+        {
+          id: 'archive-failed-' + Date.now(),
+          type: 'warning',
+          title: '未能存檔',
+          message: err instanceof Error ? err.message : String(err),
+        },
+        ...prev,
+      ]);
+    }
   };
 
   const handleRefreshSchedule = () => {
@@ -237,6 +323,37 @@ export default function AdminApp() {
     });
 
     setAlerts((prev) => prev.filter((a) => a.actionType !== 'update_hymn'));
+  };
+
+  // Drafts nobody has edited are rebuilt straight away; edited ones only if
+  // the officer agrees to lose their changes.
+  const handleRebuildDrafts = (alert: ValidationAlert) => {
+    const found = alert.bulletinId ? findDraftsToRebuild(services, alert.bulletinId) : null;
+    let message: string;
+    if (!found || found.base.id !== alert.bulletinId) {
+      message = found
+        ? `已有較新的「${found.base.title}」，草稿會以它為基礎，毋須重新建立。`
+        : '沒有需要重新建立的草稿。';
+    } else {
+      const edited = found.drafts.filter((d) => !isUntouchedDraft(d));
+      const overwrite =
+        edited.length > 0 &&
+        window.confirm(
+          `${edited.map((d) => `「${d.title}」`).join('、')} 已有修改。\n\n` +
+            '按「確定」一併重新建立（會覆蓋這些修改）；按「取消」只重新建立未修改的草稿。'
+        );
+      const drafts = overwrite ? found.drafts : found.drafts.filter(isUntouchedDraft);
+      setServices((prev) => rebuildDrafts(prev, found.base, drafts, rosterSchedule, sermonPlan));
+      const kept = found.drafts.length - drafts.length;
+      message =
+        (drafts.length > 0
+          ? `已以「${found.base.title}」重新建立 ${drafts.map((d) => `「${d.title}」`).join('、')}。`
+          : '') + (kept > 0 ? `已保留 ${kept} 份已修改的草稿。` : '');
+    }
+    setAlerts((prev) => [
+      { id: 'rebuild-' + Date.now(), type: 'info', title: '重新建立草稿', message },
+      ...prev.filter((a) => a.id !== alert.id),
+    ]);
   };
 
   const handleDismissAlert = (id: string) => {
@@ -341,6 +458,16 @@ export default function AdminApp() {
     ]);
   };
 
+  if (!activeService) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-slate-100 text-slate-600 text-sm">
+        {storeMode === 'loading'
+          ? '正在載入程序表…'
+          : `AI 正在讀取上載的週刊（尚餘 ${pendingImports} 份），完成後會以最新一份建立本主日程序表…`}
+      </div>
+    );
+  }
+
   return (
     <div className="admin-shell flex h-screen w-screen bg-slate-100 text-slate-900 overflow-hidden">
       {/* Left Operations & Rules Sidebar */}
@@ -361,6 +488,7 @@ export default function AdminApp() {
         sermonPlan={sermonPlan}
         onImportSermonPlan={handleImportSermonPlan}
         onRestoreBackup={handleRestoreBackup}
+        onImportPastBulletins={handleImportPastBulletins}
       />
 
       {/* Center Main Stage */}
@@ -370,6 +498,7 @@ export default function AdminApp() {
           selectedServiceId={selectedServiceId}
           onSelectService={setSelectedServiceId}
           onAddNewService={handleAddNewService}
+          onArchiveService={handleArchiveService}
           onExportPDF={() => setShowExportModal(true)}
           onFinalizeAndSend={() => setShowFinalizeModal(true)}
           isEditing={isEditing}
@@ -378,6 +507,28 @@ export default function AdminApp() {
           onToggleRightDrawer={() => setRightDrawerOpen((v) => !v)}
           alertCount={alerts.length}
         />
+
+        {failedImports.length > 0 && (
+          <div
+            className="px-4 py-1.5 text-xs border-b bg-red-50 text-red-800 border-red-200"
+            title={failedImports.map((f) => `${f.fileName}：${f.reason}`).join('\n')}
+          >
+            {`AI 未能讀取 ${failedImports.map((f) => `「${f.fileName}」`).join('、')}，` +
+              '請在左側「上載過往週刊（AI 讀取）」再上載一次重試。'}
+          </div>
+        )}
+
+        {(pendingImports > 0 || saveError) && (
+          <div
+            className={`px-4 py-1.5 text-xs border-b ${
+              saveError ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-blue-50 text-blue-800 border-blue-200'
+            }`}
+          >
+            {saveError
+              ? `程序表未能儲存到系統（${saveError}），請稍後再試或下載備份。`
+              : `AI 正在讀取上載的週刊（尚餘 ${pendingImports} 份），完成後會加入程序表清單。`}
+          </div>
+        )}
 
         <BulletinPreview
           service={activeService}
@@ -421,6 +572,7 @@ export default function AdminApp() {
         volunteers={volunteers}
         onShuffleRoster={handleShuffleRoster}
         onUpdateHymnLogic={handleUpdateHymnLogic}
+        onRebuildDrafts={handleRebuildDrafts}
         onDismissAlert={handleDismissAlert}
         onAddVolunteer={handleAddVolunteer}
         onToggleVolunteerAvailability={handleToggleVolunteerAvailability}

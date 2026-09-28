@@ -7,6 +7,7 @@ interface SidebarRightProps {
   volunteers: Volunteer[];
   onShuffleRoster: () => void;
   onUpdateHymnLogic: () => void;
+  onRebuildDrafts: (alert: ValidationAlert) => void;
   onDismissAlert: (id: string) => void;
   onAddVolunteer: (newVol: Volunteer) => void;
   onToggleVolunteerAvailability: (id: string) => void;
@@ -19,6 +20,7 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
   volunteers,
   onShuffleRoster,
   onUpdateHymnLogic,
+  onRebuildDrafts,
   onDismissAlert,
   onAddVolunteer,
   onToggleVolunteerAvailability,
@@ -149,6 +151,14 @@ export const SidebarRight: React.FC<SidebarRightProps> = ({
                       className="text-[10px] text-blue-900 font-bold mt-2 underline hover:text-blue-950 block"
                     >
                       {alert.actionText || '套用建議'}
+                    </button>
+                  )}
+                  {alert.actionType === 'rebuild_drafts' && (
+                    <button
+                      onClick={() => onRebuildDrafts(alert)}
+                      className="text-[10px] text-blue-900 font-bold mt-2 underline hover:text-blue-950 flex items-center gap-1"
+                    >
+                      <RefreshCw className="w-3 h-3 inline" /> {alert.actionText || '重新建立草稿'}
                     </button>
                   )}
                 </div>

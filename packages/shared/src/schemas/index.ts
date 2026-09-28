@@ -154,6 +154,25 @@ export {
 } from './bulletin-archive.schema.js';
 
 export {
+  sundayBulletinSchema,
+  saveSundayBulletinsSchema,
+  MAX_SUNDAY_BULLETIN_BYTES,
+  MAX_SUNDAY_BULLETINS_PER_SAVE,
+  type SundayBulletinData,
+  type SaveSundayBulletinsInput,
+  type SundayBulletinList,
+  type FailedBulletinImport,
+  type SaveSundayBulletinsResult,
+  type ImportSundayBulletinsResult,
+  type ResetSundayBulletinsResult,
+  importRosterSchema,
+  type ImportRosterInput,
+  type RosterExampleRow,
+  type RosterScheduleEntryData,
+  type ImportRosterResult,
+} from './sunday-bulletin.schema.js';
+
+export {
   ACTIVITY_KINDS,
   ACTIVITY_EDITOR_ROLES,
   activityContentSchema,

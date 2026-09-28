@@ -6,5 +6,6 @@ import { BulletinArchiveService } from './bulletin-archive.service.js';
 @Module({
   controllers: [BulletinArchiveController],
   providers: [BulletinArchiveService],
+  exports: [BulletinArchiveService],
 })
 export class BulletinArchiveModule {}

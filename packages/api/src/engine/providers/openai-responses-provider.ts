@@ -69,6 +69,10 @@ export class OpenAIResponsesProvider implements LLMProvider {
             options?.settings?.temperature !== undefined && {
               temperature: options.settings.temperature,
             }),
+          ...(isReasoningModel(model) &&
+            options?.settings?.reasoningEffort !== undefined && {
+              reasoning: { effort: options.settings.reasoningEffort },
+            }),
           max_output_tokens: maxTokens,
         },
         options?.abortSignal ? { signal: options.abortSignal } : undefined,

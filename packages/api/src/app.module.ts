@@ -5,6 +5,7 @@ import { ThrottlerModule, ThrottlerStorage } from '@nestjs/throttler';
 import { AdminModule } from './admin/index.js';
 import { AiToolsModule } from './ai-tools/index.js';
 import { BulletinArchiveModule } from './bulletin-archive/index.js';
+import { SundayBulletinsModule } from './sunday-bulletins/index.js';
 import { ActivitiesModule } from './activities/index.js';
 import { RollCallModule } from './roll-call/index.js';
 import { AiSurveyModule } from './ai-survey/ai-survey.module.js';
@@ -82,6 +83,7 @@ import { TalkingFaceModule } from './talkingface/talkingface.module.js';
     WorkspaceModule,
     AiToolsModule,
     BulletinArchiveModule,
+    SundayBulletinsModule,
     ActivitiesModule,
     RollCallModule,
     ConnectorsModule,

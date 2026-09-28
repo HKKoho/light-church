@@ -82,10 +82,11 @@ function isSameCalendarDay(a: Date, b: Date): boolean {
 const MAX_CATCH_UP_WEEKS = 520;
 
 /**
- * Ensures a bulletin exists for `targetSunday`, deriving it — and any
- * in-between missing weeks — forward from the most recent bulletin in
- * `services`, so a coming/next Sunday always has a draft ready to open
- * instead of sitting empty until an officer remembers to click "+".
+ * Ensures a bulletin exists for `targetSunday`, deriving it forward from the
+ * most recent bulletin in `services`, so a coming/next Sunday always has a
+ * draft ready to open instead of sitting empty until an officer remembers to
+ * click "+". Missing in-between weeks are stepped through (so rosters roll
+ * forward) but not added — they would only be clutter for Sundays already past.
  */
 export function ensureBulletinForSunday(
   services: ChurchService[],
@@ -102,16 +103,14 @@ export function ensureBulletinForSunday(
   let draftDate = parseChineseDate(draft.date);
   if (!draftDate) return services;
 
-  const additions: ChurchService[] = [];
   let weeks = 0;
   while (draftDate < targetSunday && weeks < MAX_CATCH_UP_WEEKS) {
     draft = applyRosterScheduleToService(deriveNextBulletin(draft), rosterSchedule);
     draftDate = parseChineseDate(draft.date)!;
-    additions.push(draft);
     weeks += 1;
   }
 
-  return additions.length > 0 ? [...services, ...additions] : services;
+  return weeks > 0 && isSameCalendarDay(draftDate, targetSunday) ? [...services, draft] : services;
 }
 
 /** Ensures both the coming and next Sunday's bulletins exist, derived forward as needed. */

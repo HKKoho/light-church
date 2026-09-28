@@ -73,3 +73,22 @@ export async function listBulletinFiles(churchName?: string): Promise<StoredBull
   db.close();
   return results;
 }
+
+/** Deletes this browser's stored PDFs for `churchName`; returns how many were removed. */
+export async function deleteBulletinFiles(churchName: string): Promise<number> {
+  const db = await openDb();
+  const removed = await new Promise<number>((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const request = tx.objectStore(STORE_NAME).index('churchName').getAllKeys(churchName);
+    let count = 0;
+    request.onsuccess = () => {
+      const keys = request.result;
+      count = keys.length;
+      keys.forEach((key) => tx.objectStore(STORE_NAME).delete(key));
+    };
+    tx.oncomplete = () => resolve(count);
+    tx.onerror = () => reject(tx.error);
+  });
+  db.close();
+  return removed;
+}

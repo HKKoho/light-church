@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChurchService } from '../types/bulletin';
-import { Plus, Printer, Send, CheckCircle, FileText, Menu, AlertTriangle, CalendarDays } from 'lucide-react';
+import { Archive, Plus, Printer, Send, CheckCircle, FileText, Menu, AlertTriangle, CalendarDays } from 'lucide-react';
 import { STATUS_SHORT_LABELS } from '../utils/workflow';
 import { classifyServiceDate, SUNDAY_RELATION_TAGS, SUNDAY_RELATION_BADGE_CLASSES } from '../utils/sundayDates';
 
@@ -15,6 +15,7 @@ interface HeaderProps {
   selectedServiceId: string;
   onSelectService: (id: string) => void;
   onAddNewService: () => void;
+  onArchiveService: () => void;
   onExportPDF: () => void;
   onFinalizeAndSend: () => void;
   isEditing: boolean;
@@ -29,6 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
   selectedServiceId,
   onSelectService,
   onAddNewService,
+  onArchiveService,
   onExportPDF,
   onFinalizeAndSend,
   isEditing,
@@ -95,6 +97,15 @@ export const Header: React.FC<HeaderProps> = ({
             className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors"
           >
             <Plus className="w-4 h-4" />
+          </button>
+
+          <button
+            onClick={onArchiveService}
+            disabled={services.length <= 1}
+            title="存檔此程序表（不再顯示，資料仍保留）"
+            className="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Archive className="w-4 h-4" />
           </button>
         </div>
 

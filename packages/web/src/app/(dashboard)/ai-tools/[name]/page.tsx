@@ -28,9 +28,10 @@ const messages = {
     externalHint:
       'This tool is hosted outside Light Church. Do not paste member personal data into it.',
     saved: 'Saved',
-    bulletinsArchived: (archived: number, duplicates: number) =>
+    bulletinsImported: (archived: number, duplicates: number, importing: number) =>
       `Archived ${archived} past bulletin${archived === 1 ? '' : 's'}` +
-      (duplicates > 0 ? ` (${duplicates} already archived)` : ''),
+      (duplicates > 0 ? ` (${duplicates} already archived)` : '') +
+      (importing > 0 ? ` · AI is reading ${importing}` : ''),
     saveFailed: 'Could not save — changes may be lost',
     storageUnavailable: 'Saved data could not be loaded, so changes in this tool will not be kept',
   },
@@ -40,8 +41,10 @@ const messages = {
     openExternal: '在新分頁開啟',
     externalHint: '此工具由 Light Church 以外的服務提供，請勿貼上會友個人資料。',
     saved: '已儲存',
-    bulletinsArchived: (archived: number, duplicates: number) =>
-      `已存檔 ${archived} 份過去週刊` + (duplicates > 0 ? `（${duplicates} 份已存在）` : ''),
+    bulletinsImported: (archived: number, duplicates: number, importing: number) =>
+      `已存檔 ${archived} 份過去週刊` +
+      (duplicates > 0 ? `（${duplicates} 份已存在）` : '') +
+      (importing > 0 ? `・AI 正在讀取 ${importing} 份` : ''),
     saveFailed: '無法儲存——變更可能會遺失',
     storageUnavailable: '無法載入已儲存的資料，此工具內的變更將不會保留',
   },
@@ -53,7 +56,7 @@ const messages = {
   saved: string;
   saveFailed: string;
   storageUnavailable: string;
-  bulletinsArchived: (archived: number, duplicates: number) => string;
+  bulletinsImported: (archived: number, duplicates: number, importing: number) => string;
 }>;
 
 type SaveState = 'idle' | 'saved' | 'failed' | 'unavailable';
@@ -175,9 +178,9 @@ export default function AiToolViewerPage() {
         </Button>
         <h1 className="truncate text-lg font-semibold">{tool ? aiToolLabel(tool, lang) : name}</h1>
         <div className="ml-auto flex items-center gap-3">
-          {notice?.kind === 'bulletinsArchived' && (
+          {notice?.kind === 'bulletinsImported' && (
             <span className="text-xs text-muted-foreground">
-              {t.bulletinsArchived(notice.archived, notice.duplicates)}
+              {t.bulletinsImported(notice.archived, notice.duplicates, notice.importing)}
             </span>
           )}
           {saveState !== 'idle' && (

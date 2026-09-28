@@ -5,7 +5,12 @@
 // than an agent run. Goes through engine/providers and records token usage so
 // it is accounted for like any agent call. Never send member personal data here.
 import { Injectable, Optional, ServiceUnavailableException } from '@nestjs/common';
-import { createLogger, findProviderByName, type ChatMessage } from '@clawix/shared';
+import {
+  createLogger,
+  findProviderByName,
+  type ChatMessage,
+  type GenerationSettings,
+} from '@clawix/shared';
 
 import { ProviderConfigService } from '../../provider-config/provider-config.service.js';
 import { createProvider } from '../providers/provider-factory.js';
@@ -22,6 +27,8 @@ export interface OneShotRequest {
   /** Recorded as TokenUsage.agentRunId, e.g. `ai-tool:ai-survey`. */
   readonly usageTag: string;
   readonly temperature?: number;
+  /** Lower is faster on reasoning models — for plain transcription work. */
+  readonly reasoningEffort?: GenerationSettings['reasoningEffort'];
 }
 
 interface ProviderFactory {
@@ -68,9 +75,13 @@ export class OneShotLlmService {
       { role: 'system', content: req.system },
       { role: 'user', content: req.prompt },
     ];
+    const settings: GenerationSettings = {
+      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
+      ...(req.reasoningEffort !== undefined ? { reasoningEffort: req.reasoningEffort } : {}),
+    };
     const response = await provider.chat(messages, {
       model,
-      ...(req.temperature !== undefined ? { settings: { temperature: req.temperature } } : {}),
+      ...(Object.keys(settings).length > 0 ? { settings } : {}),
     });
 
     await this.tokenCounter

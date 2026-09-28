@@ -58,6 +58,8 @@ export interface GenerationSettings {
   readonly maxTokens?: number;
   readonly topP?: number;
   readonly stopSequences?: readonly string[];
+  /** Reasoning models only (OpenAI gpt-5 family); other providers ignore it. */
+  readonly reasoningEffort?: 'minimal' | 'low' | 'medium' | 'high';
 }
 
 const EMPTY_TOOL_CALLS: readonly ToolCallRequest[] = Object.freeze([]);
