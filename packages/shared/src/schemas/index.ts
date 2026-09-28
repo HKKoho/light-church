@@ -246,10 +246,13 @@ export {
   venueSessionSchema,
   venueApplicationSchema,
   reviewVenueApplicationSchema,
+  replyVenueApplicationSchema,
   type VenueSession,
   type VenueApplicationInput,
   type VenueApplicationData,
   type ReviewVenueApplicationInput,
+  type ReplyVenueApplicationInput,
+  type VenueMailStatus,
   type VenueApplicationStatus,
   type VenueApplicationInfo,
 } from './venue-rental.schema.js';

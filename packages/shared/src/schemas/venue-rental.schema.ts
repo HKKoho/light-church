@@ -93,6 +93,19 @@ export const reviewVenueApplicationSchema = z.object({
 });
 export type ReviewVenueApplicationInput = z.infer<typeof reviewVenueApplicationSchema>;
 
+/** Staff email the applicant through the church email server (SMTP connector). */
+export const replyVenueApplicationSchema = z.object({
+  subject: z.string().trim().min(1).max(300),
+  body: z.string().trim().min(1).max(10_000),
+});
+export type ReplyVenueApplicationInput = z.infer<typeof replyVenueApplicationSchema>;
+
+/** Whether the church email server is connected, and who replies come from. */
+export interface VenueMailStatus {
+  readonly configured: boolean;
+  readonly from: string | null;
+}
+
 export type VenueApplicationStatus = (typeof VENUE_APPLICATION_STATUSES)[number];
 
 export interface VenueApplicationInfo extends Omit<
@@ -106,5 +119,7 @@ export interface VenueApplicationInfo extends Omit<
   readonly adminNotes: string | null;
   readonly reviewedByName: string | null;
   readonly reviewedAt: string | null;
+  /** When staff last emailed the applicant from the dashboard. */
+  readonly repliedAt: string | null;
   readonly createdAt: string;
 }

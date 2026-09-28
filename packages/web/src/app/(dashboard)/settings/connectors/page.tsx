@@ -11,13 +11,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
 import { useT, type Messages } from '@/lib/i18n';
+import { SmtpCard } from './smtp-card';
 
 const API = '/api/v1/connectors';
 
 const en = {
   title: 'Connectors',
   description:
-    'Church-wide accounts AI Tools publish through. Secrets are stored encrypted and never shown again.',
+    'Church-wide accounts AI Tools publish and send email through. Secrets are stored encrypted and never shown again.',
   connected: 'Connected',
   notConnected: 'Not connected',
   googleTitle: 'Google Forms',
@@ -42,7 +43,7 @@ const messages = {
   en,
   'zh-TW': {
     title: '連接器',
-    description: 'AI 工具用來發佈內容的教會帳戶。密鑰會加密儲存，之後不會再顯示。',
+    description: 'AI 工具用來發佈內容及寄出電郵的教會帳戶。密鑰會加密儲存，之後不會再顯示。',
     connected: '已連接',
     notConnected: '未連接',
     googleTitle: 'Google 表單',
@@ -105,7 +106,7 @@ export default function ConnectorsPage() {
     // Load once on mount.
   }, []);
 
-  const save = async (body: UpdateConnectorsInput) => {
+  const save = async (body: UpdateConnectorsInput): Promise<boolean> => {
     setBusy(true);
     setMessage(null);
     try {
@@ -117,8 +118,10 @@ export default function ConnectorsPage() {
       setGoogleJson('');
       setVercelToken('');
       setMessage(t.saved);
+      return true;
     } catch (err) {
       setMessage(err instanceof Error ? err.message : t.failed);
+      return false;
     } finally {
       setBusy(false);
     }
@@ -252,6 +255,14 @@ export default function ConnectorsPage() {
           </div>
         </CardContent>
       </Card>
+
+      <SmtpCard
+        status={status}
+        busy={busy}
+        spin={spin}
+        badge={status && <StatusBadge on={status.smtp.configured} t={t} />}
+        onSave={save}
+      />
     </div>
   );
 }

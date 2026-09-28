@@ -3,15 +3,18 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req } from '@ne
 import { ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import {
+  replyVenueApplicationSchema,
   reviewVenueApplicationSchema,
   VENUE_APPLICATION_STATUSES,
   venueApplicationSchema,
 } from '@clawix/shared';
 import type {
+  ReplyVenueApplicationInput,
   ReviewVenueApplicationInput,
   VenueApplicationData,
   VenueApplicationInfo,
   VenueApplicationStatus,
+  VenueMailStatus,
 } from '@clawix/shared';
 
 import type { JwtPayload } from '../auth/auth.types.js';
@@ -63,6 +66,22 @@ export class VenueRentalController {
     @Body(new ZodValidationPipe(reviewVenueApplicationSchema)) body: ReviewVenueApplicationInput,
   ): Promise<{ success: boolean; data: VenueApplicationInfo }> {
     return { success: true, data: await this.service.review(id, body, actor(req)) };
+  }
+
+  @Get('mail')
+  async mailStatus(
+    @Req() req: AuthedRequest,
+  ): Promise<{ success: boolean; data: VenueMailStatus }> {
+    return { success: true, data: await this.service.mailStatus(actor(req)) };
+  }
+
+  @Post('applications/:id/reply')
+  async reply(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+    @Body(new ZodValidationPipe(replyVenueApplicationSchema)) body: ReplyVenueApplicationInput,
+  ): Promise<{ success: boolean; data: VenueApplicationInfo }> {
+    return { success: true, data: await this.service.reply(id, body, actor(req)) };
   }
 
   @Delete('applications/:id')

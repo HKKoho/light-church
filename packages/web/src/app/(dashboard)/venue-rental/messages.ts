@@ -4,7 +4,7 @@ const en = {
   phase: 'Phase 1 · AI as a Tool',
   title: 'Rent Church Place',
   subtitle:
-    'Churches, groups and organisations apply on the public form. Review each application and approve or reject it.',
+    'Applications submitted through the Rent Church Place form on the church website. Review each one, approve or reject it, and reply to the applicant by email.',
   noAccess: 'Venue applications are reviewed by pastors and admin staff.',
   publicForm: 'Public form',
   copyLink: 'Copy link',
@@ -35,6 +35,22 @@ const en = {
   removeBody: 'The application is removed for good. This cannot be undone.',
   cancel: 'Cancel',
   failed: 'Something went wrong',
+  // Reply by email
+  replied: (d: string) => `Emailed ${d}`,
+  replyEmail: 'Reply by email',
+  replyTitle: (org: string) => `Email ${org}`,
+  replyFrom: (from: string, to: string) => `From ${from} to ${to}`,
+  replyTo: (to: string) => `To ${to}`,
+  mailNotConnected:
+    'The church email server is not connected yet, so this can’t be sent from here. A super admin can connect it in',
+  mailSettings: 'Settings → Connectors',
+  template: 'Draft',
+  subject: 'Subject',
+  message: 'Message',
+  openMailApp: 'Open in my email app',
+  send: 'Send',
+  sent: 'Email sent',
+  churchSignature: 'The Church Office',
 };
 
 const messages = {
@@ -42,7 +58,8 @@ const messages = {
   'zh-TW': {
     phase: '第一階段 · AI 作為工具',
     title: '租借教會場地',
-    subtitle: '教會、團體及機構透過公開表格申請。請審閱每份申請並批准或拒絕。',
+    subtitle:
+      '經教會網站「租借教會場地」表格提交的申請。請審閱每份申請，批准或拒絕，並以電郵回覆申請人。',
     noAccess: '場地申請由牧者及行政同工審批。',
     publicForm: '公開表格',
     copyLink: '複製連結',
@@ -73,6 +90,20 @@ const messages = {
     removeBody: '申請將被永久刪除，無法復原。',
     cancel: '取消',
     failed: '發生錯誤',
+    replied: (d: string) => `已於 ${d} 發出電郵`,
+    replyEmail: '以電郵回覆',
+    replyTitle: (org: string) => `電郵給 ${org}`,
+    replyFrom: (from: string, to: string) => `由 ${from} 寄給 ${to}`,
+    replyTo: (to: string) => `寄給 ${to}`,
+    mailNotConnected: '教會電郵伺服器尚未連接，暫時未能在此寄出。超級管理員可於以下位置連接：',
+    mailSettings: '設定 → 連接器',
+    template: '草稿',
+    subject: '主旨',
+    message: '內容',
+    openMailApp: '以我的電郵程式開啟',
+    send: '寄出',
+    sent: '電郵已寄出',
+    churchSignature: '教會辦公室',
   },
 } satisfies Messages<typeof en>;
 

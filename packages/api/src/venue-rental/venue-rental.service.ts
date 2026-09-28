@@ -1,19 +1,29 @@
 // packages/api/src/venue-rental/venue-rental.service.ts
 //
 // Rent Church Place: anyone can submit a venue-rental application from the
-// public /rent page; reviewer roles list, approve/reject and delete them.
+// public /rent page; reviewer roles list, approve/reject, email the applicant
+// through the church email server (SMTP connector) and delete them.
 import { randomUUID } from 'node:crypto';
 
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { createLogger, VENUE_RENTAL_REVIEWER_ROLES } from '@clawix/shared';
 import type {
+  ReplyVenueApplicationInput,
   ReviewVenueApplicationInput,
   VenueApplicationData,
   VenueApplicationInfo,
   VenueApplicationStatus,
+  VenueMailStatus,
   VenueSession,
 } from '@clawix/shared';
 
+import { ConnectorSettingsService } from '../connectors/connector-settings.service.js';
+import { fromHeader, sendMail } from '../connectors/smtp.client.js';
 import { AuditLogRepository } from '../db/audit-log.repository.js';
 import {
   VenueApplicationRepository,
@@ -52,6 +62,7 @@ function toInfo(row: VenueApplicationWithReviewer): VenueApplicationInfo {
     adminNotes: row.adminNotes,
     reviewedByName: row.reviewedBy?.name ?? null,
     reviewedAt: row.reviewedAt?.toISOString() ?? null,
+    repliedAt: row.repliedAt?.toISOString() ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -61,6 +72,7 @@ export class VenueRentalService {
   constructor(
     private readonly repo: VenueApplicationRepository,
     private readonly audit: AuditLogRepository,
+    private readonly connectors: ConnectorSettingsService,
   ) {}
 
   private assertReviewer(actor: Actor): void {
@@ -110,6 +122,40 @@ export class VenueRentalService {
       details: { status: input.status },
     });
     return toInfo(row);
+  }
+
+  async mailStatus(actor: Actor): Promise<VenueMailStatus> {
+    this.assertReviewer(actor);
+    const smtp = await this.connectors.smtp();
+    return { configured: smtp !== null, from: smtp ? fromHeader(smtp) : null };
+  }
+
+  /** Emails the applicant from the church address and records when. */
+  async reply(
+    id: string,
+    input: ReplyVenueApplicationInput,
+    actor: Actor,
+  ): Promise<VenueApplicationInfo> {
+    this.assertReviewer(actor);
+    const row = await this.repo.find(id);
+    if (!row) throw new NotFoundException('Venue application not found');
+    const smtp = await this.connectors.smtp();
+    if (!smtp) {
+      throw new BadRequestException(
+        'The church email server is not connected — a super admin can add it under Settings → Connectors',
+      );
+    }
+    await sendMail(smtp, { to: row.email, subject: input.subject, text: input.body });
+    const updated = await this.repo.markReplied(id);
+    await this.audit.create({
+      userId: actor.id,
+      action: 'venue-rental.reply',
+      resource: 'venue-application',
+      resourceId: id,
+      details: { to: row.email, subject: input.subject },
+    });
+    logger.info({ id }, 'Venue applicant emailed');
+    return toInfo(updated);
   }
 
   async remove(id: string, actor: Actor): Promise<void> {

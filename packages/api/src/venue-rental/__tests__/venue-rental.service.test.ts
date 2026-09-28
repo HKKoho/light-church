@@ -1,11 +1,31 @@
 // packages/api/src/venue-rental/__tests__/venue-rental.service.test.ts
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException } from '@nestjs/common';
 import { venueApplicationSchema } from '@clawix/shared';
 
+import type {
+  ConnectorSettingsService,
+  SmtpCredentials,
+} from '../../connectors/connector-settings.service.js';
+import { sendMail } from '../../connectors/smtp.client.js';
 import type { AuditLogRepository } from '../../db/audit-log.repository.js';
 import type { VenueApplicationRepository } from '../../db/venue-application.repository.js';
 import { VenueRentalService } from '../venue-rental.service.js';
+
+vi.mock('../../connectors/smtp.client.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../connectors/smtp.client.js')>()),
+  sendMail: vi.fn(async () => undefined),
+}));
+
+const smtpCreds: SmtpCredentials = {
+  host: 'mail.church.example',
+  port: 587,
+  secure: false,
+  username: 'office@church.example',
+  password: 'secret',
+  fromAddress: 'office@church.example',
+  fromName: 'City Church Office',
+};
 
 const pastor = { id: 'user-pastor', role: 'pastor' };
 const volunteer = { id: 'user-volunteer', role: 'volunteer' };
@@ -51,6 +71,7 @@ function fakeRepo() {
         adminNotes: null,
         reviewedBy: null,
         reviewedAt: null,
+        repliedAt: null,
         createdAt: new Date('2026-09-27T00:00:00Z'),
       };
       rows.set(row.id, row);
@@ -59,6 +80,11 @@ function fakeRepo() {
     review: vi.fn(async (id: string, d: { status: string; adminNotes: string | null }) => {
       const row = rows.get(id)!;
       Object.assign(row, d, { reviewedBy: { name: 'Pastor Lee' }, reviewedAt: new Date() });
+      return row;
+    }),
+    markReplied: vi.fn(async (id: string) => {
+      const row = rows.get(id)!;
+      row['repliedAt'] = new Date('2026-09-28T01:00:00Z');
       return row;
     }),
     delete: vi.fn(async (id: string) => {
@@ -73,14 +99,18 @@ function fakeRepo() {
 describe('VenueRentalService', () => {
   let repo: ReturnType<typeof fakeRepo>;
   let audit: { create: ReturnType<typeof vi.fn> };
+  let connectors: { smtp: ReturnType<typeof vi.fn> };
   let service: VenueRentalService;
 
   beforeEach(() => {
+    vi.mocked(sendMail).mockClear();
     repo = fakeRepo();
     audit = { create: vi.fn(async () => ({})) };
+    connectors = { smtp: vi.fn(async (): Promise<SmtpCredentials | null> => smtpCreds) };
     service = new VenueRentalService(
       repo as unknown as VenueApplicationRepository,
       audit as unknown as AuditLogRepository,
+      connectors as unknown as ConnectorSettingsService,
     );
   });
 
@@ -163,6 +193,64 @@ describe('VenueRentalService', () => {
       await expect(service.review(id, { status: 'approved' }, volunteer)).rejects.toBeInstanceOf(
         ForbiddenException,
       );
+    });
+  });
+
+  describe('mailStatus', () => {
+    it('reports the From header when the email server is connected', async () => {
+      expect(await service.mailStatus(pastor)).toEqual({
+        configured: true,
+        from: '"City Church Office" <office@church.example>',
+      });
+    });
+
+    it('reports not configured without SMTP', async () => {
+      connectors.smtp.mockResolvedValueOnce(null);
+      expect(await service.mailStatus(pastor)).toEqual({ configured: false, from: null });
+    });
+
+    it('forbids non-reviewers', async () => {
+      await expect(service.mailStatus(volunteer)).rejects.toBeInstanceOf(ForbiddenException);
+    });
+  });
+
+  describe('reply', () => {
+    const mail = { subject: 'Your venue application', body: 'Approved — see you then.' };
+
+    it('emails the applicant, records the time and audits', async () => {
+      const { id } = await service.submit(application());
+      const info = await service.reply(id, mail, pastor);
+      expect(sendMail).toHaveBeenCalledWith(smtpCreds, {
+        to: 'hope@example.com',
+        subject: mail.subject,
+        text: mail.body,
+      });
+      expect(info.repliedAt).toBe('2026-09-28T01:00:00.000Z');
+      expect(audit.create).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'venue-rental.reply', resourceId: id }),
+      );
+    });
+
+    it('refuses when the email server is not connected', async () => {
+      const { id } = await service.submit(application());
+      connectors.smtp.mockResolvedValueOnce(null);
+      await expect(service.reply(id, mail, pastor)).rejects.toBeInstanceOf(BadRequestException);
+      expect(sendMail).not.toHaveBeenCalled();
+    });
+
+    it('does not mark replied when sending fails', async () => {
+      const { id } = await service.submit(application());
+      vi.mocked(sendMail).mockRejectedValueOnce(new Error('smtp down'));
+      await expect(service.reply(id, mail, pastor)).rejects.toThrow('smtp down');
+      expect(repo.markReplied).not.toHaveBeenCalled();
+    });
+
+    it('404s an unknown application', async () => {
+      await expect(service.reply('nope', mail, pastor)).rejects.toBeInstanceOf(NotFoundException);
+    });
+
+    it('forbids non-reviewers', async () => {
+      await expect(service.reply('x', mail, volunteer)).rejects.toBeInstanceOf(ForbiddenException);
     });
   });
 

@@ -86,6 +86,15 @@ export interface ConnectorStatus {
     readonly teamId: string | null;
     readonly projectName: string;
   };
+  readonly smtp: {
+    readonly configured: boolean;
+    readonly host: string | null;
+    readonly port: number;
+    readonly secure: boolean;
+    readonly username: string | null;
+    readonly fromAddress: string | null;
+    readonly fromName: string | null;
+  };
 }
 
 export const updateConnectorsSchema = z.object({
@@ -99,5 +108,15 @@ export const updateConnectorsSchema = z.object({
     .trim()
     .regex(/^[a-z0-9][a-z0-9-]{0,99}$/, 'Lower-case letters, digits and dashes')
     .optional(),
+  /** Church email server (SMTP) used to email venue-rental applicants. */
+  smtpHost: z.string().trim().max(255).optional(),
+  smtpPort: z.number().int().min(1).max(65535).optional(),
+  /** true = TLS from the start (port 465); false = STARTTLS (587/25). */
+  smtpSecure: z.boolean().optional(),
+  smtpUsername: z.string().trim().max(255).optional(),
+  /** SMTP password; empty string removes it. */
+  smtpPassword: z.string().max(500).optional(),
+  smtpFromAddress: z.union([z.literal(''), z.string().trim().email().max(255)]).optional(),
+  smtpFromName: z.string().trim().max(100).optional(),
 });
 export type UpdateConnectorsInput = z.infer<typeof updateConnectorsSchema>;

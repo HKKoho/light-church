@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Check, RotateCcw, Save, Trash2, X } from 'lucide-react';
-import type { VenueApplicationInfo, VenueApplicationStatus } from '@clawix/shared';
+import type { VenueApplicationInfo, VenueApplicationStatus, VenueMailStatus } from '@clawix/shared';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { choiceLabel } from '@/components/venue-rental/choice-labels';
 import { useLanguage } from '@/lib/i18n';
 import { useVenueRentalT } from './messages';
+import { ReplyDialog } from './reply-dialog';
 
 const STATUS_VARIANT: Record<VenueApplicationStatus, 'secondary' | 'default' | 'destructive'> = {
   pending: 'secondary',
@@ -32,9 +33,11 @@ interface Props {
   readonly app: VenueApplicationInfo;
   readonly onReview: (status: VenueApplicationStatus, adminNotes: string) => Promise<void>;
   readonly onRemove: () => Promise<void>;
+  readonly mail: VenueMailStatus | null;
+  readonly onReply: (subject: string, body: string) => Promise<void>;
 }
 
-export function ApplicationCard({ app, onReview, onRemove }: Props) {
+export function ApplicationCard({ app, onReview, onRemove, mail, onReply }: Props) {
   const t = useVenueRentalT();
   const { lang } = useLanguage();
   const [notes, setNotes] = useState(app.adminNotes ?? '');
@@ -68,6 +71,7 @@ export function ApplicationCard({ app, onReview, onRemove }: Props) {
         <p className="text-xs text-muted-foreground">
           {t.submitted(when(app.createdAt))}
           {app.reviewedAt && ` · ${t.reviewed(app.reviewedByName ?? '—', when(app.reviewedAt))}`}
+          {app.repliedAt && ` · ${t.replied(when(app.repliedAt))}`}
         </p>
       </CardHeader>
       <CardContent className="flex flex-col gap-2 px-4">
@@ -118,6 +122,7 @@ export function ApplicationCard({ app, onReview, onRemove }: Props) {
           onChange={(e) => setNotes(e.target.value)}
         />
         <div className="flex flex-wrap items-center gap-2">
+          <ReplyDialog app={app} mail={mail} onSend={onReply} />
           {app.status !== 'approved' && (
             <Button
               size="sm"

@@ -793,6 +793,7 @@ model VenueApplication {
   adminNotes      String?
   reviewedById    String?
   reviewedAt      DateTime?
+  repliedAt       DateTime? // last email sent to the applicant from the dashboard
   createdAt       DateTime  @default(now())
 
   reviewedBy User? @relation(fields: [reviewedById], references: [id], onDelete: SetNull)

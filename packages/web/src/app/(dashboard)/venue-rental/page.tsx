@@ -9,6 +9,7 @@ import {
   VENUE_RENTAL_REVIEWER_ROLES,
   type VenueApplicationInfo,
   type VenueApplicationStatus,
+  type VenueMailStatus,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
 import { Badge } from '@/components/ui/badge';
@@ -31,6 +32,8 @@ export default function VenueRentalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [mail, setMail] = useState<VenueMailStatus | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [formUrl, setFormUrl] = useState(FORM_PATH);
 
   useEffect(() => setFormUrl(`${window.location.origin}${FORM_PATH}`), []);
@@ -53,6 +56,24 @@ export default function VenueRentalPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  useEffect(() => {
+    if (!canReview) return;
+    authFetch<{ data: VenueMailStatus }>('/api/v1/venue-rental/mail')
+      .then((res) => setMail(res.data))
+      .catch(() => setMail({ configured: false, from: null }));
+  }, [canReview]);
+
+  // Errors surface in the dialog; on success, confirm and refresh "Emailed …".
+  const reply = async (id: string, subject: string, body: string) => {
+    await authFetch(`${BASE}/${id}/reply`, {
+      method: 'POST',
+      body: JSON.stringify({ subject, body }),
+    });
+    setNotice(t.sent);
+    setTimeout(() => setNotice(null), 4000);
+    await load();
+  };
 
   const act = async (action: () => Promise<unknown>) => {
     try {
@@ -116,6 +137,12 @@ export default function VenueRentalPage() {
             ))}
           </div>
 
+          {notice && (
+            <div className="rounded-md border border-emerald-500/50 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-400">
+              {notice}
+            </div>
+          )}
+
           {error && (
             <div className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
               {error}
@@ -132,6 +159,8 @@ export default function VenueRentalPage() {
                 <ApplicationCard
                   key={`${app.id}:${app.status}:${app.adminNotes ?? ''}`}
                   app={app}
+                  mail={mail}
+                  onReply={(subject, body) => reply(app.id, subject, body)}
                   onReview={(status, adminNotes) =>
                     act(() =>
                       authFetch(`${BASE}/${app.id}/review`, {

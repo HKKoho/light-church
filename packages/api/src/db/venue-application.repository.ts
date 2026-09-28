@@ -41,6 +41,14 @@ export class VenueApplicationRepository {
     });
   }
 
+  markReplied(id: string): Promise<VenueApplicationWithReviewer> {
+    return this.prisma.venueApplication.update({
+      where: { id },
+      data: { repliedAt: new Date() },
+      include: withReviewer,
+    });
+  }
+
   delete(id: string): Promise<VenueApplication> {
     return this.prisma.venueApplication.delete({ where: { id } });
   }
