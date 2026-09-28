@@ -31,6 +31,9 @@ const en = {
   back: 'Activities',
   viewOnly: 'View only — ministry leaders and staff can edit.',
   edit: 'Edit',
+  companionView: 'Companion view',
+  companionHint:
+    'Open the members’ companion page on the church website (also listed under Members events)',
   save: 'Save',
   saving: 'Saving…',
   saved: 'Saved',
@@ -141,6 +144,8 @@ const messages = {
     back: '活動',
     viewOnly: '僅供檢視——事工領袖及同工可編輯。',
     edit: '編輯',
+    companionView: '隨行指南頁面',
+    companionHint: '在教會網站開啟會友隨行指南頁面（亦列於會友活動）',
     save: '儲存',
     saving: '儲存中…',
     saved: '已儲存',

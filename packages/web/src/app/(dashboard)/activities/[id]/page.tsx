@@ -3,8 +3,22 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
-import { ArrowLeft, CalendarDays, Loader2, MapPin, Pencil, Save, X } from 'lucide-react';
-import type { ActivityAssetInfo, ActivityContent, ActivityDetail } from '@clawix/shared';
+import {
+  ArrowLeft,
+  CalendarDays,
+  ExternalLink,
+  Loader2,
+  MapPin,
+  Pencil,
+  Save,
+  X,
+} from 'lucide-react';
+import {
+  COMPANION_MEMBER_PATH,
+  type ActivityAssetInfo,
+  type ActivityContent,
+  type ActivityDetail,
+} from '@clawix/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -191,6 +205,14 @@ export default function ActivityPage() {
             )}
           </div>
         </div>
+        {!editing && (
+          <Button variant="outline" asChild title={t.companionHint}>
+            <a href={`${COMPANION_MEMBER_PATH}/${id}`} target="_blank" rel="noopener noreferrer">
+              <ExternalLink className="mr-1.5 size-4" />
+              {t.companionView}
+            </a>
+          </Button>
+        )}
         {activity.canEdit &&
           (editing ? (
             <div className="flex gap-2">

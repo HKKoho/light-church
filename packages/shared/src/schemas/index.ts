@@ -158,6 +158,7 @@ export {
   ACTIVITY_EDITOR_ROLES,
   activityContentSchema,
   saveActivitySchema,
+  COMPANION_MEMBER_PATH,
   type ActivityAssetInfo,
   type ActivityAssetKind,
   type ActivityContent,

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { CHURCH_SITE_BASE } from './church-site.schema.js';
+
 // Mission / Camp Companion: one activity (mission trip, camp, retreat, …) is a
 // JSON document. Every section is optional so a leader can start from a title
 // and fill in what their activity needs.
@@ -13,6 +15,9 @@ const isoDate = z
   .optional()
   .default('');
 const assetId = z.string().cuid().nullable().optional().default(null);
+
+/** Members-only companion pages on the church website: `${COMPANION_MEMBER_PATH}/<id>`. */
+export const COMPANION_MEMBER_PATH = `${CHURCH_SITE_BASE}/members/companion`;
 
 export const ACTIVITY_KINDS = ['mission', 'camp', 'retreat', 'other'] as const;
 export type ActivityKind = (typeof ACTIVITY_KINDS)[number];
