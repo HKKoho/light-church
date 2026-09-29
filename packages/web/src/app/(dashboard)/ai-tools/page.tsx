@@ -29,6 +29,7 @@ import {
   aiToolLabel,
   useAiTools,
 } from '@/hooks/use-ai-tools';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import {
   BUILT_IN_AI_TOOLS,
   splitUploadedTools,
@@ -303,6 +304,7 @@ export default function AiToolsPage() {
         <Button asChild size="sm">
           <Link href={`/ai-tools/${encodeURIComponent(tool.name)}`}>{t.open}</Link>
         </Button>
+        <AiToolBriefButton briefKey={tool.name} toolName={aiToolLabel(tool, lang)} />
         {tool.kind === 'link' && <Badge variant="secondary">{t.external}</Badge>}
         {isAdmin && (
           <AlertDialog>
@@ -367,6 +369,7 @@ export default function AiToolsPage() {
               <Button asChild size="sm">
                 <Link href={tool.href}>{t.open}</Link>
               </Button>
+              <AiToolBriefButton briefKey={tool.key} toolName={t.builtInTools[tool.key].name} />
               <Badge variant="secondary">{t.builtIn}</Badge>
             </CardContent>
           </Card>

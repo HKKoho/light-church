@@ -2,6 +2,7 @@
 
 import { ExternalLink, Gamepad2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Button } from '@/components/ui/button';
 import { VISUAL4STORY_URL } from '@/lib/external-tools';
 import { useT, type Messages } from '@/lib/i18n';
@@ -76,6 +77,7 @@ export default function GameStudioPage() {
             </span>
           </div>
           <div className="flex flex-wrap gap-2">
+            <AiToolBriefButton briefKey="gameBuilder" toolName={t.title} />
             <Button variant="outline" asChild title={t.visualHint}>
               <a href={VISUAL4STORY_URL} target="_blank" rel="noopener noreferrer">
                 <ExternalLink className="mr-2 size-4" />

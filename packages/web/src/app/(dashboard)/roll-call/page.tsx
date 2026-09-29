@@ -10,6 +10,7 @@ import {
 } from '@clawix/shared';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/auth-provider';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -102,6 +103,9 @@ export default function RollCallPage() {
           {t.title}
         </h1>
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <div className="mt-3">
+          <AiToolBriefButton briefKey="rollCall" toolName={t.title} />
+        </div>
       </div>
 
       <div role="tablist" className="grid gap-2 sm:grid-cols-2">

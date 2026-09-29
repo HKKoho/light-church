@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, ExternalLink, Loader2 } from 'lucide-react';
 import type { AiToolDetail } from '@clawix/shared';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { authFetch } from '@/lib/auth';
@@ -177,6 +178,7 @@ export default function AiToolViewerPage() {
           </Link>
         </Button>
         <h1 className="truncate text-lg font-semibold">{tool ? aiToolLabel(tool, lang) : name}</h1>
+        <AiToolBriefButton briefKey={name} toolName={tool ? aiToolLabel(tool, lang) : name} />
         <div className="ml-auto flex items-center gap-3">
           {notice?.kind === 'bulletinsImported' && (
             <span className="text-xs text-muted-foreground">

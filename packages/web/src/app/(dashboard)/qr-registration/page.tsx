@@ -9,6 +9,7 @@ import {
   type QrRegistrationInput,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { PublishedLink } from '@/components/dashboard/published-link';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -109,6 +110,9 @@ export default function QrRegistrationPage() {
           {t.title}
         </h1>
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <div className="mt-3">
+          <AiToolBriefButton briefKey="qrRegistration" toolName={t.title} />
+        </div>
       </div>
 
       {!canUse ? (

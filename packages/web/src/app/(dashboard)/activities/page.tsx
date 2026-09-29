@@ -13,6 +13,7 @@ import {
   type ActivitySummary,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -108,6 +109,9 @@ export default function ActivitiesPage() {
           {t.title}
         </h1>
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <div className="mt-3">
+          <AiToolBriefButton briefKey="missionCamp" toolName={t.title} />
+        </div>
       </div>
 
       {error && (

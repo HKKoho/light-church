@@ -12,6 +12,7 @@ import {
   type SitePageSummary,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -76,6 +77,9 @@ function ChurchWebsiteContent() {
             {t.title}
           </h1>
           <p className="max-w-3xl text-sm text-muted-foreground">{t.subtitle}</p>
+          <div className="mt-3">
+            <AiToolBriefButton briefKey="churchWebsite" toolName={t.title} />
+          </div>
         </div>
         {isEditor && (
           <Button variant="outline" asChild>

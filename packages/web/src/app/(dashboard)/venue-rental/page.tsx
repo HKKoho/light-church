@@ -12,6 +12,7 @@ import {
   type VenueMailStatus,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
+import { AiToolBriefButton } from '@/components/dashboard/ai-tool-brief-button';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { authFetch } from '@/lib/auth';
@@ -101,6 +102,9 @@ export default function VenueRentalPage() {
           {t.title}
         </h1>
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <div className="mt-3">
+          <AiToolBriefButton briefKey="venueRental" toolName={t.title} />
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2 rounded-lg border px-4 py-3 text-sm">

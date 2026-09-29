@@ -17,6 +17,9 @@ interface AuthContextValue {
   logout: () => Promise<void>;
 }
 
+/** Set on a successful sign-in; the dashboard's WelcomeIntro consumes it once. */
+export const WELCOME_INTRO_PENDING_KEY = 'lc-welcome-intro-pending';
+
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -42,6 +45,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = useCallback(async (email: string, password: string) => {
     const authUser = await authLogin(email, password);
+    try {
+      sessionStorage.setItem(WELCOME_INTRO_PENDING_KEY, '1');
+    } catch {
+      // Storage unavailable — the welcome introduction is simply not offered.
+    }
     setUser(authUser);
   }, []);
 
