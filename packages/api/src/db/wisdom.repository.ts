@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 
 import type {
   Prisma,
+  WisdomCourse,
   WisdomCycle,
   WisdomModule,
   WisdomResponse,
@@ -12,20 +13,61 @@ import { PrismaService } from '../prisma/prisma.service.js';
 const INSIGHT_LIMIT = 200;
 
 export type WisdomCycleWithModules = WisdomCycle & { modules: WisdomModule[] };
+/** A module with the course it belongs to, for reading labels and publish state. */
+export type WisdomModuleWithCourse = WisdomModule & { cycle: { course: WisdomCourse } };
+export type WisdomCourseWithModules = WisdomCourse & {
+  cycles: { modules: Pick<WisdomModule, 'status'>[] }[];
+};
 
-/** Wisdom in Bible: course cycles, modules and members' answers. */
+const withCourse = { cycle: { select: { course: true } } } as const;
+const ORDER = [{ sortOrder: 'asc' }, { createdAt: 'asc' }] as const;
+
+/** Wisdom in Bible and Sunday School courses: cycles, modules and members' answers. */
 @Injectable()
 export class WisdomRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  /** Cycles in order with their modules; `statuses` limits which modules are included. */
-  listCycles(statuses?: readonly string[]): Promise<WisdomCycleWithModules[]> {
+  /** Courses in order; `published` limits them to those on the church website. */
+  listCourses(published?: boolean): Promise<WisdomCourse[]> {
+    return this.prisma.wisdomCourse.findMany({
+      where: published === undefined ? {} : { published },
+      orderBy: [...ORDER],
+    });
+  }
+
+  /** Every course with its modules' statuses, for the staff counts. */
+  listCoursesWithModules(): Promise<WisdomCourseWithModules[]> {
+    return this.prisma.wisdomCourse.findMany({
+      orderBy: [...ORDER],
+      include: { cycles: { select: { modules: { select: { status: true } } } } },
+    });
+  }
+
+  findCourse(id: string): Promise<WisdomCourse | null> {
+    return this.prisma.wisdomCourse.findUnique({ where: { id } });
+  }
+
+  createCourse(data: Prisma.WisdomCourseCreateInput): Promise<WisdomCourse> {
+    return this.prisma.wisdomCourse.create({ data });
+  }
+
+  updateCourse(id: string, data: Prisma.WisdomCourseUpdateInput): Promise<WisdomCourse> {
+    return this.prisma.wisdomCourse.update({ where: { id }, data });
+  }
+
+  deleteCourse(id: string): Promise<WisdomCourse> {
+    return this.prisma.wisdomCourse.delete({ where: { id } });
+  }
+
+  /** A course's cycles in order with their modules; `statuses` limits which modules are included. */
+  listCycles(courseId: string, statuses?: readonly string[]): Promise<WisdomCycleWithModules[]> {
     return this.prisma.wisdomCycle.findMany({
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+      where: { courseId },
+      orderBy: [...ORDER],
       include: {
         modules: {
           where: statuses ? { status: { in: [...statuses] } } : {},
-          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+          orderBy: [...ORDER],
         },
       },
     });
@@ -47,16 +89,19 @@ export class WisdomRepository {
     return this.prisma.wisdomCycle.delete({ where: { id } });
   }
 
-  findModule(id: string): Promise<WisdomModule | null> {
-    return this.prisma.wisdomModule.findUnique({ where: { id } });
+  findModule(id: string): Promise<WisdomModuleWithCourse | null> {
+    return this.prisma.wisdomModule.findUnique({ where: { id }, include: withCourse });
   }
 
-  createModule(data: Prisma.WisdomModuleUncheckedCreateInput): Promise<WisdomModule> {
-    return this.prisma.wisdomModule.create({ data });
+  createModule(data: Prisma.WisdomModuleUncheckedCreateInput): Promise<WisdomModuleWithCourse> {
+    return this.prisma.wisdomModule.create({ data, include: withCourse });
   }
 
-  updateModule(id: string, data: Prisma.WisdomModuleUncheckedUpdateInput): Promise<WisdomModule> {
-    return this.prisma.wisdomModule.update({ where: { id }, data });
+  updateModule(
+    id: string,
+    data: Prisma.WisdomModuleUncheckedUpdateInput,
+  ): Promise<WisdomModuleWithCourse> {
+    return this.prisma.wisdomModule.update({ where: { id }, data, include: withCourse });
   }
 
   deleteModule(id: string): Promise<WisdomModule> {

@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Check, Download, Minus, Plus, Search } from 'lucide-react';
+import { Check, Download, Minus, MonitorSmartphone, Plus, Search } from 'lucide-react';
 import type {
   RollCallGroupDetail,
   RollCallMemberInfo,
@@ -14,6 +15,10 @@ import { authFetch } from '@/lib/auth';
 import { downloadCsv, groupApi, todayIso } from '../roll-call-api';
 import { useRollCallT } from '../messages';
 import { Countdown } from '../countdown';
+import { useSmartT } from '../smart-messages';
+
+/** How often an open roll call picks up self check-ins from the kiosk. */
+const POLL_MS = 8000;
 
 interface TakeRollProps {
   readonly group: RollCallGroupDetail;
@@ -26,6 +31,7 @@ type SaveState = 'idle' | 'saving' | 'saved' | 'error';
 
 export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: TakeRollProps) {
   const t = useRollCallT();
+  const st = useSmartT();
   const [session, setSession] = useState<RollCallSessionDetail | null>(null);
   const [present, setPresent] = useState<Set<string>>(new Set());
   const [guests, setGuests] = useState(0);
@@ -37,6 +43,8 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
   const [saveState, setSaveState] = useState<SaveState>('idle');
   const [error, setError] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /** Ticks on their way to the server; polling waits for them. */
+  const pending = useRef(0);
   const api = groupApi(group.id);
 
   useEffect(() => {
@@ -56,8 +64,24 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
       .catch((err: unknown) => setError(err instanceof Error ? err.message : t.failed));
   }, [api, sessionId, t.failed]);
 
+  // Pick up people who checked themselves in at the kiosk.
+  const openId = session?.id;
+  useEffect(() => {
+    if (!openId) return;
+    const id = setInterval(() => {
+      if (pending.current > 0 || document.hidden) return;
+      void authFetch<{ data: RollCallSessionDetail }>(`${api}/sessions/${openId}`)
+        .then((res) => {
+          if (pending.current === 0) setPresent(new Set(res.data.presentIds));
+        })
+        .catch(() => undefined);
+    }, POLL_MS);
+    return () => clearInterval(id);
+  }, [api, openId]);
+
+  // Date, label and guests; marks are saved one at a time by `mark`.
   const save = useCallback(
-    (next: { present: Set<string>; guests: number; label: string; date: string }) => {
+    (next: { guests: number; label: string; date: string }) => {
       if (!session) return;
       if (timer.current) clearTimeout(timer.current);
       setSaveState('saving');
@@ -68,7 +92,6 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
             date: next.date,
             label: next.label.trim(),
             guestCount: next.guests,
-            presentIds: [...next.present],
           }),
         })
           .then(() => setSaveState('saved'))
@@ -78,23 +101,45 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
     [api, session],
   );
 
-  const update = (
-    patch: Partial<{ present: Set<string>; guests: number; label: string; date: string }>,
-  ) => {
-    const next = { present, guests, label, date, ...patch };
-    if (patch.present) setPresent(patch.present);
+  const update = (patch: Partial<{ guests: number; label: string; date: string }>) => {
+    const next = { guests, label, date, ...patch };
     if (patch.guests !== undefined) setGuests(patch.guests);
     if (patch.label !== undefined) setLabel(patch.label);
     if (patch.date !== undefined) setDate(patch.date);
     save(next);
   };
 
-  const toggle = (id: string) => {
-    const next = new Set(present);
-    if (next.has(id)) next.delete(id);
-    else next.add(id);
-    update({ present: next });
+  /** Ticks or unticks one person without overwriting anyone else's mark. */
+  const mark = (id: string, on: boolean) => {
+    if (!session) return;
+    setPresent((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+    pending.current++;
+    setSaveState('saving');
+    authFetch(`${api}/sessions/${session.id}/marks/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ present: on }),
+    })
+      .then(() => setSaveState('saved'))
+      .catch(() => {
+        setSaveState('error');
+        setPresent((prev) => {
+          const next = new Set(prev);
+          if (on) next.delete(id);
+          else next.add(id);
+          return next;
+        });
+      })
+      .finally(() => {
+        pending.current--;
+      });
   };
+
+  const toggle = (id: string) => mark(id, !present.has(id));
 
   const start = async () => {
     setError(null);
@@ -124,7 +169,7 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
     try {
       const [member] = await addNames([name]);
       setWalkIn('');
-      if (member) update({ present: new Set(present).add(member.id) });
+      if (member) mark(member.id, true);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : t.failed);
     }
@@ -244,6 +289,12 @@ export function TakeRoll({ group, sessionId, onSessionChange, onMembersAdded }: 
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
+        <Button variant="outline" asChild title={st.kioskHint}>
+          <Link href={`/roll-call/${group.id}/kiosk?session=${session.id}`}>
+            <MonitorSmartphone className="mr-2 size-4" />
+            {st.openKiosk}
+          </Link>
+        </Button>
         <Button
           variant="outline"
           onClick={() =>

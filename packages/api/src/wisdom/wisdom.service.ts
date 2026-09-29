@@ -1,8 +1,9 @@
 // packages/api/src/wisdom/wisdom.service.ts
 //
-// Wisdom in Bible: pastors, ministry leaders and admin staff edit the course
-// (cycles and modules); any signed-in member takes published modules, saves
-// answers, and sees what others answered — anonymously.
+// Wisdom in Bible and Sunday School courses: pastors, ministry leaders and
+// admin staff edit each course's cycles and modules; any signed-in member takes
+// published modules of published courses, saves answers, and sees what others
+// answered — anonymously. Courses themselves live in WisdomCoursesService.
 import { randomUUID } from 'node:crypto';
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import {
@@ -14,16 +15,22 @@ import {
   type SaveWisdomModuleData,
   type WisdomAdminCycle,
   type WisdomCycleInfo,
-  type WisdomMemberCycle,
+  type WisdomMemberCourse,
   type WisdomMemberModule,
   type WisdomModuleDetail,
   type WisdomQuestionInsight,
 } from '@clawix/shared';
 
 import { AuditLogRepository } from '../db/audit-log.repository.js';
-import { WisdomRepository } from '../db/wisdom.repository.js';
-import type { Prisma, WisdomModule } from '../generated/prisma/client.js';
-import { readAnswers, toCycleInfo, toModuleDetail, toModuleSummary } from './wisdom.mappers.js';
+import { WisdomRepository, type WisdomModuleWithCourse } from '../db/wisdom.repository.js';
+import type { Prisma, WisdomCourse } from '../generated/prisma/client.js';
+import {
+  readAnswers,
+  toCourseInfo,
+  toCycleInfo,
+  toModuleDetail,
+  toModuleSummary,
+} from './wisdom.mappers.js';
 
 export interface Actor {
   readonly id: string;
@@ -35,7 +42,7 @@ const EDITORS: ReadonlySet<string> = new Set(WISDOM_EDITOR_ROLES);
 const SAMPLES = 12;
 const SAMPLE_CHARS = 500;
 
-function assertEditor(actor: Actor): void {
+export function assertEditor(actor: Actor): void {
   if (!EDITORS.has(actor.role)) {
     throw new ForbiddenException('Only pastors, ministry leaders and admin staff can do this');
   }
@@ -88,10 +95,11 @@ export class WisdomService {
 
   // ── Staff ────────────────────────────────────────────────────────────
 
-  async listAdmin(actor: Actor): Promise<WisdomAdminCycle[]> {
+  async listAdmin(courseId: string, actor: Actor): Promise<WisdomAdminCycle[]> {
     assertEditor(actor);
+    await this.findCourse(courseId);
     const [cycles, counts] = await Promise.all([
-      this.repo.listCycles(),
+      this.repo.listCycles(courseId),
       this.repo.responseCounts(),
     ]);
     return cycles.map((c) => ({
@@ -105,7 +113,9 @@ export class WisdomService {
 
   async createCycle(input: SaveWisdomCycleInput, actor: Actor): Promise<WisdomCycleInfo> {
     assertEditor(actor);
-    const row = await this.repo.createCycle(input);
+    await this.findCourse(input.courseId);
+    const { courseId, ...data } = input;
+    const row = await this.repo.createCycle({ ...data, course: { connect: { id: courseId } } });
     await this.log(actor, 'cycle.create', row.id, row.title);
     return toCycleInfo(row);
   }
@@ -117,7 +127,9 @@ export class WisdomService {
   ): Promise<WisdomCycleInfo> {
     assertEditor(actor);
     if (!(await this.repo.findCycle(id))) throw new NotFoundException('Cycle not found');
-    const row = await this.repo.updateCycle(id, input);
+    await this.findCourse(input.courseId);
+    const { courseId, ...data } = input;
+    const row = await this.repo.updateCycle(id, { ...data, course: { connect: { id: courseId } } });
     await this.log(actor, 'cycle.update', id, row.title);
     return toCycleInfo(row);
   }
@@ -166,14 +178,16 @@ export class WisdomService {
 
   // ── Members ──────────────────────────────────────────────────────────
 
-  /** Cycles with published modules only; empty cycles are left out. */
-  async listForMember(userId: string): Promise<WisdomMemberCycle[]> {
+  /** A published course's cycles with published modules only; empty cycles are left out. */
+  async listForMember(courseId: string, userId: string): Promise<WisdomMemberCourse> {
+    const course = await this.findCourse(courseId);
+    if (!course.published) throw new NotFoundException('Course not found');
     const [cycles, responses] = await Promise.all([
-      this.repo.listCycles(['published']),
+      this.repo.listCycles(courseId, ['published']),
       this.repo.listUserResponses(userId),
     ]);
     const mine = new Map(responses.map((r) => [r.moduleId, r]));
-    return cycles
+    const visible = cycles
       .filter((c) => c.modules.length > 0)
       .map((c) => ({
         ...toCycleInfo(c),
@@ -183,6 +197,7 @@ export class WisdomService {
           completed: !!mine.get(m.id)?.completedAt,
         })),
       }));
+    return { course: toCourseInfo(course), cycles: visible };
   }
 
   async getForMember(id: string, userId: string): Promise<WisdomMemberModule> {
@@ -239,15 +254,24 @@ export class WisdomService {
 
   // ── Helpers ──────────────────────────────────────────────────────────
 
-  private async findModule(id: string): Promise<WisdomModule> {
+  private async findCourse(id: string): Promise<WisdomCourse> {
+    const row = await this.repo.findCourse(id);
+    if (!row) throw new NotFoundException('Course not found');
+    return row;
+  }
+
+  private async findModule(id: string): Promise<WisdomModuleWithCourse> {
     const row = await this.repo.findModule(id);
     if (!row) throw new NotFoundException('Module not found');
     return row;
   }
 
-  private async findPublished(id: string): Promise<WisdomModule> {
+  /** A published module of a course that is on the church website. */
+  private async findPublished(id: string): Promise<WisdomModuleWithCourse> {
     const row = await this.repo.findModule(id);
-    if (!row || row.status !== 'published') throw new NotFoundException('Module not found');
+    if (!row || row.status !== 'published' || !row.cycle.course.published) {
+      throw new NotFoundException('Module not found');
+    }
     return row;
   }
 

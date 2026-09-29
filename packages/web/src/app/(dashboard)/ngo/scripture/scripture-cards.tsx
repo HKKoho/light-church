@@ -1,18 +1,17 @@
 'use client';
 
-import { BookOpen, ExternalLink, GraduationCap, Lightbulb, type LucideIcon } from 'lucide-react';
+import { BookOpen, ExternalLink, GraduationCap, School, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useT, type Messages } from '@/lib/i18n';
-import { WISDOM_COURSE_HREF } from '../../wisdom-in-bible/routes';
 
-type CardKey = 'getInBible' | 'wisdomInBible' | 'theologyPlatform';
+type CardKey = 'getInBible' | 'sundaySchool' | 'theologyPlatform';
 
 /** Outside links open in a new tab; Light Church pages open in place. */
 const CARDS: readonly { key: CardKey; icon: LucideIcon; href: string }[] = [
   { key: 'getInBible', icon: BookOpen, href: 'https://getinbible.vercel.app/admin' },
-  { key: 'wisdomInBible', icon: Lightbulb, href: WISDOM_COURSE_HREF },
+  { key: 'sundaySchool', icon: School, href: '/ngo/scripture/sunday-school' },
   {
     key: 'theologyPlatform',
     icon: GraduationCap,
@@ -29,10 +28,10 @@ const messages = {
         description:
           'Start reading Scripture — guided entry points for newcomers and new believers.',
       },
-      wisdomInBible: {
-        name: 'Wisdom in Bible',
+      sundaySchool: {
+        name: 'Sunday School',
         description:
-          'A course reading life’s questions through Proverbs, Ecclesiastes and Job side by side.',
+          'The 2027 class plan, Sunday School talks, and Wisdom in Bible courses to read and understand the Bible regularly.',
       },
       theologyPlatform: {
         name: 'Theology Platform',
@@ -47,9 +46,9 @@ const messages = {
         name: '進入聖經',
         description: '開始閱讀聖經——為慕道者及初信者預備的入門引導。',
       },
-      wisdomInBible: {
-        name: '聖經中的智慧',
-        description: '以箴言、傳道書與約伯記並讀人生課題的課程。',
+      sundaySchool: {
+        name: '主日學',
+        description: '2027 年班別計劃、主日學講座，以及定期閱讀及明白聖經的「聖經中的智慧」課程。',
       },
       theologyPlatform: {
         name: '神學平台',

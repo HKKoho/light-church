@@ -22,7 +22,11 @@ import type {
 import { ActivityRepository, type ActivityWithAssets } from '../db/activity.repository.js';
 import type { Prisma } from '../generated/prisma/client.js';
 import { ScopedFs } from '../workspace/scoped-fs.js';
-import { INDONESIA_2026_CONTENT, INDONESIA_2026_TITLE } from './examples/indonesia-2026.js';
+import {
+  INDONESIA_2026_BANNER,
+  INDONESIA_2026_CONTENT,
+  INDONESIA_2026_TITLE,
+} from './examples/indonesia-2026.js';
 
 const logger = createLogger('activities');
 
@@ -151,14 +155,43 @@ export class ActivitiesService implements OnModuleInit {
       .then(() => true)
       .catch(() => false);
     if (seeded || (await this.repo.count()) > 0) return false;
-    await this.repo.create({
+    const row = await this.repo.create({
       title: INDONESIA_2026_TITLE,
       content: INDONESIA_2026_CONTENT as unknown as Prisma.InputJsonValue,
       userId: null,
     });
     await fs.writeFile(marker, new Date().toISOString());
+    try {
+      await this.attachExampleCover(row.id);
+    } catch (err) {
+      logger.warn({ err }, 'Could not attach the example activity cover');
+    }
     logger.info('Created the example Mission/Camp activity');
     return true;
+  }
+
+  /** Uploads the bundled trip banner and makes it the example's cover. */
+  private async attachExampleCover(id: string): Promise<void> {
+    const data = await fs.readFile(INDONESIA_2026_BANNER);
+    const mimeType = 'image/jpeg';
+    const asset = await this.repo.createAsset({
+      activityId: id,
+      kind: 'image',
+      fileName: path.basename(INDONESIA_2026_BANNER),
+      mimeType,
+      size: data.length,
+      uploadedById: null,
+    });
+    const sfs = await this.files();
+    await sfs.writeFile(ActivitiesService.assetPath(id, asset.id, mimeType), data);
+    await this.repo.update(id, {
+      title: INDONESIA_2026_TITLE,
+      content: {
+        ...INDONESIA_2026_CONTENT,
+        coverAssetId: asset.id,
+      } as unknown as Prisma.InputJsonValue,
+      userId: null,
+    });
   }
 
   async list(): Promise<ActivitySummary[]> {

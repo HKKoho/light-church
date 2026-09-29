@@ -1,7 +1,14 @@
 // Generated from reference/CampMissionHdBk/src/data (tripInfo, devotionals, hymns)
 // — the 2026 Indonesia short-term mission trip, created once as the example
 // Mission/Camp Companion activity. Hymn audio is not included (not in the repo).
+import { fileURLToPath } from 'url';
+
 import type { ActivityContent } from '@clawix/shared';
+
+/** Trip banner, copied next to the compiled module by the build (see package.json). */
+export const INDONESIA_2026_BANNER = fileURLToPath(
+  new URL('./indonesia-2026-banner.jpg', import.meta.url),
+);
 
 export const INDONESIA_2026_TITLE = '2026 印尼 P城訪宣隊';
 

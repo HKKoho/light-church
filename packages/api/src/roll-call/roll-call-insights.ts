@@ -4,6 +4,7 @@
 // statistics on the server — no names are sent to any model.
 import type {
   RollCallAlert,
+  RollCallFirstTimer,
   RollCallForecast,
   RollCallInsights,
   RollCallTrendPoint,
@@ -38,6 +39,10 @@ const DECLINE_DROP = 0.4;
 const TREND_POINTS = 12;
 const FORECAST_WINDOW = 8;
 const EWMA_ALPHA = 0.4;
+/** First came within this many of the latest roll calls → a first-timer to welcome. */
+export const FIRST_TIMER_WINDOW = 4;
+/** Roll calls a group needs before its first-timers stand out from its founders. */
+const FIRST_TIMER_AFTER = 2;
 
 const rate = (xs: readonly boolean[]) =>
   xs.length === 0 ? 0 : xs.filter(Boolean).length / xs.length;
@@ -189,6 +194,30 @@ export function forecast(trend: readonly RollCallTrendPoint[]): RollCallForecast
   };
 }
 
+/** People whose first roll call was among the latest few, newest first. */
+export function firstTimers(
+  members: readonly InsightMember[],
+  sessions: readonly InsightSession[],
+): RollCallFirstTimer[] {
+  const from = Math.max(FIRST_TIMER_AFTER, sessions.length - FIRST_TIMER_WINDOW);
+  const found: RollCallFirstTimer[] = [];
+  for (const m of members) {
+    const first = sessions.findIndex((s) => s.presentIds.has(m.id));
+    const firstSession = sessions[first];
+    if (first < from || !firstSession) continue;
+    const at = m.followedUpAt ?? null;
+    found.push({
+      id: m.id,
+      name: m.name,
+      firstDate: firstSession.date,
+      since: sessions.length - 1 - first,
+      cameBack: sessions.slice(first + 1).some((s) => s.presentIds.has(m.id)),
+      followedUp: !!at && at >= firstSession.date,
+    });
+  }
+  return found.sort((a, b) => b.firstDate.localeCompare(a.firstDate));
+}
+
 /** Sessions must be sorted by date, oldest first. */
 export function computeInsights(
   members: readonly InsightMember[],
@@ -216,5 +245,11 @@ export function computeInsights(
     guests: s.guestCount,
     members: active.length,
   }));
-  return { alerts, neverAttended, trend: points.slice(-TREND_POINTS), forecast: forecast(points) };
+  return {
+    alerts,
+    firstTimers: firstTimers(active, sessions),
+    neverAttended,
+    trend: points.slice(-TREND_POINTS),
+    forecast: forecast(points),
+  };
 }

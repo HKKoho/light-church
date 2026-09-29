@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import {
+  WISDOM_COURSE_ID,
   WISDOM_EDITOR_ROLES,
   WISDOM_MODULE_STATUSES,
   WISDOM_PERSPECTIVES,
@@ -28,7 +29,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
 import { useWisdomT } from '../../messages';
-import { WISDOM_COURSE_HREF } from '../../routes';
+import { courseAdminHref } from '../../routes';
 import { DeleteButton, ErrorBanner, Field, errorMessage } from '../../shared';
 import {
   PerspectivesEditor,
@@ -106,7 +107,7 @@ function toInput(f: Form) {
   };
 }
 
-/** Staff: create (`/modules/new?cycle=…`) or edit a Wisdom in Bible module. */
+/** Staff: create (`/modules/new?course=…&cycle=…`) or edit a module of any course. */
 export default function WisdomModulePage() {
   const t = useWisdomT();
   const router = useRouter();
@@ -116,6 +117,8 @@ export default function WisdomModulePage() {
   const { user } = useAuth();
   const isEditor = !!user && WISDOM_EDITOR_ROLES.includes(user.role);
   const [cycles, setCycles] = useState<WisdomAdminCycle[]>([]);
+  const [courseId, setCourseId] = useState(searchParams.get('course') ?? WISDOM_COURSE_ID);
+  const [readingLabels, setReadingLabels] = useState<string[]>([]);
   const [form, setForm] = useState<Form | null>(null);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -125,16 +128,23 @@ export default function WisdomModulePage() {
     if (!isEditor) return;
     const load = async () => {
       try {
-        const list = (await authFetch<{ data: WisdomAdminCycle[] }>(`${API}/cycles`)).data;
-        setCycles(list);
-        if (isNew) {
-          const cycle = list.find((c) => c.id === searchParams.get('cycle')) ?? list[0];
+        const existing = isNew
+          ? null
+          : (await authFetch<{ data: WisdomModuleDetail }>(`${API}/modules/${id}`)).data;
+        const course = existing?.courseId ?? searchParams.get('course') ?? WISDOM_COURSE_ID;
+        const [list, info] = await Promise.all([
+          authFetch<{ data: WisdomAdminCycle[] }>(`${API}/cycles?course=${course}`),
+          authFetch<{ data: { readingLabels: string[] } }>(`${API}/courses/${course}`),
+        ]);
+        setCycles(list.data);
+        setCourseId(course);
+        setReadingLabels(info.data.readingLabels);
+        if (existing) {
+          setForm(toForm(existing));
+        } else {
+          const cycle = list.data.find((c) => c.id === searchParams.get('cycle')) ?? list.data[0];
           const next = Math.max(0, ...(cycle?.modules ?? []).map((m) => m.sortOrder)) + 1;
           setForm(emptyForm(cycle?.id ?? '', next));
-        } else {
-          setForm(
-            toForm((await authFetch<{ data: WisdomModuleDetail }>(`${API}/modules/${id}`)).data),
-          );
         }
       } catch (err) {
         setError(errorMessage(err, t.notFound));
@@ -175,7 +185,7 @@ export default function WisdomModulePage() {
   const remove = async () => {
     try {
       await authFetch(`${API}/modules/${id}`, { method: 'DELETE' });
-      router.push(WISDOM_COURSE_HREF);
+      router.push(courseAdminHref(courseId));
     } catch (err) {
       setError(errorMessage(err, t.failed));
     }
@@ -202,7 +212,7 @@ export default function WisdomModulePage() {
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-6">
       <Link
-        href={WISDOM_COURSE_HREF}
+        href={courseAdminHref(courseId)}
         className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
@@ -274,6 +284,7 @@ export default function WisdomModulePage() {
             onChange={(questions) => set({ questions })}
           />
           <PerspectivesEditor
+            labels={readingLabels}
             perspectives={form.perspectives}
             onChange={(perspectives) => set({ perspectives })}
           />

@@ -38,11 +38,16 @@ export type RollCallSex = (typeof ROLL_CALL_SEXES)[number];
 
 const sex = z.enum(ROLL_CALL_SEXES);
 const birthYear = z.number().int().min(1900).max(new Date().getFullYear()).nullable();
+/** Last four digits of a phone number, for self check-in; '' when not given. */
+const phoneLast4 = z.string().regex(/^(\d{4})?$/, 'Use the last 4 digits');
+const department = z.string().trim().max(50);
 
 export const rollCallMemberInputSchema = z.object({
   name,
   sex: sex.optional(),
   birthYear: birthYear.optional(),
+  phoneLast4: phoneLast4.optional(),
+  department: department.optional(),
 });
 export type RollCallMemberInput = z.infer<typeof rollCallMemberInputSchema>;
 
@@ -57,6 +62,8 @@ export const updateRollCallMemberSchema = z.object({
   active: z.boolean().optional(),
   sex: sex.optional(),
   birthYear: birthYear.optional(),
+  phoneLast4: phoneLast4.optional(),
+  department: department.optional(),
 });
 export type UpdateRollCallMemberInput = z.infer<typeof updateRollCallMemberSchema>;
 
@@ -76,13 +83,39 @@ export const saveRollCallSessionSchema = z.object({
   date: isoDate,
   label: z.string().trim().max(100),
   guestCount: z.number().int().min(0).max(100_000),
-  /** Ids of the members present; everyone else in the group was absent. */
-  presentIds: z.array(z.string().min(1)).max(5000),
+  /**
+   * Ids of the members present; everyone else in the group was absent. Left
+   * out, the marks are untouched (so self check-ins made meanwhile survive).
+   */
+  presentIds: z.array(z.string().min(1)).max(5000).optional(),
 });
 export type SaveRollCallSessionInput = z.infer<typeof saveRollCallSessionSchema>;
 
+/** Marks one member present or not, without touching anyone else's mark. */
+export const rollCallMarkSchema = z.object({ present: z.boolean() });
+export type RollCallMarkInput = z.infer<typeof rollCallMarkSchema>;
+
+/** Kiosk step 1: find who has these last four phone digits. */
+export const rollCallKioskLookupSchema = z.object({
+  sessionId: z.string().min(1),
+  digits: z.string().regex(/^\d{4}$/, 'Enter 4 digits'),
+});
+export type RollCallKioskLookupInput = z.infer<typeof rollCallKioskLookupSchema>;
+
+/** Kiosk step 2: the person confirmed their name. */
+export const rollCallKioskCheckInSchema = z.object({
+  sessionId: z.string().min(1),
+  digits: z.string().regex(/^\d{4}$/),
+  memberId: z.string().min(1),
+});
+export type RollCallKioskCheckInInput = z.infer<typeof rollCallKioskCheckInSchema>;
+
+export const ROLL_CALL_CARE_KINDS = ['call', 'visit', 'message', 'prayer', 'other'] as const;
+export type RollCallCareKind = (typeof ROLL_CALL_CARE_KINDS)[number];
+
 /** Records that someone reached out to a member (clears their absence reminder). */
 export const rollCallFollowUpSchema = z.object({
+  kind: z.enum(ROLL_CALL_CARE_KINDS).optional().default('other'),
   note: z.string().trim().max(500).optional().default(''),
 });
 export type RollCallFollowUpInput = z.infer<typeof rollCallFollowUpSchema>;
@@ -125,6 +158,8 @@ export interface RollCallMemberInfo {
   readonly birthYear: number | null;
   readonly followedUpAt: string | null;
   readonly followUpNote: string;
+  readonly phoneLast4: string;
+  readonly department: string;
 }
 
 export interface RollCallGroupDetail extends RollCallGroupSummary {
@@ -142,6 +177,37 @@ export interface RollCallSessionSummary {
 
 export interface RollCallSessionDetail extends RollCallSessionSummary {
   readonly presentIds: readonly string[];
+}
+
+export type RollCallMarkMethod = 'roll' | 'kiosk';
+
+/** One mark in a roll call, newest first — the kiosk's live log. */
+export interface RollCallCheckIn {
+  readonly memberId: string;
+  readonly name: string;
+  readonly markedAt: string;
+  readonly method: RollCallMarkMethod;
+}
+
+export interface RollCallKioskMatch {
+  readonly id: string;
+  readonly name: string;
+  readonly department: string;
+  readonly checkedIn: boolean;
+}
+
+export interface RollCallKioskResult {
+  readonly status: 'checked_in' | 'already';
+  readonly name: string;
+}
+
+export interface RollCallCareNoteInfo {
+  readonly id: string;
+  readonly kind: RollCallCareKind;
+  readonly note: string;
+  readonly createdAt: string;
+  /** Who reached out; null when their account was removed or unknown. */
+  readonly author: string | null;
 }
 
 /**
@@ -186,8 +252,21 @@ export interface RollCallForecast {
   readonly basedOn: number;
 }
 
+/** Someone whose first roll call was recent — worth a welcome. */
+export interface RollCallFirstTimer {
+  readonly id: string;
+  readonly name: string;
+  readonly firstDate: string;
+  /** Roll calls since their first. */
+  readonly since: number;
+  /** Came again after the first time. */
+  readonly cameBack: boolean;
+  readonly followedUp: boolean;
+}
+
 export interface RollCallInsights {
   readonly alerts: readonly RollCallAlert[];
+  readonly firstTimers: readonly RollCallFirstTimer[];
   readonly neverAttended: readonly { id: string; name: string }[];
   readonly trend: readonly RollCallTrendPoint[];
   readonly forecast: RollCallForecast | null;
@@ -229,6 +308,7 @@ export interface RollCallMemberStats {
   readonly streak: number;
   readonly lastPresent: string | null;
   readonly segment: RollCallSegment;
+  readonly department: string;
 }
 
 export interface RollCallMonth {
@@ -248,11 +328,38 @@ export interface RollCallBreakdownRow {
   readonly avgRate: number | null;
 }
 
+/** Newcomers by the month they first came, and how many came back. */
+export interface RollCallRetentionRow {
+  readonly month: string; // YYYY-MM
+  readonly newcomers: number;
+  /** Came again within the next few roll calls. */
+  readonly returned: number;
+  /** Too recent to tell yet. */
+  readonly pending: number;
+  /** returned / (newcomers − pending), or null while all are pending. */
+  readonly rate: number | null;
+}
+
 export interface RollCallAnalysis {
   readonly sessions: number;
   readonly members: readonly RollCallMemberStats[];
   readonly months: readonly RollCallMonth[];
   readonly bySex: readonly RollCallBreakdownRow[];
   readonly byAge: readonly RollCallBreakdownRow[];
+  readonly byDepartment: readonly RollCallBreakdownRow[];
+  readonly retention: readonly RollCallRetentionRow[];
+  /** Roll calls a newcomer has to come back within to count as returned. */
+  readonly returnWindow: number;
   readonly segments: Readonly<Record<RollCallSegment, number>>;
+}
+
+/** An open follow-up in any group — the care queue on the Roll Call home. */
+export interface RollCallCareQueueItem extends RollCallAlert {
+  readonly groupId: string;
+  readonly groupName: string;
+}
+
+export interface RollCallCareQueue {
+  readonly alerts: readonly RollCallCareQueueItem[];
+  readonly firstTimers: readonly (RollCallFirstTimer & { groupId: string; groupName: string })[];
 }

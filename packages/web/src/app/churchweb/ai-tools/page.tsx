@@ -1,9 +1,18 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { BookOpen, ExternalLink, Landmark, Lightbulb, type LucideIcon } from 'lucide-react';
-import { WISDOM_MEMBER_PATH } from '@clawix/shared';
+import {
+  BookOpen,
+  ExternalLink,
+  GraduationCap,
+  Landmark,
+  Lightbulb,
+  type LucideIcon,
+} from 'lucide-react';
+import { WISDOM_COURSE_ID, wisdomCoursePath, type WisdomCourseInfo } from '@clawix/shared';
 import { useWisdomSiteT } from '@/components/church-site/wisdom-messages';
+import { apiFetch } from '@/lib/api';
 
 interface Tool {
   href: string;
@@ -16,16 +25,37 @@ interface Tool {
 const cardClass =
   'flex flex-col gap-2 rounded-lg border p-5 transition hover:border-primary hover:shadow-sm';
 
-/** AI Tools for church members: church tools ask them to sign in; external ones open in a new tab. */
+/**
+ * AI Tools for church members: courses staff published (Wisdom in Bible and
+ * Sunday School courses) ask them to sign in; external ones open in a new tab.
+ */
 export default function SiteAiToolsPage() {
   const t = useWisdomSiteT();
+  const [courses, setCourses] = useState<WisdomCourseInfo[]>([]);
+
+  useEffect(() => {
+    apiFetch<{ data: WisdomCourseInfo[] }>('/api/v1/public/courses')
+      .then((res) => setCourses(res.data))
+      .catch(() => undefined);
+  }, []);
+
+  const courseTools: Tool[] = courses.map((c) =>
+    c.id === WISDOM_COURSE_ID
+      ? {
+          href: wisdomCoursePath(c.id),
+          icon: Lightbulb,
+          name: t.wisdomName,
+          description: t.wisdomDescription,
+        }
+      : {
+          href: wisdomCoursePath(c.id),
+          icon: GraduationCap,
+          name: c.title,
+          description: c.description,
+        },
+  );
   const tools: readonly Tool[] = [
-    {
-      href: WISDOM_MEMBER_PATH,
-      icon: Lightbulb,
-      name: t.wisdomName,
-      description: t.wisdomDescription,
-    },
+    ...courseTools,
     {
       href: 'https://getinbible.vercel.app/login',
       icon: BookOpen,

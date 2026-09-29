@@ -16,6 +16,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { authFetch } from '@/lib/auth';
 import { ageOf, groupApi, parsePeople } from '../roll-call-api';
 import { useRollCallT } from '../messages';
+import { useSmartT } from '../smart-messages';
 
 interface MembersProps {
   readonly group: RollCallGroupDetail;
@@ -24,7 +25,10 @@ interface MembersProps {
 }
 
 type MemberPatch = Partial<
-  Pick<RollCallMemberInfo, 'name' | 'note' | 'active' | 'sex' | 'birthYear'>
+  Pick<
+    RollCallMemberInfo,
+    'name' | 'note' | 'active' | 'sex' | 'birthYear' | 'phoneLast4' | 'department'
+  >
 >;
 
 const selectClass = 'h-8 rounded-md border border-input bg-transparent px-2 text-sm shadow-xs';
@@ -39,7 +43,10 @@ function MemberRow({
   onSave: (patch: MemberPatch) => Promise<void>;
 }) {
   const t = useRollCallT();
+  const s = useSmartT();
   const [editing, setEditing] = useState(false);
+  const [phone, setPhone] = useState(member.phoneLast4);
+  const [department, setDepartment] = useState(member.department);
   const [name, setName] = useState(member.name);
   const [note, setNote] = useState(member.note);
   const [sex, setSex] = useState<RollCallSex>(member.sex);
@@ -82,6 +89,23 @@ function MemberRow({
           onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
         />
         <Input
+          className="h-8 w-28"
+          inputMode="numeric"
+          value={phone}
+          maxLength={4}
+          placeholder={s.phoneLast4}
+          aria-label={s.phoneLast4}
+          onChange={(e) => setPhone(e.target.value.replace(/\D/g, ''))}
+        />
+        <Input
+          className="h-8 w-32"
+          value={department}
+          maxLength={50}
+          placeholder={s.department}
+          aria-label={s.department}
+          onChange={(e) => setDepartment(e.target.value)}
+        />
+        <Input
           className="h-8 min-w-[10rem] flex-1"
           value={note}
           maxLength={500}
@@ -91,13 +115,15 @@ function MemberRow({
         />
         <Button
           size="sm"
-          disabled={!name.trim() || !yearOk}
+          disabled={!name.trim() || !yearOk || (phone !== '' && phone.length !== 4)}
           onClick={() =>
             void onSave({
               name: name.trim(),
               note: note.trim(),
               sex,
               birthYear: year === '' ? null : yearNum,
+              phoneLast4: phone,
+              department: department.trim(),
             }).then(() => setEditing(false))
           }
         >
@@ -118,6 +144,12 @@ function MemberRow({
       {(member.sex || age !== null) && (
         <span className="text-xs text-muted-foreground">
           {[t.sexShort[member.sex], age !== null ? t.age(age) : ''].filter(Boolean).join(' · ')}
+        </span>
+      )}
+      {member.department && <Badge variant="outline">{member.department}</Badge>}
+      {member.phoneLast4 && (
+        <span className="font-mono text-xs text-muted-foreground" title={s.phoneLast4}>
+          ···{member.phoneLast4}
         </span>
       )}
       {member.note && <span className="truncate text-xs text-muted-foreground">{member.note}</span>}
@@ -346,7 +378,7 @@ export function MembersPanel({ group, aiReady, onChanged }: MembersProps) {
         <ul className="divide-y rounded-md border">
           {shown.map((m) => (
             <MemberRow
-              key={`${m.id}-${m.name}-${m.note}-${m.active}-${m.sex}-${m.birthYear}`}
+              key={`${m.id}-${m.name}-${m.note}-${m.active}-${m.sex}-${m.birthYear}-${m.phoneLast4}-${m.department}`}
               member={m}
               canManage={group.canManage}
               onSave={(patch) => saveMember(m.id, patch)}

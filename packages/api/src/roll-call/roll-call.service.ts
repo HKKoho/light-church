@@ -58,6 +58,8 @@ export const toMemberInfo = (m: RollCallMember): RollCallMemberInfo => ({
   birthYear: m.birthYear,
   followedUpAt: m.followedUpAt ? m.followedUpAt.toISOString() : null,
   followUpNote: m.followUpNote,
+  phoneLast4: m.phoneLast4,
+  department: m.department,
 });
 
 const toInsightSession = (s: RollCallSessionRow): InsightSession => ({
@@ -174,6 +176,8 @@ export class RollCallService {
         sex: keep.sex || rest.find((r) => r.sex)?.sex || '',
         birthYear: keep.birthYear ?? rest.find((r) => r.birthYear !== null)?.birthYear ?? null,
         note: keep.note || rest.find((r) => r.note)?.note || '',
+        phoneLast4: keep.phoneLast4 || rest.find((r) => r.phoneLast4)?.phoneLast4 || '',
+        department: keep.department || rest.find((r) => r.department)?.department || '',
       };
       await this.repo.updateMember(keep.id, fill);
       for (const r of rest) await this.repo.mergeMembers(keep.id, r.id);
@@ -212,13 +216,15 @@ export class RollCallService {
         ...(m.active ? {} : { active: true }),
         ...(!m.sex && person.sex ? { sex: person.sex } : {}),
         ...(m.birthYear === null && person.birthYear ? { birthYear: person.birthYear } : {}),
+        ...(!m.phoneLast4 && person.phoneLast4 ? { phoneLast4: person.phoneLast4 } : {}),
+        ...(!m.department && person.department ? { department: person.department } : {}),
       };
       result.push(Object.keys(patch).length > 0 ? await this.repo.updateMember(m.id, patch) : m);
     }
     return result.map(toMemberInfo);
   }
 
-  private async loadMember(groupId: string, memberId: string): Promise<RollCallMember> {
+  async loadMember(groupId: string, memberId: string): Promise<RollCallMember> {
     const member = await this.repo.findMember(memberId);
     if (!member || member.groupId !== groupId) throw new NotFoundException('Member not found');
     return member;
@@ -239,23 +245,6 @@ export class RollCallService {
     const members = await this.mergeSameNames(groupId);
     const survivor = members.find((m) => normalizeName(m.name) === key) ?? updated;
     return toMemberInfo(survivor);
-  }
-
-  /** Records that someone reached out; clears the member's absence reminder. */
-  async followUp(
-    groupId: string,
-    memberId: string,
-    note: string,
-    actor: Actor,
-  ): Promise<RollCallMemberInfo> {
-    assertManager(actor);
-    await this.loadMember(groupId, memberId);
-    const member = await this.repo.updateMember(memberId, {
-      followedUpAt: new Date(),
-      followUpNote: note,
-    });
-    logger.info({ groupId, memberId, userId: actor.id }, 'Recorded pastoral follow-up');
-    return toMemberInfo(member);
   }
 
   async mergeMembers(
@@ -289,7 +278,7 @@ export class RollCallService {
     return toSession(await this.repo.createSession(groupId, input.date, input.label));
   }
 
-  private async loadSession(groupId: string, sessionId: string): Promise<RollCallSessionRow> {
+  async loadSession(groupId: string, sessionId: string): Promise<RollCallSessionRow> {
     const session = await this.repo.findSession(sessionId);
     if (!session || session.groupId !== groupId) throw new NotFoundException('Roll call not found');
     return session;
@@ -305,9 +294,27 @@ export class RollCallService {
     input: SaveRollCallSessionInput,
   ): Promise<RollCallSessionDetail> {
     await this.loadSession(groupId, sessionId);
+    if (!input.presentIds) {
+      const { presentIds: _none, ...details } = input;
+      await this.repo.saveSession(sessionId, details);
+      return this.getSession(groupId, sessionId);
+    }
     const ids = new Set((await this.repo.listMembers(groupId)).map((m) => m.id));
     const presentIds = [...new Set(input.presentIds)].filter((id) => ids.has(id));
     await this.repo.saveSession(sessionId, { ...input, presentIds });
+    return this.getSession(groupId, sessionId);
+  }
+
+  /** Ticks or unticks one member, leaving everyone else's mark (and check-ins) alone. */
+  async setMark(
+    groupId: string,
+    sessionId: string,
+    memberId: string,
+    present: boolean,
+  ): Promise<RollCallSessionDetail> {
+    await this.loadSession(groupId, sessionId);
+    await this.loadMember(groupId, memberId);
+    await this.repo.setMark(sessionId, memberId, present);
     return this.getSession(groupId, sessionId);
   }
 
@@ -321,6 +328,17 @@ export class RollCallService {
     assertManager(actor);
     await this.loadGroup(groupId);
     return this.computeFor(groupId);
+  }
+
+  /** Insights for every group, for the cross-group care queue. */
+  async insightsForAll(
+    actor: Actor,
+  ): Promise<{ group: RollCallGroupSummary; insights: RollCallInsights }[]> {
+    assertManager(actor);
+    const groups = await this.repo.listGroups();
+    return Promise.all(
+      groups.map(async (g) => ({ group: toSummary(g), insights: await this.computeFor(g.id) })),
+    );
   }
 
   async analysis(groupId: string, actor: Actor): Promise<RollCallAnalysis> {

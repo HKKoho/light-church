@@ -17,6 +17,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { authFetch } from '@/lib/auth';
 import { AiSwitch, useRollCallAi } from './ai-switch';
+import { CareQueue } from './care-queue';
 import { SimpleRollCall } from './simple-roll-call';
 import { ROLL_CALL_API } from './roll-call-api';
 import { useRollCallT } from './messages';
@@ -182,6 +183,8 @@ function SmartHome({
           {error}
         </div>
       )}
+
+      {canManage && <CareQueue />}
 
       <AiSwitch ai={ai} />
 

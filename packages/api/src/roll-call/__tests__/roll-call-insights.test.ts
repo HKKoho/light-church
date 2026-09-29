@@ -81,6 +81,7 @@ describe('computeInsights', () => {
   it('has nothing to report before the first roll call', () => {
     expect(computeInsights(members, [])).toEqual({
       alerts: [],
+      firstTimers: [],
       neverAttended: [],
       trend: [],
       forecast: null,
@@ -108,5 +109,40 @@ describe('forecast', () => {
   it('reads the direction of travel', () => {
     expect(forecast(points([20, 24, 28, 32, 36]))?.direction).toBe('rising');
     expect(forecast(points([36, 32, 28, 24, 20]))?.direction).toBe('falling');
+  });
+});
+
+describe('firstTimers', () => {
+  it('lists people whose first roll call was recent, but not a group’s founders', () => {
+    const result = computeInsights(
+      members,
+      sessions({ amy: '1111111', ben: '0000101', cat: '0000001', dan: '1000000' }),
+    );
+    expect(result.firstTimers).toEqual([
+      {
+        id: 'cat',
+        name: 'Cat',
+        firstDate: '2026-01-07',
+        since: 0,
+        cameBack: false,
+        followedUp: false,
+      },
+      {
+        id: 'ben',
+        name: 'Ben',
+        firstDate: '2026-01-05',
+        since: 2,
+        cameBack: true,
+        followedUp: false,
+      },
+    ]);
+  });
+
+  it('counts a welcome recorded after the first visit', () => {
+    const result = computeInsights(
+      [{ id: 'ben', name: 'Ben', active: true, followedUpAt: '2026-01-06' }],
+      sessions({ ben: '00001' }),
+    );
+    expect(result.firstTimers[0]?.followedUp).toBe(true);
   });
 });

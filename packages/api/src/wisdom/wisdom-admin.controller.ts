@@ -1,5 +1,16 @@
 // packages/api/src/wisdom/wisdom-admin.controller.ts
-import { Body, Controller, Delete, Get, Param, Post, Put, Req } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Put,
+  Query,
+  Req,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import {
   saveWisdomCycleSchema,
@@ -20,15 +31,20 @@ interface AuthedRequest {
 }
 const actor = (req: AuthedRequest): Actor => ({ id: req.user.sub, role: req.user.role });
 
-/** Staff: edit the Wisdom in Bible course. */
+/** Staff: edit a course's cycles and modules. */
 @ApiTags('wisdom')
 @Controller('api/v1/wisdom/admin')
 export class WisdomAdminController {
   constructor(private readonly wisdom: WisdomService) {}
 
+  /** ?course=<id> — the cycles of one course. */
   @Get('cycles')
-  async list(@Req() req: AuthedRequest): Promise<{ success: boolean; data: WisdomAdminCycle[] }> {
-    return { success: true, data: await this.wisdom.listAdmin(actor(req)) };
+  async list(
+    @Req() req: AuthedRequest,
+    @Query('course') course?: string,
+  ): Promise<{ success: boolean; data: WisdomAdminCycle[] }> {
+    if (!course) throw new BadRequestException('course is required');
+    return { success: true, data: await this.wisdom.listAdmin(course, actor(req)) };
   }
 
   @Post('cycles')

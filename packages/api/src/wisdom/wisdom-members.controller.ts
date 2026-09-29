@@ -4,7 +4,7 @@ import { ApiTags } from '@nestjs/swagger';
 import {
   saveWisdomAnswersSchema,
   type SaveWisdomAnswersInput,
-  type WisdomMemberCycle,
+  type WisdomMemberCourse,
   type WisdomMemberModule,
   type WisdomQuestionInsight,
 } from '@clawix/shared';
@@ -17,15 +17,18 @@ interface AuthedRequest {
   user: JwtPayload;
 }
 
-/** Any signed-in member: take the published Wisdom in Bible course. */
+/** Any signed-in member: take published courses (Wisdom in Bible and Sunday School). */
 @ApiTags('wisdom')
 @Controller('api/v1/wisdom')
 export class WisdomMembersController {
   constructor(private readonly wisdom: WisdomService) {}
 
-  @Get('cycles')
-  async list(@Req() req: AuthedRequest): Promise<{ success: boolean; data: WisdomMemberCycle[] }> {
-    return { success: true, data: await this.wisdom.listForMember(req.user.sub) };
+  @Get('courses/:id')
+  async course(
+    @Req() req: AuthedRequest,
+    @Param('id') id: string,
+  ): Promise<{ success: boolean; data: WisdomMemberCourse }> {
+    return { success: true, data: await this.wisdom.listForMember(id, req.user.sub) };
   }
 
   @Get('modules/:id')

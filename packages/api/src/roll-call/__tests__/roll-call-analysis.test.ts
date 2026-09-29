@@ -9,12 +9,14 @@ const member = (
   sex: 'male' | 'female' | '',
   birthYear: number | null,
   active = true,
+  department = '',
 ) => ({
   id,
   name: id,
   sex,
   birthYear,
   active,
+  department,
 });
 
 function sessions(dates: string[], patterns: Record<string, string>): InsightSession[] {
@@ -93,6 +95,42 @@ describe('analyse', () => {
       new: 1,
       never: 1,
     });
+  });
+
+  it('breaks attendance down by department, largest first', () => {
+    const withDept = analyse(
+      [
+        member('amy', 'female', null, true, 'Choir'),
+        member('ben', 'male', null, true, 'Youth'),
+        member('cat', 'female', null, true, 'Youth'),
+        member('dan', '', null),
+      ],
+      sessions(dates, { amy: '111111', ben: '101010', cat: '111111' }),
+      2026,
+    );
+    expect(withDept.byDepartment).toEqual([
+      { key: 'Youth', members: 2, avgRate: 0.75 },
+      { key: 'Choir', members: 1, avgRate: 1 },
+      { key: 'unknown', members: 1, avgRate: null },
+    ]);
+  });
+
+  it('tracks whether newcomers came back, by the month they first came', () => {
+    const r = analyse(
+      [
+        member('founder', '', null),
+        member('back', '', null),
+        member('gone', '', null, false),
+        member('late', '', null),
+      ],
+      sessions(dates, { founder: '111111', back: '010100', gone: '010000', late: '000010' }),
+      2026,
+    );
+    expect(r.returnWindow).toBe(4);
+    expect(r.retention).toEqual([
+      { month: '2026-01', newcomers: 2, returned: 1, pending: 0, rate: 0.5 },
+      { month: '2026-02', newcomers: 1, returned: 0, pending: 1, rate: null },
+    ]);
   });
 
   it('puts ages into bands', () => {

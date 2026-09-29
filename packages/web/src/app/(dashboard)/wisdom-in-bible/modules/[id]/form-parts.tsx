@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react';
 import {
   WISDOM_PERSPECTIVES,
   WISDOM_QUESTION_TYPES,
+  wisdomReadingName,
   type WisdomPerspective,
   type WisdomPerspectiveType,
   type WisdomQuestionType,
@@ -162,7 +163,7 @@ export function QuestionsEditor({
               <Input
                 id={`q-media-${i}`}
                 value={q.mediaUrl}
-                placeholder="https://"
+                placeholder="https:// or /images/wisdom/…"
                 onChange={(e) => update(i, { mediaUrl: e.target.value })}
               />
             </Field>
@@ -179,7 +180,7 @@ export function QuestionsEditor({
               <Input
                 id={`q-image-${i}`}
                 value={q.imageUrl}
-                placeholder="https://"
+                placeholder="https:// or /images/wisdom/…"
                 onChange={(e) => update(i, { imageUrl: e.target.value })}
               />
             </Field>
@@ -206,9 +207,12 @@ export function QuestionsEditor({
 }
 
 export function PerspectivesEditor({
+  labels,
   perspectives,
   onChange,
 }: {
+  /** The course's reading names; blank ones use the Wisdom in Bible names. */
+  labels: readonly string[];
   perspectives: Record<WisdomPerspectiveType, WisdomPerspective>;
   onChange: (next: Record<WisdomPerspectiveType, WisdomPerspective>) => void;
 }) {
@@ -234,7 +238,9 @@ export function PerspectivesEditor({
         );
         return (
           <div key={type} className="flex flex-col gap-3 rounded-md border p-3">
-            <h3 className="text-sm font-semibold">{t.perspectiveNames[type]}</h3>
+            <h3 className="text-sm font-semibold">
+              {wisdomReadingName(labels, type, t.perspectiveNames)}
+            </h3>
             <div className="grid gap-3 sm:grid-cols-2">
               {field('book', t.book)}
               {field('theme', t.theme)}

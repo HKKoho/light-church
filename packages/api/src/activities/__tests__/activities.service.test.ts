@@ -113,6 +113,11 @@ describe('ActivitiesService', () => {
     expect(await service.seedExampleOnce()).toBe(true);
     const [example] = await service.list();
     expect(example?.title).toContain('印尼');
+    const detail = await service.get(example!.id, member);
+    expect(detail.content.coverAssetId).toBe(detail.assets[0]?.id);
+    const cover = await service.readAsset(example!.id, detail.content.coverAssetId!);
+    expect(cover.mimeType).toBe('image/jpeg');
+    expect(cover.data.length).toBeGreaterThan(0);
 
     await service.remove(example!.id, leader);
     expect(await service.seedExampleOnce()).toBe(false);

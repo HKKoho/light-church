@@ -5,6 +5,7 @@
 // so it is read leniently: missing or odd fields become empty values.
 import {
   WISDOM_PERSPECTIVES,
+  type WisdomCourseInfo,
   type WisdomCycleInfo,
   type WisdomLifeQuestion,
   type WisdomModuleDetail,
@@ -14,15 +15,28 @@ import {
   type WisdomPerspectiveType,
 } from '@clawix/shared';
 
-import type { WisdomCycle, WisdomModule } from '../generated/prisma/client.js';
+import type { WisdomModuleWithCourse } from '../db/wisdom.repository.js';
+import type { WisdomCourse, WisdomCycle, WisdomModule } from '../generated/prisma/client.js';
 
 const str = (v: unknown): string => (typeof v === 'string' ? v : '');
 const obj = (v: unknown): Record<string, unknown> =>
   v && typeof v === 'object' && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
 
+export function toCourseInfo(row: WisdomCourse): WisdomCourseInfo {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    readingLabels: readStrings(row.readingLabels, true).slice(0, WISDOM_PERSPECTIVES.length),
+    published: row.published,
+    sortOrder: row.sortOrder,
+  };
+}
+
 export function toCycleInfo(row: WisdomCycle): WisdomCycleInfo {
   return {
     id: row.id,
+    courseId: row.courseId,
     title: row.title,
     description: row.description,
     sortOrder: row.sortOrder,
@@ -76,8 +90,11 @@ export function readPerspectives(json: unknown): Record<WisdomPerspectiveType, W
   >;
 }
 
-export function readStrings(json: unknown): string[] {
-  return Array.isArray(json) ? json.map(str).filter(Boolean) : [];
+/** `keepBlank` keeps empty entries where position matters (reading labels). */
+export function readStrings(json: unknown, keepBlank = false): string[] {
+  if (!Array.isArray(json)) return [];
+  const all = json.map(str);
+  return keepBlank ? all : all.filter(Boolean);
 }
 
 export function readAnswers(json: unknown): Record<string, string> {
@@ -86,9 +103,12 @@ export function readAnswers(json: unknown): Record<string, string> {
   );
 }
 
-export function toModuleDetail(row: WisdomModule): WisdomModuleDetail {
+export function toModuleDetail(row: WisdomModuleWithCourse): WisdomModuleDetail {
+  const course = toCourseInfo(row.cycle.course);
   return {
     ...toModuleSummary(row),
+    courseId: course.id,
+    readingLabels: course.readingLabels,
     lifeQuestions: readLifeQuestions(row.lifeQuestions),
     perspectives: readPerspectives(row.perspectives),
     tensionGuide: row.tensionGuide,

@@ -23,6 +23,8 @@ interface Member {
   birthYear: number | null;
   followedUpAt: Date | null;
   followUpNote: string;
+  phoneLast4: string;
+  department: string;
   createdAt: Date;
 }
 
@@ -37,7 +39,16 @@ function fakeRepo() {
     findGroup: vi.fn(async (id: string) => (id === 'g1' ? group : null)),
     listMembers: vi.fn(async () => [...members]),
     addMembers: vi.fn(
-      async (groupId: string, input: { name: string; sex?: string; birthYear?: number | null }[]) =>
+      async (
+        groupId: string,
+        input: {
+          name: string;
+          sex?: string;
+          birthYear?: number | null;
+          phoneLast4?: string;
+          department?: string;
+        }[],
+      ) =>
         input.map((p) => {
           const m: Member = {
             id: `m${++seq}`,
@@ -49,6 +60,8 @@ function fakeRepo() {
             birthYear: p.birthYear ?? null,
             followedUpAt: null,
             followUpNote: '',
+            phoneLast4: p.phoneLast4 ?? '',
+            department: p.department ?? '',
             createdAt: new Date(Date.now() + seq),
           };
           members.push(m);
@@ -81,6 +94,7 @@ function fakeRepo() {
         : null,
     ),
     saveSession: vi.fn(),
+    setMark: vi.fn(async () => true),
     deleteSession: vi.fn(),
     listSessions: vi.fn(async () => []),
   };
@@ -124,14 +138,30 @@ describe('RollCallService', () => {
     expect(amy).toMatchObject({ id: 'm1', sex: 'female', birthYear: 2010 });
   });
 
-  it('records a pastoral follow-up (managers only)', async () => {
+  it('fills in a phone and department, and merges them from a duplicate', async () => {
     await service.addMembers('g1', people('Amy'));
-    await expect(service.followUp('g1', 'm1', 'Called', volunteer)).rejects.toBeInstanceOf(
-      ForbiddenException,
+    const [amy] = await service.addMembers('g1', [
+      { name: 'AMY', phoneLast4: '1234', department: 'Choir' },
+    ]);
+    expect(amy).toMatchObject({ id: 'm1', phoneLast4: '1234', department: 'Choir' });
+  });
+
+  it('saves session details without touching marks when presentIds is left out', async () => {
+    await service.saveSession('g1', 's1', { date: '2026-09-20', label: 'Sunday', guestCount: 1 });
+    expect(repo.saveSession).toHaveBeenCalledWith('s1', {
+      date: '2026-09-20',
+      label: 'Sunday',
+      guestCount: 1,
+    });
+  });
+
+  it('ticks one member at a time, only within the group', async () => {
+    await service.addMembers('g1', people('Amy'));
+    await service.setMark('g1', 's1', 'm1', true);
+    expect(repo.setMark).toHaveBeenCalledWith('s1', 'm1', true);
+    await expect(service.setMark('g1', 's1', 'stranger', true)).rejects.toBeInstanceOf(
+      NotFoundException,
     );
-    const amy = await service.followUp('g1', 'm1', 'Called', leader);
-    expect(amy.followUpNote).toBe('Called');
-    expect(amy.followedUpAt).not.toBeNull();
   });
 
   it('shows follow-up counts on the group list only to managers', async () => {

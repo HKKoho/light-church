@@ -111,6 +111,7 @@ model User {
   updatedActivities       Activity[]          @relation("ActivityUpdatedBy")
   activityAssets          ActivityAsset[]
   rollCallSimpleList      RollCallSimpleList?
+  rollCallCareNotes       RollCallCareNote[]
   reviewedVenueApps       VenueApplication[]
   siteEvents              SiteEvent[]
   siteMedia               SiteMedia[]
@@ -740,12 +741,18 @@ model RollCallMember {
   // absence reminder clears once a follow-up is recorded after it began.
   followedUpAt DateTime?
   followUpNote String    @default("")
+  // Self check-in (kiosk): last four digits of the member's phone, and the
+  // ministry / department they belong to — both optional.
+  phoneLast4   String    @default("")
+  department   String    @default("")
   createdAt    DateTime  @default(now())
 
-  group RollCallGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  marks RollCallMark[]
+  group     RollCallGroup      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  marks     RollCallMark[]
+  careNotes RollCallCareNote[]
 
   @@index([groupId])
+  @@index([groupId, phoneLast4])
 }
 
 // One roll call (a meeting on a date). Members without a mark were absent.
@@ -768,12 +775,32 @@ model RollCallMark {
   sessionId String
   memberId  String
   markedAt  DateTime @default(now())
+  // How the mark was made: "roll" (someone took the roll) or "kiosk" (self check-in).
+  method    String   @default("roll")
 
   session RollCallSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   member  RollCallMember  @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   @@id([sessionId, memberId])
   @@index([memberId])
+}
+
+// Pastoral-care log: each time someone reached out to a member (a call, a
+// visit, a message, prayer). The newest entry also sets the member's
+// followedUpAt, which clears an open absence reminder.
+model RollCallCareNote {
+  id        String   @id @default(cuid())
+  memberId  String
+  authorId  String?
+  // "call" | "visit" | "message" | "prayer" | "other"
+  kind      String   @default("other")
+  note      String   @default("")
+  createdAt DateTime @default(now())
+
+  member RollCallMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  author User?          @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([memberId, createdAt])
 }
 
 // Roll Call's simple mode (茶果嶺浸信會點名應用程式): one quick list per user —
@@ -906,17 +933,37 @@ model SiteMedia {
 // then guides the tension, discussion and a summary. Staff edit it in the
 // dashboard; signed-in members take it on the church website.
 
+// A course built on the Wisdom in Bible structure (cycles → lessons). The
+// original course has id `wisdom-in-bible`; Sunday School courses are added
+// from the same template. `published` shows the course on the church website.
+model WisdomCourse {
+  id            String   @id @default(cuid())
+  title         String
+  description   String   @default("")
+  readingLabels Json     @default("[]") // three labels for the reading slots; [] uses the Wisdom in Bible names
+  published     Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  cycles WisdomCycle[]
+
+  @@index([sortOrder])
+}
+
 model WisdomCycle {
   id          String   @id @default(cuid())
+  courseId    String
   title       String
   description String   @default("")
   sortOrder   Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  course  WisdomCourse   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   modules WisdomModule[]
 
-  @@index([sortOrder])
+  @@index([courseId, sortOrder])
 }
 
 model WisdomModule {

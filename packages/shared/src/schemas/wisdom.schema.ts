@@ -7,9 +7,20 @@ import { CHURCH_SITE_BASE, SITE_EDITOR_ROLES } from './church-site.schema.js';
 // sometimes collapses), then guides the tension, discussion and a summary.
 // Staff edit it in the dashboard; signed-in members take it at
 // /churchweb/ai-tools/wisdom-in-bible.
+//
+// Sunday School courses reuse the same structure: each is a WisdomCourse with
+// its own cycles and lessons, and names the three reading slots itself. The
+// slot keys stay PROVERBS / ECCLESIASTES / JOB for every course.
 
 /** Where members take the course on the church website. */
 export const WISDOM_MEMBER_PATH = `${CHURCH_SITE_BASE}/ai-tools/wisdom-in-bible`;
+
+/** The original course; its reading slots use the Proverbs / Ecclesiastes / Job names. */
+export const WISDOM_COURSE_ID = 'wisdom-in-bible';
+
+/** Where members take a course on the church website. */
+export const wisdomCoursePath = (courseId: string): string =>
+  courseId === WISDOM_COURSE_ID ? WISDOM_MEMBER_PATH : `${CHURCH_SITE_BASE}/courses/${courseId}`;
 
 /** Edit cycles and modules, and see answer counts. */
 export const WISDOM_EDITOR_ROLES: readonly string[] = SITE_EDITOR_ROLES;
@@ -33,7 +44,11 @@ const optionalUrl = z
   .string()
   .trim()
   .max(2000)
-  .refine((u) => u === '' || /^https?:\/\//i.test(u), 'Use an http(s) link')
+  // A full link, or a path on this site such as /images/wisdom/ruth.jpg (packages/web/public).
+  .refine(
+    (u) => u === '' || /^https?:\/\//i.test(u) || /^\/(?![/\\])/.test(u),
+    'Use an http(s) link or a /path on this site',
+  )
   .default('');
 
 export const wisdomLifeQuestionSchema = z.object({
@@ -59,7 +74,33 @@ export const wisdomPerspectiveSchema = z.object({
 });
 export type WisdomPerspective = z.infer<typeof wisdomPerspectiveSchema>;
 
+/** A course's name for a reading slot, or `fallback` (the Wisdom in Bible name) when it has none. */
+export function wisdomReadingName(
+  labels: readonly string[],
+  type: WisdomPerspectiveType,
+  fallback: Readonly<Record<WisdomPerspectiveType, string>>,
+): string {
+  const label = labels[WISDOM_PERSPECTIVES.indexOf(type)]?.trim();
+  // Blank names fall back too, so `??` would not do.
+  if (label) return label;
+  return fallback[type];
+}
+
+export const saveWisdomCourseSchema = z.object({
+  title: text(200),
+  description: z.string().trim().max(2000).default(''),
+  /** Names for the three reading slots, in order; blank ones fall back to the Wisdom in Bible names. */
+  readingLabels: z.array(z.string().trim().max(200)).max(WISDOM_PERSPECTIVES.length).default([]),
+  sortOrder: z.number().int().min(0).max(10_000).default(0),
+});
+export type SaveWisdomCourseInput = z.infer<typeof saveWisdomCourseSchema>;
+
+/** Show or hide a course on the church website. */
+export const publishWisdomCourseSchema = z.object({ published: z.boolean() });
+export type PublishWisdomCourseInput = z.infer<typeof publishWisdomCourseSchema>;
+
 export const saveWisdomCycleSchema = z.object({
+  courseId: text(64),
   title: text(200),
   description: z.string().trim().max(2000).default(''),
   sortOrder: z.number().int().min(0).max(10_000).default(0),
@@ -95,6 +136,18 @@ export const saveWisdomAnswersSchema = z.object({
 });
 export type SaveWisdomAnswersInput = z.input<typeof saveWisdomAnswersSchema>;
 
+export interface WisdomCourseInfo extends SaveWisdomCourseInput {
+  readonly id: string;
+  readonly published: boolean;
+}
+
+/** Staff view of a course: how much it holds. */
+export interface WisdomAdminCourse extends WisdomCourseInfo {
+  readonly cycles: number;
+  readonly modules: number;
+  readonly publishedModules: number;
+}
+
 export interface WisdomCycleInfo extends SaveWisdomCycleInput {
   readonly id: string;
 }
@@ -110,6 +163,9 @@ export interface WisdomModuleSummary {
 }
 
 export interface WisdomModuleDetail extends WisdomModuleSummary {
+  readonly courseId: string;
+  /** The course's names for the reading slots (may be blank; see `saveWisdomCourseSchema`). */
+  readonly readingLabels: string[];
   readonly lifeQuestions: WisdomLifeQuestion[];
   readonly perspectives: Record<WisdomPerspectiveType, WisdomPerspective>;
   readonly tensionGuide: string;
@@ -126,6 +182,12 @@ export interface WisdomAdminCycle extends WisdomCycleInfo {
 /** Member view: published modules per cycle, with the member's progress. */
 export interface WisdomMemberCycle extends WisdomCycleInfo {
   readonly modules: (WisdomModuleSummary & { started: boolean; completed: boolean })[];
+}
+
+/** Member view of one published course. */
+export interface WisdomMemberCourse {
+  readonly course: WisdomCourseInfo;
+  readonly cycles: WisdomMemberCycle[];
 }
 
 export interface WisdomMemberModule {

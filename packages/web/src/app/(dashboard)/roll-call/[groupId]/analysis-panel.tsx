@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { authFetch } from '@/lib/auth';
 import { downloadCsv, groupApi } from '../roll-call-api';
 import { useRollCallT } from '../messages';
+import { useSmartT } from '../smart-messages';
 
 type SortKey =
   | 'name'
@@ -69,6 +70,7 @@ function Bar({ value }: { value: number | null }) {
 
 export function AnalysisPanel({ groupId, groupName }: { groupId: string; groupName: string }) {
   const t = useRollCallT();
+  const st = useSmartT();
   const [data, setData] = useState<RollCallAnalysis | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sort, setSort] = useState<{ key: SortKey; desc: boolean }>({ key: 'rate', desc: true });
@@ -104,7 +106,7 @@ export function AnalysisPanel({ groupId, groupName }: { groupId: string; groupNa
 
   const exportTable = () =>
     downloadCsv(`${groupName}_analysis.csv`, [
-      columns.map(([, label]) => label),
+      [...columns.map(([, label]) => label), st.department],
       ...rows.map((m) => [
         m.name,
         m.sex ? t.sexes[m.sex] : '',
@@ -115,6 +117,7 @@ export function AnalysisPanel({ groupId, groupName }: { groupId: string; groupNa
         m.streak,
         m.lastPresent ?? '',
         t.segments[m.segment],
+        m.department,
       ]),
     ]);
 
@@ -253,6 +256,15 @@ export function AnalysisPanel({ groupId, groupName }: { groupId: string; groupNa
           [
             [t.bySex, data.bySex, sexLabel],
             [t.byAge, data.byAge, (k: string) => (k === 'unknown' ? t.unknown : k)],
+            ...(data.byDepartment.some((r) => r.key !== 'unknown')
+              ? ([
+                  [
+                    st.byDepartment,
+                    data.byDepartment,
+                    (k: string) => (k === 'unknown' ? t.unknown : k),
+                  ],
+                ] as const)
+              : []),
           ] as const
         ).map(([title, breakdown, label]) => (
           <section key={title} className="flex flex-col gap-2">
@@ -285,6 +297,50 @@ export function AnalysisPanel({ groupId, groupName }: { groupId: string; groupNa
           </section>
         ))}
       </div>
+
+      <section className="flex flex-col gap-2">
+        <h3 className="text-sm font-semibold">{st.retention}</h3>
+        <p className="text-xs text-muted-foreground">{st.retentionHint(data.returnWindow)}</p>
+        {data.retention.length === 0 ? (
+          <p className="text-sm text-muted-foreground">{st.noNewcomers}</p>
+        ) : (
+          <div className="overflow-x-auto rounded-md border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-xs">
+                <tr>
+                  {[
+                    st.colFirstMonth,
+                    st.colNewcomers,
+                    st.colReturned,
+                    st.colPending,
+                    st.colRetention,
+                  ].map((h) => (
+                    <th key={h} className="whitespace-nowrap px-3 py-2 text-left font-medium">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y tabular-nums">
+                {data.retention.map((r) => (
+                  <tr key={r.month}>
+                    <td className="px-3 py-1.5 font-medium">{r.month}</td>
+                    <td className="px-3 py-1.5">{r.newcomers}</td>
+                    <td className="px-3 py-1.5">{r.returned}</td>
+                    <td className="px-3 py-1.5 text-muted-foreground">{r.pending || '—'}</td>
+                    <td className="min-w-[8rem] px-3 py-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className="w-9">{pct(r.rate)}</span>
+                        <Bar value={r.rate} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

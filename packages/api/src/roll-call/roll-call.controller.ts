@@ -6,7 +6,7 @@ import {
   createRollCallSessionSchema,
   mergeRollCallMembersSchema,
   rollCallAiSettingsSchema,
-  rollCallFollowUpSchema,
+  rollCallMarkSchema,
   simpleRollCallSchema,
   saveRollCallGroupSchema,
   saveRollCallSessionSchema,
@@ -18,7 +18,7 @@ import type {
   MergeRollCallMembersInput,
   RollCallAiSettingsInput,
   RollCallAnalysis,
-  RollCallFollowUpInput,
+  RollCallMarkInput,
   SimpleRollCall,
   RollCallAiStatus,
   RollCallDuplicate,
@@ -41,23 +41,26 @@ import { RollCallAiService } from './roll-call-ai.service.js';
 import { RollCallSimpleService } from './roll-call-simple.service.js';
 import { RollCallService } from './roll-call.service.js';
 
-interface AuthedRequest {
+export interface AuthedRequest {
   user: JwtPayload;
 }
-const actor = (req: AuthedRequest) => ({ id: req.user.sub, role: req.user.role });
-const ok = <T>(data: T) => ({ success: true, data });
+export const actor = (req: AuthedRequest) => ({ id: req.user.sub, role: req.user.role });
+export const ok = <T>(data: T) => ({ success: true, data });
 
-// Member names are personal data: only roles that take attendance get in.
+/** Member names are personal data: only roles that take attendance get in. */
+export const RollCallRoles = () =>
+  Roles(
+    UserRole.super_admin,
+    UserRole.senior_pastor,
+    UserRole.pastor,
+    UserRole.admin_staff,
+    UserRole.ministry_leader,
+    UserRole.volunteer,
+  );
+
 @ApiTags('roll-call')
 @Controller('api/v1/roll-call')
-@Roles(
-  UserRole.super_admin,
-  UserRole.senior_pastor,
-  UserRole.pastor,
-  UserRole.admin_staff,
-  UserRole.ministry_leader,
-  UserRole.volunteer,
-)
+@RollCallRoles()
 export class RollCallController {
   constructor(
     private readonly service: RollCallService,
@@ -186,16 +189,6 @@ export class RollCallController {
     return ok(await this.service.analysis(id, actor(req)));
   }
 
-  @Post('groups/:id/members/:memberId/follow-up')
-  async followUp(
-    @Req() req: AuthedRequest,
-    @Param('id') id: string,
-    @Param('memberId') memberId: string,
-    @Body(new ZodValidationPipe(rollCallFollowUpSchema)) body: RollCallFollowUpInput,
-  ): Promise<{ success: boolean; data: RollCallMemberInfo }> {
-    return ok(await this.service.followUp(id, memberId, body.note, actor(req)));
-  }
-
   @Get('groups/:id/sessions')
   async listSessions(
     @Param('id') id: string,
@@ -226,6 +219,16 @@ export class RollCallController {
     @Body(new ZodValidationPipe(saveRollCallSessionSchema)) body: SaveRollCallSessionInput,
   ): Promise<{ success: boolean; data: RollCallSessionDetail }> {
     return ok(await this.service.saveSession(id, sessionId, body));
+  }
+
+  @Put('groups/:id/sessions/:sessionId/marks/:memberId')
+  async setMark(
+    @Param('id') id: string,
+    @Param('sessionId') sessionId: string,
+    @Param('memberId') memberId: string,
+    @Body(new ZodValidationPipe(rollCallMarkSchema)) body: RollCallMarkInput,
+  ): Promise<{ success: boolean; data: RollCallSessionDetail }> {
+    return ok(await this.service.setMark(id, sessionId, memberId, body.present));
   }
 
   @Delete('groups/:id/sessions/:sessionId')

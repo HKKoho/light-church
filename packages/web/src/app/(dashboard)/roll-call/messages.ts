@@ -7,7 +7,8 @@ const en = {
     'Take attendance for services and groups, keep the history, and see who may need a pastoral follow-up.',
   groups: 'Groups',
   modeSmart: 'Smart',
-  modeSmartHint: 'Groups, history, pastoral-care reminders and analysis',
+  modeSmartHint:
+    'Groups, self check-in kiosk, history, pastoral-care log and queue, and attendance analysis',
   modeSimple: 'Simple',
   modeSimpleHint: 'One quick list — tick, count, export',
   simpleTitle: '茶果嶺浸信會點名應用程式',
@@ -131,7 +132,7 @@ const en = {
   // Members
   addNames: 'Add names',
   addNamesHint:
-    'One person per line: name, then optionally sex and birth year or age — e.g. “陳大文, 男, 1985” or “Mary Lee, F, 34”. A CSV with the same columns also works.',
+    'One person per line: name, then optionally sex, birth year or age, phone number and department — e.g. “陳大文, 男, 1985, 91234567, 詩班” or “Mary Lee, F, 34”. A CSV works too; with a header row (姓名, 電話, 部門…) a column of just the last 4 phone digits is understood.',
   importCsv: 'Import CSV',
   active: 'Active',
   inactive: 'Inactive',
@@ -187,7 +188,7 @@ const messages = {
     subtitle: '為崇拜及各小組點名、保存出席紀錄，並留意哪些人可能需要牧養關顧。',
     groups: '群組',
     modeSmart: '智能',
-    modeSmartHint: '群組、出席紀錄、牧養關顧提示及分析',
+    modeSmartHint: '群組、自助報到、出席紀錄、牧養關顧紀錄及清單、出席分析',
     modeSimple: '簡易',
     modeSimpleHint: '單一名單——點選、統計、匯出',
     simpleTitle: '茶果嶺浸信會點名應用程式',
@@ -299,7 +300,7 @@ const messages = {
     exportAll: '匯出出席總表',
     addNames: '加入姓名',
     addNamesHint:
-      '每行一人：姓名，之後可選填性別及出生年份或年齡——例如「陳大文, 男, 1985」或「Mary Lee, F, 34」。相同欄位的 CSV 亦可。',
+      '每行一人：姓名，之後可選填性別、出生年份或年齡、電話號碼及部門——例如「陳大文, 男, 1985, 91234567, 詩班」或「Mary Lee, F, 34」。亦可匯入 CSV；如有標題列（姓名、電話、部門…），只填電話末 4 位的欄位亦可辨認。',
     importCsv: '匯入 CSV',
     active: '在名單',
     inactive: '已移出',

@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Check,
+  HandHeart,
   HeartHandshake,
   Loader2,
   MoveRight,
@@ -12,15 +12,15 @@ import {
   UserX,
 } from 'lucide-react';
 import type { RollCallAlert, RollCallInsights } from '@clawix/shared';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { authFetch } from '@/lib/auth';
 import { groupApi } from '../roll-call-api';
 import { useRollCallT, type RollCallT } from '../messages';
+import { useSmartT } from '../smart-messages';
+import { FollowUpCard } from './care-log';
 
 const pct = (r: number) => Math.round(r * 100);
 
-function alertText(t: RollCallT, a: RollCallAlert): string {
+export function alertText(t: RollCallT, a: RollCallAlert): string {
   const detail = [
     a.previousRate > 0 ? t.usually(pct(a.previousRate)) : null,
     a.lastPresent ? t.lastSeen(a.lastPresent) : null,
@@ -38,83 +38,16 @@ function alertText(t: RollCallT, a: RollCallAlert): string {
   return detail ? `${headline} — ${detail}` : headline;
 }
 
-const TONE: Record<RollCallAlert['kind'], string> = {
+export const TONE: Record<RollCallAlert['kind'], string> = {
   missing: 'border-amber-500/50 bg-amber-500/10',
   absent: 'border-sky-500/40 bg-sky-500/5',
   declining: 'border-orange-500/40 bg-orange-500/5',
   returned: 'border-emerald-500/50 bg-emerald-500/10',
 };
 
-function FollowUpCard({
-  groupId,
-  alert,
-  onDone,
-}: {
-  groupId: string;
-  alert: RollCallAlert;
-  onDone: () => void;
-}) {
-  const t = useRollCallT();
-  const [note, setNote] = useState('');
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const save = async () => {
-    setBusy(true);
-    setError(null);
-    try {
-      await authFetch(`${groupApi(groupId)}/members/${alert.memberId}/follow-up`, {
-        method: 'POST',
-        body: JSON.stringify({ note: note.trim() }),
-      });
-      onDone();
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t.failed);
-    } finally {
-      setBusy(false);
-    }
-  };
-  return (
-    <li className={`flex flex-col gap-2 rounded-md border px-3 py-2 text-sm ${TONE[alert.kind]}`}>
-      <div className="flex items-start gap-2">
-        <div className="min-w-0 flex-1">
-          <p className="font-medium">{alert.name}</p>
-          <p className="text-xs text-muted-foreground">{alertText(t, alert)}</p>
-        </div>
-        {!open && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-7 shrink-0 text-xs"
-            onClick={() => setOpen(true)}
-          >
-            <Check className="mr-1 size-3.5" />
-            {t.markFollowedUp}
-          </Button>
-        )}
-      </div>
-      {open && (
-        <div className="flex gap-2">
-          <Input
-            className="h-8"
-            value={note}
-            maxLength={500}
-            placeholder={t.followUpNotePlaceholder}
-            aria-label={t.note}
-            onChange={(e) => setNote(e.target.value)}
-          />
-          <Button size="sm" className="h-8" disabled={busy} onClick={() => void save()}>
-            {t.save}
-          </Button>
-        </div>
-      )}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </li>
-  );
-}
-
 export function InsightsPanel({ groupId }: { groupId: string }) {
   const t = useRollCallT();
+  const st = useSmartT();
   const [data, setData] = useState<RollCallInsights | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -134,6 +67,7 @@ export function InsightsPanel({ groupId }: { groupId: string }) {
   const open = data.alerts.filter((a) => a.kind !== 'returned' && !a.followedUp);
   const welcome = data.alerts.filter((a) => a.kind === 'returned');
   const handled = data.alerts.filter((a) => a.kind !== 'returned' && a.followedUp);
+  const newcomers = data.firstTimers.filter((f) => !f.followedUp);
   const max = Math.max(1, ...data.trend.map((p) => p.present + p.guests));
   const f = data.forecast;
   const Direction =
@@ -151,10 +85,41 @@ export function InsightsPanel({ groupId }: { groupId: string }) {
         {open.length === 0 && <p className="text-sm text-muted-foreground">{t.noAlerts}</p>}
         <ul className="grid gap-2 md:grid-cols-2">
           {open.map((a) => (
-            <FollowUpCard key={a.memberId} groupId={groupId} alert={a} onDone={load} />
+            <FollowUpCard
+              key={a.memberId}
+              groupId={groupId}
+              memberId={a.memberId}
+              name={a.name}
+              detail={alertText(t, a)}
+              tone={TONE[a.kind]}
+              onDone={load}
+            />
           ))}
         </ul>
       </section>
+
+      {newcomers.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h3 className="flex items-center gap-2 text-sm font-semibold">
+            <HandHeart className="size-4" />
+            {st.firstTimers}
+          </h3>
+          <ul className="grid gap-2 md:grid-cols-2">
+            {newcomers.map((f) => (
+              <FollowUpCard
+                key={f.id}
+                groupId={groupId}
+                memberId={f.id}
+                name={f.name}
+                detail={st.firstTimerText(f.firstDate, f.since, f.cameBack)}
+                tone="border-violet-500/40 bg-violet-500/5"
+                action={st.markWelcomed}
+                onDone={load}
+              />
+            ))}
+          </ul>
+        </section>
+      )}
 
       {welcome.length > 0 && (
         <section className="flex flex-col gap-2">

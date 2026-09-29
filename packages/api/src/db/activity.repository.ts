@@ -40,7 +40,10 @@ export class ActivityRepository {
     });
   }
 
-  update(id: string, data: { title: string; content: Prisma.InputJsonValue; userId: string }) {
+  update(
+    id: string,
+    data: { title: string; content: Prisma.InputJsonValue; userId: string | null },
+  ) {
     return this.prisma.activity.update({
       where: { id },
       data: { title: data.title, content: data.content, updatedById: data.userId },
@@ -57,7 +60,7 @@ export class ActivityRepository {
     fileName: string;
     mimeType: string;
     size: number;
-    uploadedById: string;
+    uploadedById: string | null;
   }): Promise<ActivityAsset> {
     return this.prisma.activityAsset.create({ data });
   }

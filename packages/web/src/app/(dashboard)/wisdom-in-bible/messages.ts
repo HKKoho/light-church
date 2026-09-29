@@ -36,7 +36,7 @@ const en = {
   questionTypes: { open: 'Open answer', multi_choice: 'Multiple choice' },
   options: 'Choices (one per line)',
   mediaUrl: 'Video or resource link (optional)',
-  imageUrl: 'Image link (optional)',
+  imageUrl: 'Image link or /images/wisdom/… path (optional)',
   imageAlt: 'Image description',
   addQuestion: 'Add question',
   perspectives: 'Three perspectives',
@@ -69,6 +69,24 @@ const en = {
   failed: 'Something went wrong',
   invalid: 'Please check the title and every question, choice and link.',
   notFound: 'This module no longer exists.',
+  // Courses (Wisdom in Bible and Sunday School courses built on its template)
+  onWebsite: 'On church website',
+  notOnWebsite: 'Not on website',
+  publish: 'Publish on Church Website',
+  unpublish: 'Remove from website',
+  publishHint: 'Members see published lessons of this course under AI Tools on the church website.',
+  newCourse: 'New course',
+  editCourse: 'Edit course',
+  courseTitle: 'Course title',
+  courseDescription: 'Description',
+  readingLabels: 'Reading names',
+  readingLabelsHint:
+    'Each lesson sets three readings side by side, like Proverbs, Ecclesiastes and Job in Wisdom in Bible. Name the three for this course.',
+  readingSlot: (n: number) => `Reading ${n}`,
+  lessonCount: (published: number, all: number) => `${published} of ${all} lessons published`,
+  deleteCourseBody:
+    'Its cycles, lessons and every member’s answers are deleted too. This cannot be undone.',
+  noCourses: 'No courses yet.',
 };
 
 const messages = {
@@ -107,7 +125,7 @@ const messages = {
     questionTypes: { open: '自由作答', multi_choice: '選擇題' },
     options: '選項（每行一個）',
     mediaUrl: '影片或資源連結（選填）',
-    imageUrl: '圖片連結（選填）',
+    imageUrl: '圖片連結或 /images/wisdom/… 路徑（選填）',
     imageAlt: '圖片說明',
     addQuestion: '新增問題',
     perspectives: '三個視角',
@@ -139,6 +157,22 @@ const messages = {
     failed: '發生錯誤',
     invalid: '請檢查標題及每個問題、選項和連結。',
     notFound: '此課堂已不存在。',
+    onWebsite: '已在教會網站',
+    notOnWebsite: '未在網站',
+    publish: '發佈到教會網站',
+    unpublish: '從網站移除',
+    publishHint: '會友可在教會網站「AI 工具」中學習此課程已發佈的課堂。',
+    newCourse: '新增課程',
+    editCourse: '編輯課程',
+    courseTitle: '課程名稱',
+    courseDescription: '簡介',
+    readingLabels: '經文視角名稱',
+    readingLabelsHint:
+      '每課並讀三段經文，如「聖經中的智慧」的箴言、傳道書與約伯記。請為此課程命名三個視角。',
+    readingSlot: (n: number) => `視角 ${n}`,
+    lessonCount: (published: number, all: number) => `${all} 課中 ${published} 課已發佈`,
+    deleteCourseBody: '課程內的循環、課堂及所有會友的答案亦會刪除，無法復原。',
+    noCourses: '暫時未有課程。',
   },
 } satisfies Messages<typeof en>;
 

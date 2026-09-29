@@ -16,15 +16,17 @@ import { authFetch } from '@/lib/auth';
 import { useWisdomT } from './messages';
 import { ErrorBanner, Field, errorMessage } from './shared';
 
-type Form = Omit<WisdomCycleInfo, 'id'>;
+type Form = Omit<WisdomCycleInfo, 'id' | 'courseId'>;
 
 /** Create (`cycle` = 'new') or edit a cycle; `null` keeps the dialog closed. */
 export function CycleDialog({
+  courseId,
   cycle,
   nextOrder,
   onClose,
   onSaved,
 }: {
+  courseId: string;
   cycle: WisdomCycleInfo | 'new' | null;
   nextOrder: number;
   onClose: () => void;
@@ -43,7 +45,7 @@ export function CycleDialog({
   }, [cycle, nextOrder]);
 
   const save = async () => {
-    const parsed = saveWisdomCycleSchema.safeParse(form);
+    const parsed = saveWisdomCycleSchema.safeParse({ ...form, courseId });
     if (!parsed.success) {
       setError(t.invalid);
       return;

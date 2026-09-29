@@ -3,6 +3,7 @@
 import { ExternalLink, Volume2 } from 'lucide-react';
 import {
   WISDOM_PERSPECTIVES,
+  wisdomReadingName,
   WISDOM_SUMMARY_KEY,
   wisdomDiscussionKey,
   type WisdomLifeQuestion,
@@ -186,7 +187,7 @@ export function PerspectivesStep({ module }: { module: WisdomModuleDetail }) {
         return (
           <article key={type} className="flex flex-col gap-3 rounded-lg border p-4">
             <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-              {t.perspectiveNames[type]}
+              {wisdomReadingName(module.readingLabels, type, t.perspectiveNames)}
             </h3>
             {p.book && <p className="font-semibold">{p.book}</p>}
             {p.theme && <p className="text-sm font-medium text-primary">{p.theme}</p>}

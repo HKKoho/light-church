@@ -8,6 +8,7 @@ import type {
   RollCallBreakdownRow,
   RollCallMemberStats,
   RollCallMonth,
+  RollCallRetentionRow,
   RollCallSegment,
   RollCallSex,
 } from '@clawix/shared';
@@ -20,6 +21,7 @@ export interface AnalysisMember {
   readonly active: boolean;
   readonly sex: RollCallSex;
   readonly birthYear: number | null;
+  readonly department: string;
 }
 
 const RECENT = 6;
@@ -27,6 +29,8 @@ const RECENT = 6;
 const LAPSED_STREAK = 8;
 /** Fewer roll calls than this since first attending → new. */
 const NEW_WITHIN = 4;
+/** A newcomer counts as returned if they came again within this many roll calls. */
+export const RETURN_WINDOW = 4;
 
 export const AGE_BANDS: readonly { key: string; max: number }[] = [
   { key: '0-11', max: 11 },
@@ -76,6 +80,7 @@ function memberStats(
       streak: 0,
       lastPresent: null,
       segment: 'never',
+      department: m.department,
     };
   }
   const marks = sessions.slice(first).map((s) => s.presentIds.has(m.id));
@@ -109,6 +114,7 @@ function memberStats(
     streak,
     lastPresent: sessions[first + lastIndex]?.date ?? null,
     segment: segment(marks.length, rate, streak),
+    department: m.department,
   };
 }
 
@@ -158,6 +164,49 @@ function breakdown(
     .filter((row) => row.members > 0);
 }
 
+/**
+ * Newcomer retention by the month people first came: did they come again
+ * within RETURN_WINDOW roll calls? Everyone at a group's very first roll call
+ * is a founder, not a newcomer, so they are left out. Members since removed
+ * from the list still count — they are often the ones who did not return.
+ */
+export function retention(
+  members: readonly AnalysisMember[],
+  sessions: readonly InsightSession[],
+): RollCallRetentionRow[] {
+  const byMonth = new Map<string, { newcomers: number; returned: number; pending: number }>();
+  for (const m of members) {
+    const first = sessions.findIndex((s) => s.presentIds.has(m.id));
+    const firstSession = sessions[first];
+    if (first < 1 || !firstSession) continue;
+    const later = sessions.slice(first + 1, first + 1 + RETURN_WINDOW);
+    const returned = later.some((s) => s.presentIds.has(m.id));
+    const month = firstSession.date.slice(0, 7);
+    const row = byMonth.get(month) ?? { newcomers: 0, returned: 0, pending: 0 };
+    row.newcomers++;
+    if (returned) row.returned++;
+    else if (later.length < RETURN_WINDOW) row.pending++;
+    byMonth.set(month, row);
+  }
+  return [...byMonth.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([month, r]) => {
+      const decided = r.newcomers - r.pending;
+      return { month, ...r, rate: decided > 0 ? round(r.returned / decided) : null };
+    });
+}
+
+/** Departments, largest first; members without one come last. */
+function departmentOrder(stats: readonly RollCallMemberStats[]): string[] {
+  const counts = new Map<string, number>();
+  for (const s of stats)
+    if (s.department) counts.set(s.department, (counts.get(s.department) ?? 0) + 1);
+  const named = [...counts.entries()]
+    .sort(([a, x], [b, y]) => y - x || a.localeCompare(b))
+    .map(([key]) => key);
+  return [...named, 'unknown'];
+}
+
 /** Sessions must be sorted by date, oldest first. */
 export function analyse(
   members: readonly AnalysisMember[],
@@ -181,6 +230,9 @@ export function analyse(
     months: months(sessions, new Set(active.map((m) => m.id))),
     bySex: breakdown(stats, (s) => s.sex || 'unknown', ['female', 'male', 'unknown']),
     byAge: breakdown(stats, (s) => ageBand(s.age), [...AGE_BANDS.map((b) => b.key), 'unknown']),
+    byDepartment: breakdown(stats, (s) => s.department || 'unknown', departmentOrder(stats)),
+    retention: retention(members, sessions),
+    returnWindow: RETURN_WINDOW,
     segments,
   };
 }
