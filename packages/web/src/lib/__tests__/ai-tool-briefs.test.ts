@@ -25,6 +25,20 @@ describe('bestVoice', () => {
     expect(bestVoice(voices, 'en')?.name).toBe('Ava (Premium)');
   });
 
+  it('picks Samantha from a stock macOS voice list', () => {
+    const voices = [
+      'Daniel/en-GB',
+      'Fred/en-US',
+      'Karen/en-AU',
+      'Moira/en-IE',
+      'Samantha/en-US',
+      'Tessa/en-ZA',
+    ]
+      .map((v) => v.split('/') as [string, string])
+      .map(([name, lang]) => voice(name, lang));
+    expect(bestVoice(voices, 'en')?.name).toBe('Samantha');
+  });
+
   it('prefers a female Cantonese voice and ignores other languages', () => {
     const voices = [
       voice('Microsoft WanLung Online (Natural) - Chinese (Hong Kong)', 'zh-HK', false),

@@ -26,6 +26,9 @@ const FEMALE_VOICE: Record<Lang, RegExp> = {
   'zh-TW': /\b(HiuGaai|HiuMaan|Sinji|Tracy|Female)\b|Google/i,
 };
 
+// Breaks ties between equal voices, e.g. Samantha (en-US) over Karen (en-AU).
+const HOME_LOCALE: Record<Lang, RegExp> = { en: /^en[-_]US$/i, 'zh-TW': /^zh[-_]HK$/i };
+
 type VoiceInfo = Pick<SpeechSynthesisVoice, 'name' | 'lang' | 'localService'>;
 
 /** Higher is better: a female voice first, then neural > premium > enhanced > Google. */
@@ -40,7 +43,12 @@ export function voiceScore(voice: VoiceInfo, lang: Lang): number {
         : /Google/i.test(name)
           ? 1
           : 0;
-  return (FEMALE_VOICE[lang].test(name) ? 10 : 0) + quality + (voice.localService ? 0.5 : 0);
+  return (
+    (FEMALE_VOICE[lang].test(name) ? 10 : 0) +
+    quality +
+    (voice.localService ? 0.5 : 0) +
+    (HOME_LOCALE[lang].test(voice.lang) ? 0.25 : 0)
+  );
 }
 
 /** Best-scoring voice for the language, or null when none is installed. */
