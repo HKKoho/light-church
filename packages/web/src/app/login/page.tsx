@@ -207,11 +207,11 @@ function LoginForm() {
       {/* Right panel */}
       <div className="relative hidden flex-1 bg-neutral-100 lg:block">
         <Image
-          src="/images/login-bg.png"
+          src="/images/site/church-interior.jpg"
           alt=""
           fill
           sizes="50vw"
-          className="object-cover opacity-50"
+          className="object-cover"
           priority
         />
       </div>

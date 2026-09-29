@@ -93,6 +93,11 @@ export default function GameStudioPage() {
           </div>
         </div>
         <p className="max-w-2xl text-sm text-muted-foreground">{t.description}</p>
+        <img
+          src="/images/site/animals.jpg"
+          alt=""
+          className="mt-3 h-32 w-full rounded-lg object-cover sm:h-40"
+        />
       </header>
 
       <div className="mx-auto grid w-full max-w-3xl gap-4 py-6 sm:grid-cols-3">

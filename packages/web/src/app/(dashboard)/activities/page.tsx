@@ -109,6 +109,11 @@ export default function ActivitiesPage() {
           {t.title}
         </h1>
         <p className="text-sm text-muted-foreground">{t.subtitle}</p>
+        <img
+          src="/images/site/playground.jpg"
+          alt=""
+          className="mt-4 h-32 w-full rounded-lg object-cover sm:h-40"
+        />
         <div className="mt-3">
           <AiToolBriefButton briefKey="missionCamp" toolName={t.title} />
         </div>
