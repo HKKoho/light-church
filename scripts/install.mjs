@@ -168,7 +168,7 @@ async function main() {
     );
     info(
       deployMode === 'production'
-        ? 'Production normally runs on a server (docs/Hetzner.md, docs/DEPLOY_VPS.md). To install it here, ' +
+        ? 'Production normally runs on a server (Hetzner_deploy.md, docs/Hetzner.md). To install it here, ' +
             'move .env aside (e.g. mv .env .env.dev) and re-run so the installer asks for production settings.'
         : 'Move the production .env aside (e.g. mv .env .env.prod) and re-run for a development setup.',
     );

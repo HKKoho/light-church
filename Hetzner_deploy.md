@@ -11,6 +11,16 @@ agent's Docker container) via the installer this repo already ships
 **Estimated cost:** ~$5/mo infra (Hetzner CX22 + amortized domain) + variable
 LLM API usage. See [Cost recap](#cost-recap) at the end.
 
+**Why a plain VPS and not a PaaS (Vercel/Render/Railway/Fly)?** The engine
+spawns each agent run as its own Docker container via the Docker CLI directly
+(`ContainerPoolService`/`ContainerRunner` in `packages/api/src/engine/`). That
+needs a real Docker daemon the API process can reach, which most managed
+platforms don't give you without extra cost or complexity. (The old Railway
+and DigitalOcean guides are kept for reference in `docs/archive/`.)
+
+Replacing another app already running on the same Hetzner server? Follow
+[`docs/Hetzner.md`](docs/Hetzner.md) alongside this guide.
+
 ---
 
 ## Step 1 — Create the Hetzner Server
@@ -22,7 +32,11 @@ LLM API usage. See [Cost recap](#cost-recap) at the end.
 3. Inside the project, click **Add Server**:
    - **Location:** closest to your users
    - **Image:** Ubuntu 24.04
-   - **Type:** Shared vCPU → **CX22** (2 vCPU / 4 GB RAM / 40 GB SSD, ~€3.79/mo)
+   - **Type:** Shared vCPU → **CX22** (2 vCPU / 4 GB RAM / 40 GB SSD, ~€3.79/mo).
+     Postgres, Redis, the API, the dashboard and a couple of agent containers
+     (512 MB each) fit in 4 GB for a small congregation. Move to **CX32**
+     (4 vCPU / 8 GB / 80 GB, ~€7.59/mo) if you turn on Telegram/WhatsApp and
+     see several concurrent conversations.
    - **SSH Key:** click **Add SSH Key**, paste your public key
      (`cat ~/.ssh/id_ed25519.pub` locally if you need to generate one first:
      `ssh-keygen -t ed25519`)
@@ -229,7 +243,7 @@ docker compose -f docker-compose.prod.yml logs -f
 docker compose -f docker-compose.prod.yml ps
 
 # Back up the database (cron this — e.g. daily via crontab -e)
-docker exec clawix-postgres pg_dump -U clawix clawix | gzip > ~/backups/db-$(date +%F).sql.gz
+docker exec lightchurch-postgres pg_dump -U clawix clawix | gzip > ~/backups/db-$(date +%F).sql.gz
 
 # Back up workspace data (prayer requests, incidents, pastoral-care records, etc.)
 tar czf ~/backups/data-$(date +%F).tar.gz ./data

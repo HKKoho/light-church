@@ -1,7 +1,7 @@
 # Replacing an Existing App on the Same Hetzner Instance
 
-This doc covers a different scenario from `Hetzner_deploy.md` (fresh server) and
-`docs/DEPLOY_VPS.md` (general VPS guide): you already have a Hetzner Cloud
+This doc covers a different scenario from `Hetzner_deploy.md` (fresh server):
+you already have a Hetzner Cloud
 server running another app — referred to below as **`gracemission`** — and you
 want to deploy this repo (Light Church / Clawixea) onto that **same instance**,
 under a **new domain**, replacing `gracemission` rather than standing up a
@@ -241,4 +241,3 @@ the proxy.
 - `Hetzner_deploy.md` — fresh-server setup (server creation, Docker/Node
   install, full installer walkthrough) for anything in this doc that assumes
   prior steps you haven't done yet.
-- `docs/DEPLOY_VPS.md` — general VPS deployment reference, provider-agnostic.

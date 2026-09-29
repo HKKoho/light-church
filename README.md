@@ -169,9 +169,7 @@ Light Church is a ministry configuration of **Clawixea**, a **self-hosted multi-
 **Guides:**
 
 - **Development strategy (adoption phases 1 → 3c):** [`docs/AI_ADOPTION_PHASES.md`](docs/AI_ADOPTION_PHASES.md)
-- **DigitalOcean deployment (domains, SSL):** [`DO_deploy.md`](DO_deploy.md)
-- **Hetzner / VPS deployment:** [`docs/Hetzner.md`](docs/Hetzner.md), [`docs/DEPLOY_VPS.md`](docs/DEPLOY_VPS.md)
-- **Railway deployment (managed web/API + VPS agent containers):** [`Railway_install.md`](Railway_install.md)
+- **Production deployment (Hetzner):** [`Hetzner_deploy.md`](Hetzner_deploy.md); replacing an app on the same server: [`docs/Hetzner.md`](docs/Hetzner.md). Old Railway and DigitalOcean guides are in [`docs/archive/`](docs/archive/).
 - **Codebase architecture and developer commands:** [`CLAUDE.md`](CLAUDE.md) and [`docs/`](docs/)
 - **Engineering hardening backlog:** [`docs/PHASE2.md`](docs/PHASE2.md). This is separate from adoption Phase 2.
 
