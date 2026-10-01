@@ -145,6 +145,22 @@ export {
 } from './ai-tools.schema.js';
 
 export {
+  helpAssistantAttachmentSchema,
+  helpAssistantChatSchema,
+  helpAssistantMessageSchema,
+  HELP_ASSISTANT_MAX_ATTACHMENT_CHARS,
+  HELP_ASSISTANT_MAX_ATTACHMENTS,
+  HELP_ASSISTANT_MAX_MESSAGE_CHARS,
+  HELP_ASSISTANT_MAX_MESSAGES,
+  type HelpAssistantAttachment,
+  type HelpAssistantChatRequest,
+  type HelpAssistantChatResponse,
+  type HelpAssistantExtractResponse,
+  type HelpAssistantMessage,
+  type HelpAssistantSource,
+} from './help-assistant.schema.js';
+
+export {
   archiveBulletinsSchema,
   MAX_ARCHIVE_FILES,
   MAX_ARCHIVE_FILE_BYTES,

@@ -77,3 +77,23 @@ describe('OneShotLlmService', () => {
     expect(await service.complete(req)).toBe('{"ok":true}');
   });
 });
+
+describe('OneShotLlmService.chat', () => {
+  it('passes the conversation and tools through and returns the raw response', async () => {
+    const { service, chat, tokenCounter } = makeService({ defaultProvider: 'openai' });
+    const tools = [{ name: 't', description: 'd', inputSchema: {} }];
+    const messages = [{ role: 'user' as const, content: 'hello' }];
+    const result = await service.chat({ messages, userId: 'u1', usageTag: 'help', tools });
+    expect(result).toBe(response);
+    expect(chat).toHaveBeenCalledWith(messages, { model: 'gpt-5', tools });
+    expect(tokenCounter.recordUsage).toHaveBeenCalledWith(
+      expect.objectContaining({ agentRunId: 'help' }),
+    );
+  });
+
+  it('omits an empty tool list', async () => {
+    const { service, chat } = makeService({ defaultProvider: 'openai' });
+    await service.chat({ messages: [], userId: 'u1', usageTag: 'help', tools: [] });
+    expect(chat).toHaveBeenCalledWith([], { model: 'gpt-5' });
+  });
+});

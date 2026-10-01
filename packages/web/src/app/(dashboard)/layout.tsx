@@ -7,6 +7,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { AppSidebar } from '@/components/dashboard/app-sidebar';
 import { MinistriesNav } from '@/components/dashboard/ministries-nav';
 import { WelcomeIntro } from '@/components/dashboard/welcome-intro';
+import { HelpAssistant } from '@/components/dashboard/help-assistant/help-assistant';
 import { EASING, DURATION } from '@/lib/anime';
 
 function AnimatedContent({ children }: { children: React.ReactNode }) {
@@ -50,6 +51,7 @@ export default function DashboardLayout({
         </div>
       </SidebarInset>
       <WelcomeIntro />
+      <HelpAssistant />
     </SidebarProvider>
   );
 }

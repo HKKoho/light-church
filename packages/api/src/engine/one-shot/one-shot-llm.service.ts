@@ -10,6 +10,8 @@ import {
   findProviderByName,
   type ChatMessage,
   type GenerationSettings,
+  type LLMResponse,
+  type ToolDefinition,
 } from '@clawix/shared';
 
 import { ProviderConfigService } from '../../provider-config/provider-config.service.js';
@@ -31,6 +33,15 @@ export interface OneShotRequest {
   readonly reasoningEffort?: GenerationSettings['reasoningEffort'];
 }
 
+export interface OneShotChatRequest {
+  readonly messages: readonly ChatMessage[];
+  readonly userId: string;
+  /** Recorded as TokenUsage.agentRunId, e.g. `help-assistant`. */
+  readonly usageTag: string;
+  readonly tools?: readonly ToolDefinition[];
+  readonly settings?: GenerationSettings;
+}
+
 interface ProviderFactory {
   readonly create: typeof createProvider;
 }
@@ -49,6 +60,27 @@ export class OneShotLlmService {
 
   /** Returns the model's text reply. */
   async complete(req: OneShotRequest): Promise<string> {
+    const settings: GenerationSettings = {
+      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
+      ...(req.reasoningEffort !== undefined ? { reasoningEffort: req.reasoningEffort } : {}),
+    };
+    const response = await this.chat({
+      messages: [
+        { role: 'system', content: req.system },
+        { role: 'user', content: req.prompt },
+      ],
+      userId: req.userId,
+      usageTag: req.usageTag,
+      settings,
+    });
+    return response.content ?? '';
+  }
+
+  /**
+   * One multi-turn call, optionally offering tools. The caller runs any tool
+   * calls in the response and calls again — a bounded loop, not an agent run.
+   */
+  async chat(req: OneShotChatRequest): Promise<LLMResponse> {
     const providerName = (await this.providerConfig.getDefaultProviderName()) ?? FALLBACK_PROVIDER;
     const model = process.env['AI_TOOLS_MODEL'] ?? findProviderByName(providerName)?.defaultModel;
     if (!model) {
@@ -71,16 +103,10 @@ export class OneShotLlmService {
       resolved.apiBaseUrl ?? undefined,
       model,
     );
-    const messages: ChatMessage[] = [
-      { role: 'system', content: req.system },
-      { role: 'user', content: req.prompt },
-    ];
-    const settings: GenerationSettings = {
-      ...(req.temperature !== undefined ? { temperature: req.temperature } : {}),
-      ...(req.reasoningEffort !== undefined ? { reasoningEffort: req.reasoningEffort } : {}),
-    };
-    const response = await provider.chat(messages, {
+    const settings = req.settings ?? {};
+    const response = await provider.chat(req.messages, {
       model,
+      ...(req.tools && req.tools.length > 0 ? { tools: req.tools } : {}),
       ...(Object.keys(settings).length > 0 ? { settings } : {}),
     });
 
@@ -96,6 +122,6 @@ export class OneShotLlmService {
         logger.warn({ err, usageTag: req.usageTag }, 'Failed to record token usage');
       });
 
-    return response.content ?? '';
+    return response;
   }
 }

@@ -10,6 +10,7 @@ import {
   SUNDAY_BULLETINS_IMPORT_PATH,
   SUNDAY_ROSTER_IMPORT_PATH,
 } from './sunday-bulletins/sunday-bulletins.controller.js';
+import { HELP_ASSISTANT_CHAT_PATH } from './help-assistant/help-assistant.controller.js';
 import { registerSecurityPlugins } from './common/security.config.js';
 import { configureGlobalHttpDispatcher } from './common/http-dispatcher.js';
 import { secretProblems } from './common/secret-strength.js';
@@ -107,6 +108,10 @@ async function bootstrap() {
       // Saving several bulletins at once (each up to 512 KB).
       if (route.url === '/api/v1/sunday-bulletins' && route.method === 'PUT') {
         route.bodyLimit = 11 * 1024 * 1024;
+      }
+      // The Help Assistant resends its conversation and attached document text.
+      if (route.url === HELP_ASSISTANT_CHAT_PATH && route.method === 'POST') {
+        route.bodyLimit = 4 * 1024 * 1024;
       }
     });
 
