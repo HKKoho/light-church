@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { GalleryVerticalEnd, Languages } from 'lucide-react';
+import { GalleryVerticalEnd, HandHeart, Languages } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 
@@ -12,6 +12,8 @@ const messages = {
     howItWorks: 'The path',
     capabilities: 'Capabilities',
     trust: 'Faithfulness',
+    plans: 'Plans',
+    contribute: 'Contribute',
     signIn: 'Sign in',
     switchLanguage: 'Switch language',
   },
@@ -21,6 +23,8 @@ const messages = {
     howItWorks: '發展路徑',
     capabilities: '功能',
     trust: '忠心管理',
+    plans: '方案',
+    contribute: '奉獻支持',
     signIn: '登入',
     switchLanguage: '切換語言',
   },
@@ -30,6 +34,8 @@ const messages = {
   howItWorks: string;
   capabilities: string;
   trust: string;
+  plans: string;
+  contribute: string;
   signIn: string;
   switchLanguage: string;
 }>;
@@ -49,18 +55,21 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
-          <a href="#why" className="hover:text-foreground">
+          <a href="/#why" className="hover:text-foreground">
             {t.why}
           </a>
-          <a href="#how-it-works" className="hover:text-foreground">
+          <a href="/#how-it-works" className="hover:text-foreground">
             {t.howItWorks}
           </a>
-          <a href="#capabilities" className="hover:text-foreground">
+          <a href="/#capabilities" className="hover:text-foreground">
             {t.capabilities}
           </a>
-          <a href="#trust" className="hover:text-foreground">
+          <a href="/#trust" className="hover:text-foreground">
             {t.trust}
           </a>
+          <Link href="/subscription" className="hover:text-foreground">
+            {t.plans}
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
@@ -74,6 +83,12 @@ export function SiteHeader() {
           >
             <Languages className="size-4" />
             {lang === 'en' ? '中文' : 'English'}
+          </Button>
+          <Button size="sm" variant="outline" className="hidden sm:inline-flex" asChild>
+            <Link href="/contribute">
+              <HandHeart className="size-4" />
+              {t.contribute}
+            </Link>
           </Button>
           <Button size="sm" asChild>
             <Link href="/login">{t.signIn}</Link>
