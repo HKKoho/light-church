@@ -189,10 +189,10 @@ VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 VITE_GEMINI_API_KEY=AIzaSyXXXXXX
 
 # OpenAI (Required for Michael AI assistant)
-VITE_OPENAI_API_KEY=sk-proj-XXXXX
+OPENAI_API_KEY=sk-proj-XXXXX  # server-side only (api/openai.ts proxy); never VITE_-prefixed
 ```
 
-**Critical:** All Vite environment variables must be prefixed with `VITE_`
+**Critical:** Browser-side Vite variables must be prefixed with `VITE_` — and are therefore public. Secrets like `OPENAI_API_KEY` must NOT use the prefix.
 
 ## Common Development Tasks
 

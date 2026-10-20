@@ -207,7 +207,7 @@ The AI Student Value System Analysis feature has been successfully implemented a
 - [x] `VITE_SUPABASE_URL` - Configured
 - [x] `VITE_SUPABASE_ANON_KEY` - Configured
 - [x] `VITE_GEMINI_API_KEY` - Configured (for life questions)
-- [x] `VITE_OPENAI_API_KEY` - Configured (for analysis + Michael AI)
+- [x] `OPENAI_API_KEY` - Configured (for analysis + Michael AI)
 
 **Note:** All environment variables use `VITE_` prefix (required for Vite)
 
@@ -324,7 +324,7 @@ Total:                          $0.04631 ≈ $0.04
 2. **Environment Variables:**
    - Verify in Vercel dashboard (production)
    - Verify in `.env` file (local development)
-   - Ensure `VITE_OPENAI_API_KEY` starts with `sk-proj-`
+   - Ensure `OPENAI_API_KEY` starts with `sk-proj-`
 
 3. **Test Data:**
    - Ensure at least 1 student has completed all 6 modules in Cycle 1

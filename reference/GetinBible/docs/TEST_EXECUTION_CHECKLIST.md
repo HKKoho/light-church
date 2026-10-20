@@ -19,7 +19,7 @@
 - [ ] Verified `VITE_SUPABASE_URL` is set
 - [ ] Verified `VITE_SUPABASE_ANON_KEY` is set
 - [ ] Verified `VITE_GEMINI_API_KEY` is set
-- [ ] Verified `VITE_OPENAI_API_KEY` is set (starts with `sk-proj-`)
+- [ ] Verified `OPENAI_API_KEY` is set (starts with `sk-proj-`)
   - **OpenAI Key Status:** ☐ Valid  ☐ Invalid
 
 ### Test Data Preparation
@@ -415,7 +415,7 @@
 **Time Started:** _________________
 
 **Steps:**
-1. Temporarily remove `VITE_OPENAI_API_KEY` from `.env`
+1. Temporarily remove `OPENAI_API_KEY` from `.env`
 2. Restart dev server
 3. Try to generate analysis
 
@@ -430,7 +430,7 @@
 - **Console Output:** _________________
 
 **Cleanup:**
-- [ ] Restored `VITE_OPENAI_API_KEY` to `.env`
+- [ ] Restored `OPENAI_API_KEY` to `.env`
 - [ ] Restarted dev server
 
 ---

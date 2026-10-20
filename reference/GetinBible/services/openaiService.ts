@@ -1,21 +1,19 @@
 import OpenAI from 'openai';
 import { Module } from '../types';
+import { createOpenAIClient } from './openaiClient';
 import { ModuleResponseSummary } from './responseService';
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
 const ollamaBaseUrl = import.meta.env.VITE_OLLAMA_BASE_URL; // e.g. https://your-ollama-cloud-host
 const ollamaModel = import.meta.env.VITE_OLLAMA_MODEL || 'llama3';
 
-if (!apiKey && !ollamaBaseUrl) {
-  console.warn('Neither OpenAI API key nor Ollama base URL configured. Michael AI Teaching Assistant will not be available.');
-} else if (!apiKey) {
-  console.info('OpenAI API key not configured. Using Ollama as the LLM provider.');
-}
+// Calls go through the server-side /api/openai proxy; the key never reaches the browser.
+const openai = createOpenAIClient();
 
-const openai = apiKey ? new OpenAI({
-  apiKey,
-  dangerouslyAllowBrowser: true, // Note: In production, consider using a backend proxy
-}) : null;
+if (!openai && !ollamaBaseUrl) {
+  console.warn('Neither OpenAI nor Ollama base URL configured. Michael AI Teaching Assistant will not be available.');
+} else if (!openai) {
+  console.info('OpenAI disabled. Using Ollama as the LLM provider.');
+}
 
 // Ollama client — uses the OpenAI-compatible /v1 endpoint
 const ollama = ollamaBaseUrl ? new OpenAI({
@@ -34,6 +32,7 @@ function isRegionBlockedError(error: unknown): boolean {
   // OpenAI returns 403 for region-blocked requests; also catch network errors
   return (
     msg.includes('403') ||
+    msg.includes('503') ||
     msg.includes('region') ||
     msg.includes('country') ||
     msg.includes('unsupported_country') ||
@@ -78,7 +77,7 @@ async function chatWithFallback(
     return response.trim();
   }
 
-  throw new Error('No LLM provider is configured. Please add VITE_OPENAI_API_KEY or VITE_OLLAMA_BASE_URL to your environment.');
+  throw new Error('No LLM provider is configured. Please set OPENAI_API_KEY on the server or VITE_OLLAMA_BASE_URL.');
 }
 
 export interface ConversationMessage {
@@ -166,7 +165,7 @@ export async function getMichaelResponse(
   userModuleResponses?: ModuleResponseSummary[]
 ): Promise<string> {
   if (!openai && !ollama) {
-    throw new Error('No LLM provider configured. Please add VITE_OPENAI_API_KEY or VITE_OLLAMA_BASE_URL to your environment.');
+    throw new Error('No LLM provider configured. Please set OPENAI_API_KEY on the server or VITE_OLLAMA_BASE_URL.');
   }
 
   try {
@@ -305,7 +304,7 @@ ${truncatedDiscussionContext || '學生尚未完成討論問題'}
  */
 export async function generateOpenAITTS(text: string): Promise<string> {
   if (!openai) {
-    throw new Error('OpenAI service is not configured. Please add VITE_OPENAI_API_KEY to your environment.');
+    throw new Error('OpenAI service is not configured. Please set OPENAI_API_KEY on the server.');
   }
 
   try {
@@ -423,7 +422,7 @@ export async function getMichaelContentHelp(
   conversationHistory: ConversationMessage[]
 ): Promise<string> {
   if (!openai && !ollama) {
-    throw new Error('No LLM provider configured. Please add VITE_OPENAI_API_KEY or VITE_OLLAMA_BASE_URL to your environment.');
+    throw new Error('No LLM provider configured. Please set OPENAI_API_KEY on the server or VITE_OLLAMA_BASE_URL.');
   }
 
   try {
@@ -570,7 +569,7 @@ export async function getMichaelStudentHelp(
   conversationHistory: ConversationMessage[]
 ): Promise<string> {
   if (!openai && !ollama) {
-    throw new Error('No LLM provider configured. Please add VITE_OPENAI_API_KEY or VITE_OLLAMA_BASE_URL to your environment.');
+    throw new Error('No LLM provider configured. Please set OPENAI_API_KEY on the server or VITE_OLLAMA_BASE_URL.');
   }
 
   try {
@@ -638,7 +637,7 @@ ${moduleContextText}
  */
 export async function generateBibleBookOverview(bookTitle: string): Promise<string> {
   if (!openai && !ollama) {
-    throw new Error('No LLM provider configured. Please add VITE_OPENAI_API_KEY or VITE_OLLAMA_BASE_URL to your environment.');
+    throw new Error('No LLM provider configured. Please set OPENAI_API_KEY on the server or VITE_OLLAMA_BASE_URL.');
   }
 
   try {

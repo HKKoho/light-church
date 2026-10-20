@@ -1,13 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
-import OpenAI from 'openai';
+import type OpenAI from 'openai';
 import SpeechInputButton from './SpeechInputButton';
+import { createOpenAIClient } from '../services/openaiClient';
 
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
-
-const openai = apiKey ? new OpenAI({
-  apiKey,
-  dangerouslyAllowBrowser: true,
-}) : null;
+// Calls go through the server-side /api/openai proxy; the key never reaches the browser.
+const openai = createOpenAIClient();
 
 interface Message {
   id: string;

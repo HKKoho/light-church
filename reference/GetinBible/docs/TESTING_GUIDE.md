@@ -101,7 +101,7 @@ ORDER BY ordinal_position;
 1. Open browser DevTools → Console tab
 2. Look for errors containing "OpenAI" or "generateCycleAnalysis"
 3. Check Vercel environment variables:
-   - `VITE_OPENAI_API_KEY` must be set
+   - `OPENAI_API_KEY` must be set
    - Value should start with `sk-proj-`
 
 ---
@@ -272,7 +272,7 @@ ORDER BY ordinal_position;
 ### Test 10: Missing OpenAI API Key
 
 **Steps:**
-1. Remove `VITE_OPENAI_API_KEY` from Vercel environment variables
+1. Remove `OPENAI_API_KEY` from Vercel environment variables
 2. Redeploy
 3. Try to generate analysis
 
@@ -377,7 +377,7 @@ ORDER BY ca.generated_at DESC;
 ### Problem: "生成失敗，請稍後再試"
 
 **Check:**
-1. Vercel environment variables → `VITE_OPENAI_API_KEY` exists
+1. Vercel environment variables → `OPENAI_API_KEY` exists
 2. Browser console → look for OpenAI API errors
 3. Supabase → table `cycle_analyses` exists
 4. Student completion → all 6 modules marked complete

@@ -8,7 +8,7 @@
 // IMPORTANT: This service transforms between database snake_case and TypeScript camelCase
 // ============================================================================
 
-import OpenAI from 'openai';
+import { createOpenAIClient } from './openaiClient';
 import { supabase } from './supabaseClient';
 import { getModulesByCycle } from './moduleService';
 import { getUserProgress } from './progressService';
@@ -471,17 +471,13 @@ ${isPartial ? `\n【部分分析特別指引】
  * Call OpenAI API to generate analysis
  */
 async function callOpenAIForAnalysis(prompt: string): Promise<string> {
-  const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+  // Calls go through the server-side /api/openai proxy; the key never reaches the browser.
+  const openai = createOpenAIClient();
 
-  if (!apiKey) {
-    console.error('[Analysis] OpenAI API key not configured');
-    throw new Error('OpenAI API 金鑰未設定，請聯繫管理員');
+  if (!openai) {
+    console.error('[Analysis] OpenAI disabled');
+    throw new Error('OpenAI API 未啟用，請聯繫管理員');
   }
-
-  const openai = new OpenAI({
-    apiKey,
-    dangerouslyAllowBrowser: true
-  });
 
   try {
     console.log('[Analysis] Calling OpenAI API...');

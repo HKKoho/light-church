@@ -52,9 +52,19 @@ Create a `.env` file with the following variables:
 ```env
 VITE_SUPABASE_URL=your_supabase_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
-VITE_OPENAI_API_KEY=your_openai_api_key
 VITE_GEMINI_API_KEY=your_gemini_api_key
+
+# Server-side only (NO VITE_ prefix) — read by the api/openai.ts proxy and
+# never bundled into the browser. Set these in Vercel → Environment Variables.
+OPENAI_API_KEY=your_openai_api_key
+# Optional: lock the proxy to your site's origin(s)
+ALLOWED_ORIGINS=https://your-app.vercel.app
 ```
+
+> ⚠️ Never put the OpenAI key in a `VITE_*` variable: Vite inlines every
+> `VITE_*` value into the public JavaScript bundle. All OpenAI calls go
+> through `/api/openai` (see `api/openai.ts`), so use `vercel dev` locally
+> instead of `vite` when you need the AI features.
 
 ### Installation
 
