@@ -186,7 +186,7 @@ VITE_SUPABASE_URL=https://xxxxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 # Google Gemini (Required for AI feedback)
-VITE_GEMINI_API_KEY=AIzaSyXXXXXX
+GEMINI_API_KEY=AIzaSyXXXXXX  # server-side only (api/gemini.ts proxy); never VITE_-prefixed
 
 # OpenAI (Required for Michael AI assistant)
 OPENAI_API_KEY=sk-proj-XXXXX  # server-side only (api/openai.ts proxy); never VITE_-prefixed

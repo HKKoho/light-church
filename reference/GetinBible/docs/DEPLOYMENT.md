@@ -39,7 +39,7 @@ Before deploying, you'll need:
    ```bash
    vercel env add VITE_SUPABASE_URL
    vercel env add VITE_SUPABASE_ANON_KEY
-   vercel env add VITE_GEMINI_API_KEY
+   vercel env add GEMINI_API_KEY
    ```
 
    Paste each value when prompted, and select:
@@ -77,7 +77,7 @@ Before deploying, you'll need:
    ```
    VITE_SUPABASE_URL = your_supabase_url
    VITE_SUPABASE_ANON_KEY = your_supabase_anon_key
-   VITE_GEMINI_API_KEY = your_gemini_api_key (optional)
+   GEMINI_API_KEY = your_gemini_api_key (optional)
    ```
 
 5. **Deploy**
@@ -96,7 +96,7 @@ Before deploying, you'll need:
 
 1. Go to https://aistudio.google.com/apikey
 2. Click "Create API Key"
-3. Copy the key → Use for `VITE_GEMINI_API_KEY`
+3. Copy the key → Use for `GEMINI_API_KEY`
 
 ## Post-Deployment
 

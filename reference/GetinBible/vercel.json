@@ -5,6 +5,10 @@
       "destination": "/api/openai?path=:path*"
     },
     {
+      "source": "/api/gemini/:path*",
+      "destination": "/api/gemini?path=:path*"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }

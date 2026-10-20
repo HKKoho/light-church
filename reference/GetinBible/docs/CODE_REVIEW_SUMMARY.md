@@ -206,7 +206,7 @@ The AI Student Value System Analysis feature has been successfully implemented a
 **Verified Variables:**
 - [x] `VITE_SUPABASE_URL` - Configured
 - [x] `VITE_SUPABASE_ANON_KEY` - Configured
-- [x] `VITE_GEMINI_API_KEY` - Configured (for life questions)
+- [x] `GEMINI_API_KEY` - Configured (for life questions)
 - [x] `OPENAI_API_KEY` - Configured (for analysis + Michael AI)
 
 **Note:** All environment variables use `VITE_` prefix (required for Vite)

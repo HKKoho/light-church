@@ -18,7 +18,7 @@
 ### Environment Variables
 - [ ] Verified `VITE_SUPABASE_URL` is set
 - [ ] Verified `VITE_SUPABASE_ANON_KEY` is set
-- [ ] Verified `VITE_GEMINI_API_KEY` is set
+- [ ] Verified `GEMINI_API_KEY` is set
 - [ ] Verified `OPENAI_API_KEY` is set (starts with `sk-proj-`)
   - **OpenAI Key Status:** ☐ Valid  ☐ Invalid
 

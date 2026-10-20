@@ -241,7 +241,7 @@ The admin CMS is fully functional with implemented components including:
 
    Create a `.env.local` file in the root directory:
    ```env
-   VITE_GEMINI_API_KEY=your-gemini-api-key
+   GEMINI_API_KEY=your-gemini-api-key
    VITE_SUPABASE_URL=your-supabase-project-url
    VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
    ```
@@ -279,7 +279,7 @@ npm run preview
 3. **Add environment variables in Vercel dashboard:**
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_GEMINI_API_KEY`
+   - `GEMINI_API_KEY`
 4. **Deploy!**
 
 ## 📚 Usage

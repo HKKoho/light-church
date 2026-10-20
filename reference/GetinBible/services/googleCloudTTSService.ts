@@ -3,8 +3,10 @@
  * Provides native Cantonese (yue-HK) TTS support with Neural2 voices
  */
 
-// Google Cloud TTS REST API endpoint
-const TTS_API_ENDPOINT = 'https://texttospeech.googleapis.com/v1/text:synthesize';
+// Server-side proxy (api/tts.ts) that adds GOOGLE_CLOUD_TTS_API_KEY; the key
+// never reaches the browser. Set VITE_GOOGLE_CLOUD_TTS_ENABLED=false to disable.
+const TTS_PROXY_ENDPOINT = '/api/tts';
+const isTTSEnabled = import.meta.env.VITE_GOOGLE_CLOUD_TTS_ENABLED !== 'false';
 
 // Available Cantonese voices (yue-HK)
 export const CANTONESE_VOICES = {
@@ -50,10 +52,8 @@ export async function generateCantoneseSpeech(
   voice: CantoneseVoice = CANTONESE_VOICES.STANDARD_A,
   speakingRate: number = 0.95
 ): Promise<string | undefined> {
-  const apiKey = import.meta.env.VITE_GOOGLE_CLOUD_TTS_API_KEY;
-
-  if (!apiKey) {
-    console.error('Missing VITE_GOOGLE_CLOUD_TTS_API_KEY environment variable');
+  if (!isTTSEnabled) {
+    console.error('Google Cloud TTS is disabled (VITE_GOOGLE_CLOUD_TTS_ENABLED=false)');
     return undefined;
   }
 
@@ -74,7 +74,7 @@ export async function generateCantoneseSpeech(
   };
 
   try {
-    const response = await fetch(`${TTS_API_ENDPOINT}?key=${apiKey}`, {
+    const response = await fetch(TTS_PROXY_ENDPOINT, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -100,7 +100,7 @@ export async function generateCantoneseSpeech(
  * Check if Google Cloud TTS service is available
  */
 export function isGoogleCloudTTSAvailable(): boolean {
-  return !!import.meta.env.VITE_GOOGLE_CLOUD_TTS_API_KEY;
+  return isTTSEnabled;
 }
 
 /**

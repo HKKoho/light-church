@@ -2,17 +2,31 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { Module } from "../types";
 
+/**
+ * Gemini calls go through the server-side /api/gemini proxy (api/gemini.ts);
+ * the real GEMINI_API_KEY never reaches the browser.
+ * Set VITE_GEMINI_ENABLED=false to turn Gemini features off.
+ */
+const isGeminiEnabled = import.meta.env.VITE_GEMINI_ENABLED !== 'false';
+
+function createGeminiClient(): GoogleGenAI | null {
+  if (!isGeminiEnabled) return null;
+  return new GoogleGenAI({
+    apiKey: 'proxied', // placeholder; the proxy ignores it and adds the real key
+    httpOptions: { baseUrl: `${window.location.origin}/api/gemini` },
+  });
+}
+
 export const getWisdomAssistantResponse = async (
   module: Module,
   userQuestion: string,
   userInput: string
 ) => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error('Missing VITE_GEMINI_API_KEY environment variable');
+  const ai = createGeminiClient();
+  if (!ai) {
+    console.error('Gemini is disabled (VITE_GEMINI_ENABLED=false)');
     return "智慧的言語如同金蘋果落在銀網子裡。讓我們在安靜中繼續思考。";
   }
-  const ai = new GoogleGenAI({ apiKey });
   
   const systemInstruction = `
     你是一位資深的聖經智慧文學導師。這是一門關於《箴言》、《傳道書》與《約伯記》的互動課程。
@@ -47,12 +61,11 @@ export const getWisdomAssistantResponse = async (
  * Returns base64 encoded PCM data.
  */
 export const generateSpeech = async (text: string): Promise<string | undefined> => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    console.error('Missing VITE_GEMINI_API_KEY environment variable');
+  const ai = createGeminiClient();
+  if (!ai) {
+    console.error('Gemini is disabled (VITE_GEMINI_ENABLED=false)');
     return undefined;
   }
-  const ai = new GoogleGenAI({ apiKey });
   
   try {
     const response = await ai.models.generateContent({
@@ -81,12 +94,10 @@ export const generateSpeech = async (text: string): Promise<string | undefined> 
  * @returns Generated overview text
  */
 export const generateBibleBookOverview = async (bookTitle: string): Promise<string> => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Gemini service is not configured. Please add VITE_GEMINI_API_KEY to your environment.');
+  const ai = createGeminiClient();
+  if (!ai) {
+    throw new Error('Gemini service is not configured. Please set GEMINI_API_KEY on the server.');
   }
-
-  const ai = new GoogleGenAI({ apiKey });
 
   const systemInstruction = `你是一位專精於聖經研究的學者。請為指定的聖經書卷撰寫一份概要。
 
@@ -126,7 +137,7 @@ export const generateBibleBookOverview = async (bookTitle: string): Promise<stri
  * Check if Gemini service is available
  */
 export const isGeminiAvailable = (): boolean => {
-  return !!import.meta.env.VITE_GEMINI_API_KEY;
+  return isGeminiEnabled;
 };
 
 // ============================================================================
@@ -155,12 +166,10 @@ export async function analyzeEducationalContent(
   mimeType?: string,
   wordLimit?: number
 ): Promise<EducationalContentAnalysisResult> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Gemini service is not configured. Please add VITE_GEMINI_API_KEY to your environment.');
+  const ai = createGeminiClient();
+  if (!ai) {
+    throw new Error('Gemini service is not configured. Please set GEMINI_API_KEY on the server.');
   }
-
-  const ai = new GoogleGenAI({ apiKey });
 
   // Calculate lengths based on word limit
   const limit = wordLimit || 300;
@@ -313,12 +322,10 @@ export interface WebSearchResult {
  * Returns synthesized content from search results
  */
 export async function searchWebContent(query: string): Promise<WebSearchResult> {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey) {
-    throw new Error('Gemini service is not configured. Please add VITE_GEMINI_API_KEY to your environment.');
+  const ai = createGeminiClient();
+  if (!ai) {
+    throw new Error('Gemini service is not configured. Please set GEMINI_API_KEY on the server.');
   }
-
-  const ai = new GoogleGenAI({ apiKey });
 
   const systemInstruction = `你是一個專業的研究助手。請根據用戶的搜尋查詢，從網路搜尋結果中整理出最相關、最有價值的內容。
 
