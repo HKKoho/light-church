@@ -15,7 +15,13 @@ import {
   TELEGRAM_MAX_MESSAGE_LENGTH,
   splitMessage,
 } from '../utils/message-chunker.js';
-import { downloadTelegramFile, transcribeAudio, generateSpeech } from './transcription.js';
+import {
+  downloadTelegramFile,
+  transcribeAudio,
+  generateSpeech,
+  resolveOpenAIFromEnv,
+  type OpenAICredentialsResolver,
+} from './transcription.js';
 
 const logger = createLogger('channels:telegram');
 
@@ -49,8 +55,14 @@ const extractReplyContext = (message: Message): InboundMessage['replyCtx'] => {
 /**
  * Create a Telegram channel adapter using grammy.
  * Supports polling (default) and webhook modes.
+ *
+ * @param resolveOpenAI - Supplies OpenAI credentials for voice transcription/TTS.
+ *   Wired to ProviderConfigService (encrypted DB config, env fallback) in production.
  */
-export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdapter {
+export function createTelegramAdapter(
+  config: ChannelAdapterConfig,
+  resolveOpenAI: OpenAICredentialsResolver = resolveOpenAIFromEnv,
+): ChannelAdapter {
   const botToken = config.config['bot_token'] as string | undefined;
 
   if (!botToken) {
@@ -85,9 +97,12 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
     const from = ctx.from;
     if (!from) return;
 
-    const openaiApiKey = process.env['OPENAI_API_KEY'];
-    if (!openaiApiKey) {
-      logger.warn({ chatId: ctx.chat.id }, 'OPENAI_API_KEY not set — cannot transcribe voice');
+    const openaiCredentials = await resolveOpenAI();
+    if (!openaiCredentials) {
+      logger.warn(
+        { chatId: ctx.chat.id },
+        'No OpenAI provider configured — cannot transcribe voice',
+      );
       await ctx.reply(
         'Voice transcription requires an OpenAI API key. Contact your administrator.',
       );
@@ -98,7 +113,7 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
       const fileInfo = await ctx.getFile();
       const fileUrl = `https://api.telegram.org/file/bot${botToken}/${fileInfo.file_path}`;
       const audioBuffer = await downloadTelegramFile(fileUrl);
-      const transcription = await transcribeAudio(audioBuffer, openaiApiKey);
+      const transcription = await transcribeAudio(audioBuffer, openaiCredentials);
 
       if (!transcription) {
         await ctx.reply(
@@ -254,8 +269,8 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
       const plain = stripMarkdown(bufferedText);
       if (!plain) return;
 
-      const openaiApiKey = process.env['OPENAI_API_KEY'];
-      if (!openaiApiKey) {
+      const openaiCredentials = await resolveOpenAI();
+      if (!openaiCredentials) {
         // No TTS key — fall back to text
         const chunks = splitMessage(bufferedText, SAFE_SPLIT_LENGTH);
         for (const chunk of chunks) {
@@ -271,7 +286,7 @@ export function createTelegramAdapter(config: ChannelAdapterConfig): ChannelAdap
       }
 
       try {
-        const audioBuffer = await generateSpeech(plain, openaiApiKey);
+        const audioBuffer = await generateSpeech(plain, openaiCredentials);
         await bot.api.sendVoice(recipientId, new InputFile(audioBuffer, 'response.ogg'));
         logger.info({ chatId: recipientId, chars: plain.length }, 'TTS voice reply sent');
       } catch (error: unknown) {
