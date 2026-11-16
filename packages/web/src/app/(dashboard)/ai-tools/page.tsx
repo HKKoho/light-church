@@ -35,6 +35,11 @@ import {
   splitUploadedTools,
   type BuiltInAiTool,
 } from '@/components/dashboard/built-in-ai-tools';
+import {
+  builtInAiToolNavKey,
+  uploadedAiToolNavKey,
+  useNavVisibility,
+} from '@/hooks/use-nav-visibility';
 
 // Roll Call stays in the sidebar dropdown but has no card on this page.
 type BuiltInCardKey = Exclude<BuiltInAiTool['key'], 'rollCall'>;
@@ -282,7 +287,11 @@ export default function AiToolsPage() {
   };
 
   // Sunday Service Bulletin and SecureFin Pipeline lead, then the built-ins.
-  const uploaded = splitUploadedTools(tools);
+  // Tools a super admin hid in Settings → Navigation are left off this page too.
+  const { isHidden } = useNavVisibility();
+  const uploaded = splitUploadedTools(
+    tools.filter((tool) => !isHidden(uploadedAiToolNavKey(tool.name))),
+  );
   const renderToolCard = (tool: AiToolSummary) => (
     <Card key={tool.name} className="gap-3 py-4">
       <CardHeader className="px-4">
@@ -354,7 +363,7 @@ export default function AiToolsPage() {
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {!isLoading && uploaded.leading.map(renderToolCard)}
-        {BUILT_IN_CARDS.map((tool) => (
+        {BUILT_IN_CARDS.filter((tool) => !isHidden(builtInAiToolNavKey(tool.key))).map((tool) => (
           <Card key={tool.key} className="gap-3 py-4">
             <CardHeader className="px-4">
               <CardTitle className="flex items-center gap-2 text-sm">

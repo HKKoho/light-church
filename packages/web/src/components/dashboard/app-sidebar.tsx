@@ -45,6 +45,7 @@ import {
   Wallet,
   Workflow,
   Wrench,
+  Eye,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import anime from 'animejs';
@@ -156,6 +157,7 @@ const settingsItems: readonly NavItem[] = [
   { key: 'congregationProfile', href: '/settings/congregation-profile', icon: UsersRound },
   { key: 'packs', href: '/settings/packs', icon: Package },
   { key: 'connectors', href: '/settings/connectors', icon: Plug },
+  { key: 'navigation', href: '/settings/navigation', icon: Eye },
 ];
 
 const messages = {
@@ -204,6 +206,7 @@ const messages = {
       congregationProfile: 'Congregation Profile',
       packs: 'Ministry Packs',
       connectors: 'Connectors',
+      navigation: 'Navigation',
     },
     lightMode: 'Light mode',
     darkMode: 'Dark mode',
@@ -261,6 +264,7 @@ const messages = {
       congregationProfile: '會眾背景設定',
       packs: '事工套件',
       connectors: '連接器',
+      navigation: '導覽顯示',
     },
     lightMode: '淺色模式',
     darkMode: '深色模式',

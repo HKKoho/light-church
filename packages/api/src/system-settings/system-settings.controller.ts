@@ -18,6 +18,17 @@ export class SystemSettingsController {
     return { success: true, data: await this.service.get() };
   }
 
+  /**
+   * Which nav entries the super admin has hidden. Readable by every signed-in
+   * role, since each user's top bar and sidebar must honour it.
+   */
+  @Get('nav-visibility')
+  @Roles(...Object.values(UserRole))
+  async navVisibility() {
+    const { hiddenNavKeys } = await this.service.get();
+    return { success: true, data: { hiddenNavKeys } };
+  }
+
   @Patch()
   async update(@Body() body: unknown) {
     const data = updateSystemSettingsSchema.parse(body);

@@ -14,6 +14,11 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { aiToolLabel, useAiTools } from '@/hooks/use-ai-tools';
+import {
+  builtInAiToolNavKey,
+  uploadedAiToolNavKey,
+  useNavVisibility,
+} from '@/hooks/use-nav-visibility';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { BUILT_IN_AI_TOOLS, splitUploadedTools, type BuiltInAiTool } from './built-in-ai-tools';
 import { navButtonClass } from './sidebar-nav-group';
@@ -22,7 +27,7 @@ import { navButtonClass } from './sidebar-nav-group';
 // (/roll-call, /activities), so they never get their own sidebar entry.
 const HIDDEN_UPLOADED_TOOLS: ReadonlySet<string> = new Set(['roll-call', 'mission-camp-companion']);
 
-const messages = {
+export const aiToolsNavMessages = {
   en: {
     aiTools: 'AI Tools',
     toggle: 'Show or hide AI tools',
@@ -61,13 +66,16 @@ const messages = {
  * Service Bulletin, SecureFin Pipeline), the built-ins, then the other uploads.
  */
 export function AiToolsNavItem() {
-  const t = useT(messages);
+  const t = useT(aiToolsNavMessages);
   const { lang } = useLanguage();
   const pathname = usePathname();
   const { tools } = useAiTools();
+  const { isHidden } = useNavVisibility();
 
   const uploaded = splitUploadedTools(
-    tools.filter((tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name)),
+    tools.filter(
+      (tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name) && !isHidden(uploadedAiToolNavKey(tool.name)),
+    ),
   );
   const toItem = (tool: AiToolSummary) => ({
     key: `ai-tool:${tool.name}`,
@@ -77,7 +85,7 @@ export function AiToolsNavItem() {
   });
   const items = [
     ...uploaded.leading.map(toItem),
-    ...BUILT_IN_AI_TOOLS.map((tool) => ({
+    ...BUILT_IN_AI_TOOLS.filter((tool) => !isHidden(builtInAiToolNavKey(tool.key))).map((tool) => ({
       key: tool.key,
       href: tool.href,
       label: t.builtIn[tool.key],
