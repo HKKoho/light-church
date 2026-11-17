@@ -7,6 +7,8 @@ import { authFetch } from '@/lib/auth';
  * Key scheme:
  *  - `topbar:<menuKey>`            — a whole top-bar menu (e.g. `topbar:bibleMinistries`)
  *  - `topbar:<menuKey>:<itemKey>`  — one item in a top-bar menu
+ *  - `sidebar:<groupKey>`         — a whole sidebar group (e.g. `sidebar:phase2`)
+ *  - `sidebar:<groupKey>:<itemKey>` — one item in a sidebar group
  *  - `ai-tool:builtin:<key>`       — a built-in AI tool (e.g. `ai-tool:builtin:rollCall`)
  *  - `ai-tool:<name>`              — an uploaded AI tool (its folder name; names never contain ':')
  *
@@ -16,6 +18,9 @@ import { authFetch } from '@/lib/auth';
 export const topbarMenuNavKey = (menuKey: string) => `topbar:${menuKey}`;
 export const topbarItemNavKey = (menuKey: string, itemKey: string) =>
   `topbar:${menuKey}:${itemKey}`;
+export const sidebarGroupNavKey = (groupKey: string) => `sidebar:${groupKey}`;
+export const sidebarItemNavKey = (groupKey: string, itemKey: string) =>
+  `sidebar:${groupKey}:${itemKey}`;
 export const builtInAiToolNavKey = (key: string) => `ai-tool:builtin:${key}`;
 export const uploadedAiToolNavKey = (name: string) => `ai-tool:${name}`;
 

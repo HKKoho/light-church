@@ -59,6 +59,11 @@ import {
 } from '@/components/dashboard/sidebar-nav-group';
 import { ADOPTION_PHASES } from '@/components/dashboard/adoption-phases';
 import { AiToolsNavItem } from '@/components/dashboard/ai-tools-nav-item';
+import {
+  sidebarGroupNavKey,
+  sidebarItemNavKey,
+  useNavVisibility,
+} from '@/hooks/use-nav-visibility';
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -90,7 +95,7 @@ export interface NavItem {
 }
 
 // Phase 2 — AI as a Worker / Volunteer (Tier 2b): the built-in agents.
-const phase2Items: readonly NavItem[] = [
+export const phase2Items: readonly NavItem[] = [
   { key: 'conversations', icon: MessageSquare, href: '/conversations' },
   { key: 'agents', icon: Bot, href: '/agents' },
   { key: 'talkingFace', icon: Video, href: '/talkingface' },
@@ -160,7 +165,7 @@ const settingsItems: readonly NavItem[] = [
   { key: 'navigation', href: '/settings/navigation', icon: Eye },
 ];
 
-const messages = {
+export const sidebarNavMessages = {
   en: {
     brandTagline: 'Gospel Mission AI',
     groupAiTools: 'AI Tools',
@@ -306,7 +311,12 @@ export function AppSidebar() {
   const { user, logout } = useAuth();
   const { resolvedTheme, setTheme } = useTheme();
   const { lang, toggleLang } = useLanguage();
-  const t = useT(messages);
+  const t = useT(sidebarNavMessages);
+  const { isHidden } = useNavVisibility();
+  const phase2Hidden = isHidden(sidebarGroupNavKey('phase2'));
+  const visiblePhase2Items = phase2Items.filter(
+    (item) => !isHidden(sidebarItemNavKey('phase2', item.key)),
+  );
   const { governanceModel } = useGovernanceModel();
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
@@ -368,13 +378,15 @@ export function AppSidebar() {
           <AiToolsNavItem />
         </SidebarNavGroup>
 
-        <SidebarNavGroup
-          label={t.groupWorkspace}
-          phase="2"
-          toBeConstructedLabel={t.toBeConstructed}
-          links={toLinks(phase2Items)}
-          isActive={isActive}
-        />
+        {!phase2Hidden && visiblePhase2Items.length > 0 && (
+          <SidebarNavGroup
+            label={t.groupWorkspace}
+            phase="2"
+            toBeConstructedLabel={t.toBeConstructed}
+            links={toLinks(visiblePhase2Items)}
+            isActive={isActive}
+          />
+        )}
 
         {governanceModel === 'decentralized' && (
           <SidebarNavGroup

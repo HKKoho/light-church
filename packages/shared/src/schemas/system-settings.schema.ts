@@ -20,7 +20,8 @@ export const systemSettingsSchema = z.object({
     .default('UTC'),
   /**
    * Navigation entries a super admin has hidden for every user — top-bar menus
-   * and their items (`topbar:<menu>`, `topbar:<menu>:<item>`) and sidebar AI
+   * and their items (`topbar:<menu>`, `topbar:<menu>:<item>`), sidebar groups
+   * and their items (`sidebar:<group>`, `sidebar:<group>:<item>`) and sidebar AI
    * Tools (`ai-tool:<name>`). Only hides the link; the page stays reachable.
    */
   hiddenNavKeys: z.array(navKeySchema).max(500).default([]),
