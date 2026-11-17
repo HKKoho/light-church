@@ -4,11 +4,14 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, CheckCircle2, Loader2 } from 'lucide-react';
 import {
+  WISDOM_LESSON_STEPS,
   wisdomCoursePath,
+  type WisdomLessonStep,
   type WisdomMemberModule,
   type WisdomQuestionInsight,
 } from '@clawix/shared';
 import { useAuth } from '@/components/auth-provider';
+import { MichaelHelper } from '@/components/church-site/michael-helper';
 import { SignInCard } from '@/components/church-site/sign-in-card';
 import { useWisdomSiteT } from '@/components/church-site/wisdom-messages';
 import {
@@ -22,8 +25,8 @@ import { Button } from '@/components/ui/button';
 import { authFetch } from '@/lib/auth';
 import { cn } from '@/lib/utils';
 
-const STEPS = ['questions', 'perspectives', 'tension', 'discussion', 'summary'] as const;
-type Step = (typeof STEPS)[number];
+const STEPS = WISDOM_LESSON_STEPS;
+type Step = WisdomLessonStep;
 
 /** One lesson of a published course, step by step; answers save as the member moves on. */
 export function LessonView({ courseId, moduleId }: { courseId: string; moduleId: string }) {
@@ -160,6 +163,8 @@ export function LessonView({ courseId, moduleId }: { courseId: string; moduleId:
               <SummaryStep module={lesson} answers={answers} onAnswer={onAnswer} />
             )}
           </section>
+
+          <MichaelHelper moduleId={moduleId} step={step} />
 
           <div className="flex flex-wrap items-center gap-3">
             {prev && (

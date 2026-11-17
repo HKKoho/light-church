@@ -51,6 +51,25 @@ const en = {
   finish: 'Finish lesson',
   finished: 'Lesson completed. Well done!',
   noPrompts: 'No discussion prompts for this lesson.',
+  michael: {
+    open: 'Ask Michael',
+    title: 'Michael, your teaching assistant',
+    intro:
+      'Stuck or curious? Ask about this step. Michael helps you think it through rather than giving you the answer.',
+    hints: {
+      questions: 'How should I think about this question?',
+      perspectives: 'How do these three readings see the theme differently?',
+      tension: 'Why do these perspectives seem to contradict each other?',
+      discussion: 'How could I answer this discussion question?',
+      summary: 'Help me sum up what I learned today.',
+    },
+    placeholder: 'Type your question…',
+    send: 'Send',
+    thinking: 'Michael is thinking…',
+    failed: 'Michael could not answer just now. Please try again.',
+    close: 'Close',
+    note: 'AI replies can be wrong — weigh them against Scripture and talk with your pastor.',
+  },
 };
 
 const messages = {
@@ -102,6 +121,24 @@ const messages = {
     finish: '完成本課',
     finished: '已完成本課，做得好！',
     noPrompts: '本課沒有討論題。',
+    michael: {
+      open: '問問 Michael',
+      title: 'Michael 助教',
+      intro: '卡住了或想知道更多？就這一步發問。Michael 會引導你思考，而不是直接給你答案。',
+      hints: {
+        questions: '這個問題要怎麼思考？',
+        perspectives: '這三段經文對主題的看法有什麼不同？',
+        tension: '為什麼這些觀點看起來互相矛盾？',
+        discussion: '我可以怎樣回答這個討論問題？',
+        summary: '幫我總結今天學到的重點。',
+      },
+      placeholder: '輸入你的問題…',
+      send: '發送',
+      thinking: 'Michael 正在思考…',
+      failed: 'Michael 暫時未能回應，請再試。',
+      close: '關閉',
+      note: 'AI 的回答可能有錯——請以聖經衡量，並與牧者傾談。',
+    },
   },
 } satisfies Messages<typeof en>;
 

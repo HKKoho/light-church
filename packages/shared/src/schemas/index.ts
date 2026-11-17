@@ -394,3 +394,15 @@ export {
   type WisdomMemberModule,
   type WisdomQuestionInsight,
 } from './wisdom.schema.js';
+
+export {
+  WISDOM_LESSON_STEPS,
+  WISDOM_MICHAEL_MAX_HISTORY,
+  WISDOM_MICHAEL_MAX_QUESTION,
+  askWisdomMichaelSchema,
+  type WisdomLessonStep,
+  type WisdomMichaelMessage,
+  type AskWisdomMichaelInput,
+  type AskWisdomMichaelData,
+  type WisdomMichaelReply,
+} from './wisdom-michael.schema.js';
