@@ -10,12 +10,15 @@ import { Switch } from '@/components/ui/switch';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { ministriesNavMessages, ministryCategories } from '@/components/dashboard/ministries-nav';
 import { aiToolsNavMessages } from '@/components/dashboard/ai-tools-nav-item';
+import { phase2Items, sidebarNavMessages } from '@/components/dashboard/app-sidebar';
 import { BUILT_IN_AI_TOOLS } from '@/components/dashboard/built-in-ai-tools';
 import { aiToolLabel, useAiTools } from '@/hooks/use-ai-tools';
 import {
   builtInAiToolNavKey,
   reloadNavVisibility,
   setHiddenNavKeys,
+  sidebarGroupNavKey,
+  sidebarItemNavKey,
   topbarItemNavKey,
   topbarMenuNavKey,
   uploadedAiToolNavKey,
@@ -27,6 +30,9 @@ const messages = {
     aiToolsSection: 'AI Tools (sidebar)',
     aiToolsDescription: 'Show or hide each AI tool in the sidebar and on the AI Tools page.',
     topbarDescription: 'Turn off the menu to hide it entirely, or hide individual items.',
+    phase2Section: 'P2 — AI Volunteers (sidebar)',
+    sidebarGroupDescription: 'Turn off the group to hide it entirely, or hide individual items.',
+    wholeGroup: 'Show this group',
     wholeMenu: 'Show this menu',
     save: 'Save',
     saveFailed: 'Could not save — try again.',
@@ -37,6 +43,9 @@ const messages = {
     aiToolsSection: 'AI 工具（側邊欄）',
     aiToolsDescription: '在側邊欄及 AI 工具頁面顯示或隱藏各個 AI 工具。',
     topbarDescription: '關閉選單可整個隱藏，或逐項隱藏。',
+    phase2Section: 'P2 — AI 同工（側邊欄）',
+    sidebarGroupDescription: '關閉群組可整個隱藏，或逐項隱藏。',
+    wholeGroup: '顯示此群組',
     wholeMenu: '顯示此選單',
     save: '儲存',
     saveFailed: '無法儲存，請再試一次。',
@@ -47,6 +56,9 @@ const messages = {
   aiToolsSection: string;
   aiToolsDescription: string;
   topbarDescription: string;
+  phase2Section: string;
+  sidebarGroupDescription: string;
+  wholeGroup: string;
   wholeMenu: string;
   save: string;
   saveFailed: string;
@@ -75,6 +87,7 @@ export function NavigationVisibilityTab() {
   const t = useT(messages);
   const navT = useT(ministriesNavMessages);
   const toolsT = useT(aiToolsNavMessages);
+  const sidebarT = useT(sidebarNavMessages);
   const { lang } = useLanguage();
   const { tools } = useAiTools();
   const { hiddenKeys } = useNavVisibility();
@@ -121,8 +134,41 @@ export function NavigationVisibilityTab() {
     }
   };
 
+  const phase2Key = sidebarGroupNavKey('phase2');
+  const phase2Visible = isVisible(phase2Key);
+
   return (
     <div className="flex flex-col gap-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">{t.phase2Section}</CardTitle>
+          <CardDescription>{t.sidebarGroupDescription}</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col divide-y">
+          <ToggleRow
+            label={t.wholeGroup}
+            checked={phase2Visible}
+            onChange={(v) => {
+              setVisible(phase2Key, v);
+            }}
+          />
+          {phase2Items.map((item) => {
+            const key = sidebarItemNavKey('phase2', item.key);
+            return (
+              <ToggleRow
+                key={key}
+                label={sidebarT.nav[item.key as keyof typeof sidebarT.nav]}
+                checked={isVisible(key)}
+                disabled={!phase2Visible}
+                onChange={(v) => {
+                  setVisible(key, v);
+                }}
+              />
+            );
+          })}
+        </CardContent>
+      </Card>
+
       {ministryCategories.map((category) => {
         const menuKey = topbarMenuNavKey(category.key);
         const menuVisible = isVisible(menuKey);
