@@ -22,3 +22,28 @@ describe('systemSettingsSchema.defaultTimezone', () => {
     expect(parsed.defaultTimezone).toBe('UTC');
   });
 });
+
+describe('systemSettingsSchema.hiddenNavKeys', () => {
+  it('defaults to an empty list', () => {
+    expect(systemSettingsSchema.parse({}).hiddenNavKeys).toEqual([]);
+  });
+
+  it('accepts top-bar and AI tool keys, trimming whitespace', () => {
+    const parsed = systemSettingsSchema.parse({
+      hiddenNavKeys: [
+        'topbar:bibleMinistries',
+        ' topbar:careGovernance:prayer ',
+        'ai-tool:主日 週報',
+      ],
+    });
+    expect(parsed.hiddenNavKeys).toEqual([
+      'topbar:bibleMinistries',
+      'topbar:careGovernance:prayer',
+      'ai-tool:主日 週報',
+    ]);
+  });
+
+  it('rejects empty keys', () => {
+    expect(() => systemSettingsSchema.parse({ hiddenNavKeys: [' '] })).toThrow();
+  });
+});

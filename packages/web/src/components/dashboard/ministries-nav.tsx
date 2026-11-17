@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronDown } from 'lucide-react';
 import { useT, type Messages } from '@/lib/i18n';
 import { useAuth } from '@/components/auth-provider';
+import { topbarItemNavKey, topbarMenuNavKey, useNavVisibility } from '@/hooks/use-nav-visibility';
 import {
   governanceItems,
   ngoItems,
@@ -21,7 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 
-interface MinistryCategory {
+export interface MinistryCategory {
   readonly key: string;
   readonly itemKeys: readonly string[];
   /** Rendered after a divider — e.g. Phase 3b governance items. */
@@ -32,7 +33,7 @@ interface MinistryCategory {
   readonly restrictedRoles?: readonly string[];
 }
 
-const categories: readonly MinistryCategory[] = [
+export const ministryCategories: readonly MinistryCategory[] = [
   {
     key: 'bibleMinistries',
     itemKeys: ['comms', 'scripture', 'fieldOps', 'outreach', 'programs'],
@@ -56,11 +57,11 @@ const categories: readonly MinistryCategory[] = [
   },
 ];
 
-const itemsByKey = new Map<string, NavItem>(
+export const ministryItemsByKey = new Map<string, NavItem>(
   [...ngoItems, ...governanceItems, ...phase3cItems].map((item) => [item.key, item]),
 );
 
-const messages = {
+export const ministriesNavMessages = {
   en: {
     category: {
       bibleMinistries: 'Bible & Ministries',
@@ -120,7 +121,8 @@ const messages = {
 
 export function MinistriesNav({ className }: { className?: string }) {
   const pathname = usePathname();
-  const t = useT(messages);
+  const t = useT(ministriesNavMessages);
+  const { isHidden } = useNavVisibility();
   const { user } = useAuth();
 
   const isActive = (href: string) => pathname.startsWith(href);
@@ -128,13 +130,15 @@ export function MinistriesNav({ className }: { className?: string }) {
 
   return (
     <nav className={cn('flex items-center gap-1', className)}>
-      {categories.map((category) => {
+      {ministryCategories.map((category) => {
+        if (isHidden(topbarMenuNavKey(category.key))) return null;
         const seesRestricted =
           isSuperAdmin || (!!user && !!category.restrictedRoles?.includes(user.role));
         const resolve = (keys: readonly string[]) =>
           keys
-            .map((key) => itemsByKey.get(key))
+            .map((key) => ministryItemsByKey.get(key))
             .filter((item): item is NavItem => item !== undefined)
+            .filter((item) => !isHidden(topbarItemNavKey(category.key, item.key)))
             .filter(
               (item) =>
                 isSuperAdmin ||
@@ -143,6 +147,7 @@ export function MinistriesNav({ className }: { className?: string }) {
             );
         const items = resolve(category.itemKeys);
         const extraItems = resolve(category.extraItemKeys ?? []);
+        if (items.length === 0 && extraItems.length === 0) return null;
         const categoryActive = [...items, ...extraItems].some((item) => isActive(item.href));
 
         return (

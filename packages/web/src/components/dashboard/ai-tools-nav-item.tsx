@@ -22,6 +22,11 @@ import {
   SidebarMenuSubItem,
 } from '@/components/ui/sidebar';
 import { aiToolLabel, useAiTools } from '@/hooks/use-ai-tools';
+import {
+  builtInAiToolNavKey,
+  uploadedAiToolNavKey,
+  useNavVisibility,
+} from '@/hooks/use-nav-visibility';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { BUILT_IN_AI_TOOLS, type BuiltInAiTool } from './built-in-ai-tools';
 import { navButtonClass } from './sidebar-nav-group';
@@ -30,7 +35,7 @@ import { navButtonClass } from './sidebar-nav-group';
 // (/roll-call, /activities), so they never get their own sidebar entry.
 const HIDDEN_UPLOADED_TOOLS: ReadonlySet<string> = new Set(['roll-call', 'mission-camp-companion']);
 
-const messages = {
+export const aiToolsNavMessages = {
   en: {
     aiTools: 'AI Tools',
     toggle: 'Show or hide AI tools',
@@ -127,12 +132,15 @@ interface NavLink {
  * Admin) mixing built-in pages and church-uploaded tools.
  */
 export function AiToolsNavItem() {
-  const t = useT(messages);
+  const t = useT(aiToolsNavMessages);
   const { lang } = useLanguage();
   const pathname = usePathname();
   const { tools } = useAiTools();
+  const { isHidden } = useNavVisibility();
 
-  const visible = tools.filter((tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name));
+  const visible = tools.filter(
+    (tool) => !HIDDEN_UPLOADED_TOOLS.has(tool.name) && !isHidden(uploadedAiToolNavKey(tool.name)),
+  );
   const toUploadedLink = (tool: AiToolSummary): NavLink => ({
     key: `ai-tool:${tool.name}`,
     href: `/ai-tools/${encodeURIComponent(tool.name)}`,
@@ -143,7 +151,7 @@ export function AiToolsNavItem() {
     const links = group.entries.flatMap((entry): NavLink[] => {
       if ('builtIn' in entry) {
         const tool = BUILT_IN_AI_TOOLS.find((item) => item.key === entry.builtIn);
-        return tool
+        return tool && !isHidden(builtInAiToolNavKey(tool.key))
           ? [{ key: tool.key, href: tool.href, label: t.builtIn[tool.key], icon: tool.icon }]
           : [];
       }
@@ -171,16 +179,18 @@ export function AiToolsNavItem() {
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>
-      {NAV_GROUPS.map((group) => (
-        <AiToolsNavGroup
-          key={group.key}
-          label={t.groups[group.key]}
-          toggleLabel={t.toggle}
-          icon={group.icon}
-          links={toLinks(group)}
-          pathname={pathname}
-        />
-      ))}
+      {NAV_GROUPS.map((group) => ({ group, links: toLinks(group) }))
+        .filter(({ links }) => links.length > 0)
+        .map(({ group, links }) => (
+          <AiToolsNavGroup
+            key={group.key}
+            label={t.groups[group.key]}
+            toggleLabel={t.toggle}
+            icon={group.icon}
+            links={links}
+            pathname={pathname}
+          />
+        ))}
     </>
   );
 }

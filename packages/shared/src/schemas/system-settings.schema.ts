@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { isValidIanaTimezone } from '../utils/timezone.js';
 
+const navKeySchema = z.string().trim().min(1).max(200);
+
 export const systemSettingsSchema = z.object({
   /**
    * System-wide cap for cron-run token spend (input + output cumulative,
@@ -16,6 +18,12 @@ export const systemSettingsSchema = z.object({
     .min(1)
     .refine(isValidIanaTimezone, { message: 'Invalid IANA timezone' })
     .default('UTC'),
+  /**
+   * Navigation entries a super admin has hidden for every user — top-bar menus
+   * and their items (`topbar:<menu>`, `topbar:<menu>:<item>`) and sidebar AI
+   * Tools (`ai-tool:<name>`). Only hides the link; the page stays reachable.
+   */
+  hiddenNavKeys: z.array(navKeySchema).max(500).default([]),
 });
 
 export type SystemSettingsInput = z.infer<typeof systemSettingsSchema>;
