@@ -15,7 +15,7 @@ export const PACKS: readonly PackDefinition[] = [
     id: 'ngo',
     name: 'NGO Operations',
     description:
-      'Program coordination, donor engagement, M&E, communications, field operations, game studio, pastoral care, finance, evangelism & outreach, and Scripture & literacy — 10 specialist worker agents.',
+      'Program coordination, donor engagement, M&E, communications, field operations, game studio, pastoral care, finance, evangelism & outreach, and Scripture & learning — 10 specialist worker agents.',
     agents: NGO_AGENTS,
   },
   {

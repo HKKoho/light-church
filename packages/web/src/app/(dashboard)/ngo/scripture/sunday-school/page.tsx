@@ -8,6 +8,7 @@ import { useLanguage, useT, type Messages } from '@/lib/i18n';
 import { SundaySchoolCourses } from './courses';
 import { CLASSES_2027, LEADERS } from './curriculum';
 import { GuestPathway, MemberCycle } from './pathways';
+import { StudioEntry } from './studio/studio-entry';
 
 const QUARTERS = [0, 1, 2, 3] as const;
 
@@ -163,6 +164,7 @@ export default function SundaySchoolPage() {
 
       <Section title={t.coursesTitle}>
         <SundaySchoolCourses />
+        <StudioEntry />
       </Section>
 
       <Section title={t.goalsTitle}>

@@ -102,7 +102,7 @@ const DEPARTMENT_ORDER = [
   'pastoral_care',
   'finance',
   'outreach',
-  'scripture_literacy',
+  'bible_theology',
 ] as const;
 type DepartmentKey = (typeof DEPARTMENT_ORDER)[number];
 
@@ -338,7 +338,7 @@ const messages = {
       pastoral_care: 'Pastoral Care',
       finance: 'Finance',
       outreach: 'Outreach',
-      scripture_literacy: 'Scripture & Learning',
+      bible_theology: 'Scripture & Learning',
     },
     userCount: (n: number) => `${n} user${n !== 1 ? 's' : ''}`,
     matrix: {
@@ -494,7 +494,7 @@ const messages = {
       pastoral_care: '牧養關懷',
       finance: '財務',
       outreach: '外展佈道',
-      scripture_literacy: '聖經與學習',
+      bible_theology: '聖經與學習',
     },
     userCount: (n: number) => `${n} 位使用者`,
     matrix: {

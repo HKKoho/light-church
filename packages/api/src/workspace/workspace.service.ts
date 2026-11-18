@@ -139,7 +139,7 @@ export class WorkspaceService {
     '/mne': Department.monitoring_evaluation,
     '/comms': Department.communications,
     '/outreach': Department.outreach,
-    '/scripture': Department.scripture_literacy,
+    '/scripture': Department.bible_theology,
     '/donors': Department.donor_engagement,
     '/partners': Department.donor_engagement,
     '/proposals': Department.donor_engagement,

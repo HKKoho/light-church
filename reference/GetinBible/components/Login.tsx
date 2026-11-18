@@ -227,7 +227,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSetupPassword }) => {
                   type="text"
                   id="name"
                   required
-                  className="flex-1 px-4 py-4 rounded-xl border-2 border-slate-200 focus:border-purple-500 focus:ring-0 outline-none transition-all text-lg text-center"
+                  className="min-w-0 w-full flex-1 px-4 py-4 rounded-xl border-2 border-slate-200 focus:border-purple-500 focus:ring-0 outline-none transition-all text-lg text-center"
                   placeholder="管理員帳號"
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
@@ -291,7 +291,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSetupPassword }) => {
                 type="text"
                 id="name"
                 required
-                className="flex-1 px-4 py-4 rounded-xl border-2 border-slate-200 focus:border-amber-500 focus:ring-0 outline-none transition-all text-lg text-center"
+                className="min-w-0 w-full flex-1 px-4 py-4 rounded-xl border-2 border-slate-200 focus:border-amber-500 focus:ring-0 outline-none transition-all text-lg text-center"
                 placeholder="例如：熊天佑"
                 value={name}
                 onChange={(e) => { setName(e.target.value); setError(''); }}

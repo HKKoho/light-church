@@ -23,6 +23,8 @@ const messages = {
 export interface FolderDef {
   readonly path: string;
   readonly label: string;
+  /** Display title; defaults to `label` (which is also the `columns` key). */
+  readonly title?: string;
 }
 
 type RenderItemAction = (entry: FileEntry, folderPath: string) => React.ReactNode;
@@ -38,10 +40,10 @@ export function FolderColumns({
 }) {
   return (
     <div className="flex min-h-[calc(100vh-14rem)] gap-4 overflow-x-auto pb-3">
-      {folders.map(({ path, label }) => (
+      {folders.map(({ path, label, title }) => (
         <Column
           key={label}
-          label={label}
+          label={title ?? label}
           path={path}
           items={columns[label] ?? []}
           renderItemAction={renderItemAction}
