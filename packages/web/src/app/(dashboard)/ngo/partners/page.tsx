@@ -48,7 +48,9 @@ export default function PartnersPage() {
     setError('');
     const results = await Promise.allSettled(
       FOLDERS.map((f) =>
-        authFetch<DirectoryListing>(`/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`),
+        authFetch<DirectoryListing>(
+          `/api/v1/workspace/files?path=${encodeURIComponent(f.path)}&missing=empty`,
+        ),
       ),
     );
     const next: Record<string, readonly FileEntry[]> = {};

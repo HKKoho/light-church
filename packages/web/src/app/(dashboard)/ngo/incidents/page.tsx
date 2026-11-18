@@ -60,7 +60,9 @@ export default function IncidentsPage() {
     setError('');
     const results = await Promise.allSettled(
       folders.map((f) =>
-        authFetch<DirectoryListing>(`/api/v1/workspace/files?path=${encodeURIComponent(f.path)}`),
+        authFetch<DirectoryListing>(
+          `/api/v1/workspace/files?path=${encodeURIComponent(f.path)}&missing=empty`,
+        ),
       ),
     );
     const next: Record<string, readonly FileEntry[]> = {};
