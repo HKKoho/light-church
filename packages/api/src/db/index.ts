@@ -25,3 +25,4 @@ export { VenueApplicationRepository } from './venue-application.repository.js';
 export { ChurchSiteRepository } from './church-site.repository.js';
 export { SiteContentRepository } from './site-content.repository.js';
 export { WisdomRepository } from './wisdom.repository.js';
+export { SundaySchoolRepository } from './sunday-school.repository.js';

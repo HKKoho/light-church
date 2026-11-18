@@ -155,6 +155,10 @@ const SECTIONS: readonly GuideSection[] = [
         text: 'Bible & Ministries → Scripture & Learning (/ngo/scripture).',
       },
       {
+        navKey: topbar('bibleMinistries', 'scripture'),
+        text: 'Sunday School Studio (/ngo/scripture/sunday-school/studio): pastors, ministry leaders and admin staff prepare Sunday School lessons with AI. Add a class profile (age, maturity, Bible translation, tradition, lesson length), choose New course and give a Bible book or topic — AI drafts a week-by-week syllabus. Check and approve it, then open each lesson and choose Prepare lesson: passage study, a timed lesson plan and a review of Scripture, age fit, doctrine and pacing. Edit the plan and approve it for class.',
+      },
+      {
         navKey: topbar('bibleMinistries', 'fieldOps'),
         text: 'Bible & Ministries → Mission Field (/ngo/field-ops): field operations.',
       },

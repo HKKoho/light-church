@@ -24,6 +24,7 @@ import { RollCallRepository } from './roll-call.repository.js';
 import { VenueApplicationRepository } from './venue-application.repository.js';
 import { ChurchSiteRepository } from './church-site.repository.js';
 import { SiteContentRepository } from './site-content.repository.js';
+import { SundaySchoolRepository } from './sunday-school.repository.js';
 import { WisdomRepository } from './wisdom.repository.js';
 
 const repositories = [
@@ -52,6 +53,7 @@ const repositories = [
   ChurchSiteRepository,
   SiteContentRepository,
   WisdomRepository,
+  SundaySchoolRepository,
 ];
 
 @Global()

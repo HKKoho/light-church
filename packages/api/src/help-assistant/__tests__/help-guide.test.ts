@@ -52,4 +52,10 @@ describe('renderHelpGuide', () => {
     const guide = renderHelpGuide(new Set(items.map((k) => `sidebar:phase2:${k}`)));
     expect(guide).not.toContain('## AI Volunteers');
   });
+
+  it('hides the Sunday School Studio with Scripture & Learning', () => {
+    expect(renderHelpGuide()).toContain('Sunday School Studio');
+    const guide = renderHelpGuide(new Set(['topbar:bibleMinistries:scripture']));
+    expect(guide).not.toContain('Sunday School Studio');
+  });
 });

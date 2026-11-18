@@ -1004,3 +1004,68 @@ model WisdomResponse {
   @@unique([userId, moduleId])
   @@index([moduleId])
 }
+
+// Sunday School Studio: teachers prepare week-by-week lessons for a class.
+// A profile describes the learners; enum-like strings use the SS_* keys in
+// packages/shared/src/schemas/sunday-school.schema.ts.
+model SundaySchoolProfile {
+  id                     String   @id @default(cuid())
+  name                   String
+  description            String   @default("")
+  ageStage               String
+  literacyLevel          String
+  spiritualMaturity      String
+  bibleTranslation       String
+  tradition              String
+  guardrails             String   @default("")
+  classSize              Int      @default(12)
+  defaultDurationMinutes Int      @default(45)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  courses SundaySchoolCourse[]
+}
+
+model SundaySchoolCourse {
+  id               String   @id @default(cuid())
+  title            String
+  mode             String // book | topical
+  subject          String
+  language         String   @default("zh-TW")
+  methodology      String
+  deliveryFormat   String
+  profileId        String
+  syllabusApproved Boolean  @default(false)
+  createdById      String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  profile SundaySchoolProfile  @relation(fields: [profileId], references: [id], onDelete: Restrict)
+  lessons SundaySchoolLesson[]
+
+  @@index([updatedAt])
+}
+
+model SundaySchoolLesson {
+  id                    String   @id @default(cuid())
+  courseId              String
+  weekNumber            Int
+  title                 String
+  passage               String
+  bigIdea               String   @default("")
+  learningObjective     String   @default("")
+  status                String   @default("outline") // outline | generated | approved
+  methodology           String
+  participationLevel    Int      @default(3)
+  deliveryFormat        String
+  targetDurationMinutes Int      @default(45)
+  blocks                Json     @default("[]") // SundaySchoolBlock[]
+  exegesis              Json? // SundaySchoolExegesis
+  review                Json? // SundaySchoolReview
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  course SundaySchoolCourse @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([courseId, weekNumber])
+}
