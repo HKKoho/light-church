@@ -19,20 +19,20 @@ const FOLDERS: readonly FolderDef[] = [
 const messages = {
   en: {
     title: 'Scripture & Learning',
-    subtitle: 'translation · distribution · literacy',
+    subtitle: 'learning · textual · literature',
     startConversation: 'Start conversation',
     descBefore:
-      'Bible translation project status, Scripture distribution records, and mother-tongue literacy programmes. Managed by the ',
+      'Bible learning, Scripture development studies, and Hebrew and Greek literacy programmes. Managed by the ',
     descAgent: 'Scripture & Learning',
-    descAfter: ' agent. Community-led and mother-tongue first, always.',
+    descAfter: ' agent.',
   },
   'zh-TW': {
     title: '聖經與學習',
-    subtitle: '翻譯 · 分發 · 識字教育',
+    subtitle: '學習 · 經文 · 文學',
     startConversation: '開始對話',
-    descBefore: '聖經翻譯專案進度、聖經分發紀錄、母語識字教育計畫。由',
+    descBefore: '聖經學習、聖經發展研究，以及希伯來文與希臘文識字教育計畫。由',
     descAgent: '聖經與學習',
-    descAfter: '代理管理。始終以社群主導、母語優先為原則。',
+    descAfter: '代理管理。',
   },
 } satisfies Messages<{
   title: string;
