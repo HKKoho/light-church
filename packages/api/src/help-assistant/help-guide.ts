@@ -152,7 +152,7 @@ const SECTIONS: readonly GuideSection[] = [
       },
       {
         navKey: topbar('bibleMinistries', 'scripture'),
-        text: 'Bible & Ministries → Scripture & Literacy (/ngo/scripture).',
+        text: 'Bible & Ministries → Scripture & Learning (/ngo/scripture).',
       },
       {
         navKey: topbar('bibleMinistries', 'fieldOps'),

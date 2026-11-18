@@ -13,7 +13,7 @@ const QUARTERS = [0, 1, 2, 3] as const;
 
 const messages = {
   en: {
-    back: 'Scripture & Literacy',
+    back: 'Scripture & Learning',
     title: 'Sunday School',
     subtitle: 'Nurture Ministry · 2027',
     head: 'Head',
@@ -56,7 +56,7 @@ const messages = {
     coursesTitle: 'Courses',
   },
   'zh-TW': {
-    back: '聖經與識字',
+    back: '聖經與學習',
     title: '主日學',
     subtitle: '培育部 · 2027',
     head: '部長',
