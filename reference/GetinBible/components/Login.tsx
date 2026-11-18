@@ -30,11 +30,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSetupPassword }) => {
     setError('');
     setLoading(true);
     try {
-      // Client-side check first
-      if (password !== 'CKLBCKOHO') {
-        setError('密碼不正確');
-        return;
-      }
+      // Checked on the server; each admin has their own password.
       await onLogin(name.trim(), password);
     } catch (err: any) {
       setError(err.message || '登入失敗');

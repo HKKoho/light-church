@@ -11,7 +11,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useLanguage, useT, type Messages } from '@/lib/i18n';
-import { AI_TOOL_BRIEFS } from './ai-tool-briefs';
+import { useNavVisibility } from '@/hooks/use-nav-visibility';
+import { AI_TOOL_BRIEFS, briefParagraphs } from './ai-tool-briefs';
 import { BriefPlayer } from './brief-player';
 
 const messages = {
@@ -29,6 +30,7 @@ interface AiToolBriefButtonProps {
 export function AiToolBriefButton({ briefKey, toolName }: AiToolBriefButtonProps) {
   const t = useT(messages);
   const { lang } = useLanguage();
+  const { isHidden } = useNavVisibility();
   const brief = AI_TOOL_BRIEFS[briefKey]?.[lang];
   if (!brief) return null;
 
@@ -45,7 +47,7 @@ export function AiToolBriefButton({ briefKey, toolName }: AiToolBriefButtonProps
           <DialogTitle>{toolName}</DialogTitle>
           <DialogDescription>{t.subtitle}</DialogDescription>
         </DialogHeader>
-        <BriefPlayer paragraphs={[brief.helps, ...brief.steps]} numberedFrom={1} />
+        <BriefPlayer paragraphs={briefParagraphs(brief, isHidden)} numberedFrom={1} />
       </DialogContent>
     </Dialog>
   );

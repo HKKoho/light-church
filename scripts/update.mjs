@@ -24,6 +24,7 @@ import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installAiTools } from './lib/ai-tools-install.mjs';
 import { ensureEnvSecret, jwtSecretProblem, readEnvValue } from './lib/env-secrets.mjs';
+import { ensureGetinbibleSecrets } from './lib/getinbible-secrets.mjs';
 import { stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -132,6 +133,10 @@ async function main() {
       ok('Added POSTGRES_APP_PASSWORD to .env — the API now uses a rows-only database login');
     } else {
       ok('Secrets look fine');
+    }
+    const getinbibleAdded = ensureGetinbibleSecrets(ENV_FILE);
+    if (getinbibleAdded.length > 0) {
+      ok(`Added ${getinbibleAdded.join(', ')} to .env — local Supabase for Get in Bible`);
     }
   }
 

@@ -1,12 +1,14 @@
 // packages/api/src/help-assistant/help-assistant.prompt.ts
 import type { HelpAssistantAttachment } from '@clawix/shared';
 
-import { HELP_GUIDE } from './help-guide.js';
+import { renderHelpGuide } from './help-guide.js';
 
 export interface PromptContext {
   readonly currentPage?: string;
   readonly lang?: 'en' | 'zh-TW';
   readonly today: string;
+  /** SystemSettings.hiddenNavKeys — features the super admin has hidden. */
+  readonly hiddenNavKeys?: readonly string[];
 }
 
 const RULES = `You are the Light Church Help Assistant, a friendly guide inside the church's Light Church dashboard. You help staff and volunteers in two ways:
@@ -21,8 +23,8 @@ If asked, say kindly that you can only help with using Light Church's features, 
 
 How to answer:
 - Reply in the user's language. For Chinese, use Traditional Chinese.
-- Be concise. For how-to questions give short numbered steps and name the menu or page (e.g. "Sidebar → AI Tools → Roll Call").
-- Only describe features that are in the guide. If the guide doesn't cover something, say you're not sure it exists and suggest asking an administrator — never invent features, buttons or settings.
+- Be concise. For how-to questions give short numbered steps and name the menu or page (e.g. "Sidebar → AI Tools → <tool name>").
+- Only describe, suggest or use as an example the features that are in the guide. If the guide doesn't cover something, say it isn't available here and suggest asking an administrator — never invent features, buttons or settings.
 - Some features depend on role or department. If the user may not see something, say so.
 - When you write a draft or an edited version, put it after a short heading line such as "Draft:" or "Edited version:" so it is easy to copy, and remind the user to check it before it is published or sent.
 - When summarizing, keep names, dates, numbers and scripture references exactly as in the source.
@@ -41,7 +43,7 @@ export function buildSystemPrompt(ctx: PromptContext): string {
     .filter((line): line is string => line !== null)
     .join('\n');
 
-  return `${RULES}\n\n${context}\n\n<feature_guide>\n${HELP_GUIDE}\n</feature_guide>`;
+  return `${RULES}\n\n${context}\n\n<feature_guide>\n${renderHelpGuide(new Set(ctx.hiddenNavKeys))}</feature_guide>`;
 }
 
 /** Puts attached documents in front of the user's latest message. */

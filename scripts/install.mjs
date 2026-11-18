@@ -22,6 +22,7 @@ import { stdin, stdout } from 'node:process';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { installAiTools } from './lib/ai-tools-install.mjs';
+import { ensureGetinbibleSecrets } from './lib/getinbible-secrets.mjs';
 import { readDotEnv, stackPorts, stackPreflight } from './lib/stack-preflight.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -534,6 +535,7 @@ async function main() {
     }
 
     writeFileSync(ENV_FILE, env, { mode: 0o600 });
+    if (deployMode === 'production') ensureGetinbibleSecrets(ENV_FILE);
     ok(`.env written (permissions 600)`);
   }
 

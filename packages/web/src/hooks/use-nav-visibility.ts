@@ -70,6 +70,15 @@ function subscribe(listener: () => void): () => void {
   };
 }
 
+/** True when `key` or any parent (`sidebar:phase2` for `sidebar:phase2:tasks`) is hidden. */
+export function isNavKeyHidden(key: string, hiddenKeys: ReadonlySet<string>): boolean {
+  const parts = key.split(':');
+  for (let i = 2; i <= parts.length; i += 1) {
+    if (hiddenKeys.has(parts.slice(0, i).join(':'))) return true;
+  }
+  return false;
+}
+
 const getSnapshot = () => hidden;
 const getServerSnapshot = () => EMPTY;
 
@@ -80,7 +89,7 @@ export function useNavVisibility() {
     if (!loaded) void reloadNavVisibility();
   }, []);
 
-  const isHidden = useCallback((key: string) => hiddenKeys.has(key), [hiddenKeys]);
+  const isHidden = useCallback((key: string) => isNavKeyHidden(key, hiddenKeys), [hiddenKeys]);
 
   return { hiddenKeys, isHidden };
 }

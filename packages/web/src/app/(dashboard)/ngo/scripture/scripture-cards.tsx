@@ -10,7 +10,7 @@ type CardKey = 'getInBible' | 'sundaySchool' | 'theologyPlatform';
 
 /** Outside links open in a new tab; Light Church pages open in place. */
 const CARDS: readonly { key: CardKey; icon: LucideIcon; href: string }[] = [
-  { key: 'getInBible', icon: BookOpen, href: 'https://getinbible.vercel.app/admin' },
+  { key: 'getInBible', icon: BookOpen, href: '/ngo/scripture/get-in-bible' },
   { key: 'sundaySchool', icon: School, href: '/ngo/scripture/sunday-school' },
   {
     key: 'theologyPlatform',

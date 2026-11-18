@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { builtInAiToolNavKey, useNavVisibility } from '@/hooks/use-nav-visibility';
 import { authFetch } from '@/lib/auth';
 import { useLanguage } from '@/lib/i18n';
 import { useQrT } from './messages';
@@ -45,6 +46,10 @@ export default function QrRegistrationPage() {
   const t = useQrT();
   const { lang } = useLanguage();
   const { user } = useAuth();
+  const { isHidden } = useNavVisibility();
+  // Don't point people to tools the super admin has hidden.
+  const aiSurveyHidden = isHidden(builtInAiToolNavKey('aiSurvey'));
+  const churchWebsiteHidden = isHidden(builtInAiToolNavKey('churchWebsite'));
   const canUse = !!user && AI_PUBLISH_ROLES.includes(user.role);
 
   const [input, setInput] = useState<QrRegistrationInput>({
@@ -142,7 +147,11 @@ export default function QrRegistrationPage() {
               <div className="grid gap-4 sm:grid-cols-[1fr_auto]">
                 <div className="flex flex-col gap-1.5">
                   {field('registrationUrl', 'url', 'https://forms.gle/…')}
-                  <span className="text-xs text-muted-foreground">{t.registrationUrlHint}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {aiSurveyHidden
+                      ? t.registrationUrlHint
+                      : `${t.registrationUrlHint} ${t.registrationUrlHintAiSurvey}`}
+                  </span>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="page-language">{t.pageLanguage}</Label>
@@ -203,11 +212,13 @@ export default function QrRegistrationPage() {
 
           <PostDesigner event={input} ready={input.eventName.trim() !== ''} />
 
-          <SiteEventPoster
-            key={`${input.eventName}|${input.date}`}
-            event={input}
-            pageUrl={published?.url ?? null}
-          />
+          {!churchWebsiteHidden && (
+            <SiteEventPoster
+              key={`${input.eventName}|${input.date}`}
+              event={input}
+              pageUrl={published?.url ?? null}
+            />
+          )}
 
           {published && (
             <Card className="border-emerald-500/50">
