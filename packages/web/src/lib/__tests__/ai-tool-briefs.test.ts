@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AI_TOOL_BRIEFS } from '@/components/dashboard/ai-tool-briefs';
+import { AI_TOOL_BRIEFS, briefParagraphs } from '@/components/dashboard/ai-tool-briefs';
 import { BUILT_IN_AI_TOOLS } from '@/components/dashboard/built-in-ai-tools';
 import { bestVoice, toSentences } from '@/hooks/use-brief-speech';
 
@@ -61,5 +61,29 @@ describe('AI_TOOL_BRIEFS', () => {
     const brief = AI_TOOL_BRIEFS[key];
     expect(brief?.en.steps.length).toBeGreaterThan(0);
     expect(brief?.['zh-TW'].steps.length).toBeGreaterThan(0);
+  });
+});
+
+describe('briefParagraphs', () => {
+  const brief = AI_TOOL_BRIEFS['qrRegistration']?.en;
+
+  it('reads every step when nothing is hidden', () => {
+    const text = briefParagraphs(brief!, () => false).join(' ');
+    expect(text).toContain('AI Survey');
+    expect(text).toContain('church website');
+  });
+
+  it('drops mentions of features the super admin hid', () => {
+    const hidden = new Set(['ai-tool:builtin:aiSurvey', 'ai-tool:builtin:churchWebsite']);
+    const paragraphs = briefParagraphs(brief!, (key) => hidden.has(key));
+    const text = paragraphs.join(' ');
+    expect(text).not.toContain('AI Survey');
+    expect(text).not.toContain('church website');
+    expect(paragraphs).toHaveLength(1 + brief!.steps.length);
+  });
+
+  it('drops a conditional step with no fallback', () => {
+    const custom = { helps: 'h', steps: ['a', { text: 'b', navKey: 'x' }] };
+    expect(briefParagraphs(custom, () => true)).toEqual(['h', 'a']);
   });
 });

@@ -1,4 +1,14 @@
 import type { Messages } from '@/lib/i18n';
+import { builtInAiToolNavKey, sidebarItemNavKey } from '@/hooks/use-nav-visibility';
+
+export interface HelpSuggestion {
+  readonly text: string;
+  /** Not offered when the super admin has hidden this feature. */
+  readonly navKey?: string;
+}
+
+const ROLL_CALL = builtInAiToolNavKey('rollCall');
+const WORKSPACE = sidebarItemNavKey('phase2', 'workspace');
 
 export interface HelpAssistantText {
   open: string;
@@ -8,7 +18,7 @@ export interface HelpAssistantText {
   newChat: string;
   welcome: string;
   suggestionsLabel: string;
-  suggestions: readonly string[];
+  suggestions: readonly HelpSuggestion[];
   placeholder: string;
   send: string;
   attach: string;
@@ -34,10 +44,10 @@ export const helpAssistantMessages = {
       'Hi! I can show you how to use any part of Light Church, and help you draft, edit, summarize or search. What would you like to do?',
     suggestionsLabel: 'Try asking',
     suggestions: [
-      'What can I do on this page?',
-      'How do I take attendance with Roll Call?',
-      'Draft a Sunday announcement for our church picnic',
-      'Find our newsletter files in the workspace',
+      { text: 'What can I do on this page?' },
+      { text: 'How do I take attendance with Roll Call?', navKey: ROLL_CALL },
+      { text: 'Draft a Sunday announcement for our church picnic' },
+      { text: 'Find our newsletter files in the workspace', navKey: WORKSPACE },
     ],
     placeholder: 'Ask a question, or paste text to edit…',
     send: 'Send',
@@ -62,10 +72,10 @@ export const helpAssistantMessages = {
     welcome: '你好！我可以教你使用光教會的各項功能，也可以幫你草擬、修改、摘要或搜尋。想做甚麼呢？',
     suggestionsLabel: '可以試試問',
     suggestions: [
-      '這個頁面可以做甚麼？',
-      '怎樣用「點名」記錄出席？',
-      '幫我草擬教會野餐的主日報告',
-      '在工作區找我們的通訊檔案',
+      { text: '這個頁面可以做甚麼？' },
+      { text: '怎樣用「點名」記錄出席？', navKey: ROLL_CALL },
+      { text: '幫我草擬教會野餐的主日報告' },
+      { text: '在工作區找我們的通訊檔案', navKey: WORKSPACE },
     ],
     placeholder: '輸入問題，或貼上要修改的文字…',
     send: '傳送',

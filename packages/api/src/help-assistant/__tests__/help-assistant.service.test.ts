@@ -5,6 +5,7 @@ import type { ChatMessage, LLMResponse, ToolCallRequest } from '@clawix/shared';
 import type { JwtPayload } from '../../auth/auth.types.js';
 import type { OneShotLlmService } from '../../engine/one-shot/one-shot-llm.service.js';
 import type { SearchProviderRegistry } from '../../engine/tools/web/search-provider.js';
+import type { SystemSettingsService } from '../../system-settings/system-settings.service.js';
 import type { WorkspaceService } from '../../workspace/workspace.service.js';
 import { HelpAssistantService, MAX_TOOL_ROUNDS } from '../help-assistant.service.js';
 
@@ -26,8 +27,9 @@ const searchCall: ToolCallRequest = {
   arguments: { query: 'easter' },
 };
 
-function makeService(responses: LLMResponse[]) {
+function makeService(responses: LLMResponse[], hiddenNavKeys: string[] = []) {
   const chat = vi.fn(async () => responses.shift() ?? reply('done'));
+  const settings = { get: vi.fn(async () => ({ hiddenNavKeys })) };
   const search = {
     search: vi.fn(async () => [{ title: 'Easter', url: 'https://e.org', snippet: 's' }]),
   };
@@ -35,8 +37,9 @@ function makeService(responses: LLMResponse[]) {
     { chat } as unknown as OneShotLlmService,
     search as unknown as SearchProviderRegistry,
     {} as WorkspaceService,
+    settings as unknown as SystemSettingsService,
   );
-  return { service, chat, search };
+  return { service, chat, search, settings };
 }
 
 const input = (content = 'How do I take attendance?') => ({
@@ -57,6 +60,22 @@ describe('HelpAssistantService', () => {
     expect(call.usageTag).toBe('help-assistant');
     expect(call.tools.length).toBe(3);
     expect(call.messages[0]?.content).toContain('/roll-call');
+  });
+
+  it('leaves features the super admin hid out of the system prompt', async () => {
+    const { service, chat } = makeService([reply('ok')], ['ai-tool:builtin:rollCall']);
+    await service.chat(user, input());
+    const call = chat.mock.calls[0]?.[0] as unknown as { messages: ChatMessage[] };
+    expect(call.messages[0]?.content).not.toContain('Roll Call (/roll-call)');
+    expect(call.messages[0]?.content).toContain('AI Survey (/ai-survey)');
+  });
+
+  it('describes every feature when settings cannot be read', async () => {
+    const { service, chat, settings } = makeService([reply('ok')]);
+    settings.get.mockRejectedValueOnce(new Error('db down'));
+    await service.chat(user, input());
+    const call = chat.mock.calls[0]?.[0] as unknown as { messages: ChatMessage[] };
+    expect(call.messages[0]?.content).toContain('Roll Call (/roll-call)');
   });
 
   it('runs tool calls, feeds results back and returns deduplicated sources', async () => {

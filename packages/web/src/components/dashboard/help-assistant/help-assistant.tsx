@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage, useT } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import { useNavVisibility } from '@/hooks/use-nav-visibility';
 import { HelpAssistantMessage } from './help-assistant-message';
 import { helpAssistantMessages } from './messages';
 import { useHelpAssistant } from './use-help-assistant';
@@ -24,6 +25,8 @@ export function HelpAssistant() {
   const t = useT(helpAssistantMessages);
   const { lang } = useLanguage();
   const pathname = usePathname();
+  const { isHidden } = useNavVisibility();
+  const suggestions = t.suggestions.filter((s) => !s.navKey || !isHidden(s.navKey));
   const [open, setOpen] = useState(false);
   const [draft, setDraft] = useState('');
   const [notice, setNotice] = useState('');
@@ -139,14 +142,14 @@ export function HelpAssistant() {
                 </p>
                 <p className="text-xs font-medium text-muted-foreground">{t.suggestionsLabel}</p>
                 <div className="flex flex-col items-start gap-1.5">
-                  {t.suggestions.map((s) => (
+                  {suggestions.map((s) => (
                     <button
-                      key={s}
+                      key={s.text}
                       type="button"
                       className="rounded-full border px-3 py-1 text-left text-xs hover:bg-muted"
-                      onClick={() => void submit(s)}
+                      onClick={() => void submit(s.text)}
                     >
-                      {s}
+                      {s.text}
                     </button>
                   ))}
                 </div>

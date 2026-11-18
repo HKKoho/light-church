@@ -1,14 +1,44 @@
 import type { Lang } from '@/lib/i18n';
+import { builtInAiToolNavKey } from '@/hooks/use-nav-visibility';
 
 /**
  * One-minute brief per AI Tool: how it helps, then how to use it. Shown as text
  * and read aloud. The Chinese text is written as spoken Cantonese so a zh-HK
  * voice reads it naturally. Keyed by built-in tool key or uploaded tool folder.
  */
+
+/**
+ * A step that mentions another feature: when the super admin hides `navKey`,
+ * `otherwise` is read instead (or the step is dropped if there is none).
+ */
+export interface ConditionalBriefStep {
+  readonly text: string;
+  readonly navKey: string;
+  readonly otherwise?: string;
+}
+
+export type BriefStep = string | ConditionalBriefStep;
+
 export interface AiToolBrief {
   readonly helps: string;
-  readonly steps: readonly string[];
+  readonly steps: readonly BriefStep[];
 }
+
+/** The brief as paragraphs, without mentions of features the super admin hid. */
+export function briefParagraphs(
+  brief: AiToolBrief,
+  isHidden: (navKey: string) => boolean,
+): string[] {
+  const steps = brief.steps.flatMap((step) => {
+    if (typeof step === 'string') return [step];
+    if (!isHidden(step.navKey)) return [step.text];
+    return step.otherwise ? [step.otherwise] : [];
+  });
+  return [brief.helps, ...steps];
+}
+
+const AI_SURVEY = builtInAiToolNavKey('aiSurvey');
+const CHURCH_WEBSITE = builtInAiToolNavKey('churchWebsite');
 
 export const AI_TOOL_BRIEFS: Readonly<Record<string, Record<Lang, AiToolBrief>>> = {
   rollCall: {
@@ -152,9 +182,17 @@ export const AI_TOOL_BRIEFS: Readonly<Record<string, Record<Lang, AiToolBrief>>>
         'Event Planning turns any event into a shareable web page with a QR code, so people can scan a poster or the bulletin and sign up straight away.',
       steps: [
         'Enter the event name, date, time, location and details.',
-        'Paste the registration link — for example, a Google Form made with AI Survey.',
+        {
+          text: 'Paste the registration link — for example, a Google Form made with AI Survey.',
+          navKey: AI_SURVEY,
+          otherwise: 'Paste the registration link — for example, a Google Form.',
+        },
         'If you like, let AI design a post for social media, or build visuals in Visual4Story.',
-        'Publish, then share the page link or print the QR code. You can also post it to the church website.',
+        {
+          text: 'Publish, then share the page link or print the QR code. You can also post it to the church website.',
+          navKey: CHURCH_WEBSITE,
+          otherwise: 'Publish, then share the page link or print the QR code.',
+        },
         'Anyone with the link can see the page, so leave out personal details.',
       ],
     },
@@ -163,9 +201,17 @@ export const AI_TOOL_BRIEFS: Readonly<Record<string, Record<Lang, AiToolBrief>>>
         '「活動策劃」將任何活動變成一版可以分享、附 QR 碼嘅網頁，大家喺海報或者週刊一掃就可以即刻報名。',
       steps: [
         '輸入活動名稱、日期、時間、地點同詳情。',
-        '貼上報名連結，例如用「AI 問卷」整嘅 Google 表單。',
+        {
+          text: '貼上報名連結，例如用「AI 問卷」整嘅 Google 表單。',
+          navKey: AI_SURVEY,
+          otherwise: '貼上報名連結，例如 Google 表單。',
+        },
         '想嘅話，可以叫 AI 幫你設計一張社交媒體海報，或者用 Visual4Story 自己整。',
-        '發佈之後，分享網頁連結或者印出 QR 碼；亦都可以放上教會網站。',
+        {
+          text: '發佈之後，分享網頁連結或者印出 QR 碼；亦都可以放上教會網站。',
+          navKey: CHURCH_WEBSITE,
+          otherwise: '發佈之後，分享網頁連結或者印出 QR 碼。',
+        },
         '有連結嘅人都睇到呢版，所以唔好放個人資料。',
       ],
     },

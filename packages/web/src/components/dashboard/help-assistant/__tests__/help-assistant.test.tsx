@@ -6,6 +6,17 @@ import { HelpAssistant } from '../help-assistant';
 import { HELP_ASSISTANT_STORAGE_KEY } from '../use-help-assistant';
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/roll-call' }));
+const hiddenNavKeys = new Set<string>();
+vi.mock('@/hooks/use-nav-visibility', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@/hooks/use-nav-visibility')>();
+  return {
+    ...actual,
+    useNavVisibility: () => ({
+      hiddenKeys: hiddenNavKeys,
+      isHidden: (key: string) => actual.isNavKeyHidden(key, hiddenNavKeys),
+    }),
+  };
+});
 vi.mock('@/lib/auth', () => ({
   authFetch: vi.fn(),
   ensureAccessToken: vi.fn(async () => 'token'),
@@ -17,6 +28,7 @@ const mockAuthFetch = authFetch as Mock;
 const fetchMock = vi.fn();
 
 beforeEach(() => {
+  hiddenNavKeys.clear();
   sessionStorage.clear();
   mockAuthFetch.mockReset();
   fetchMock.mockReset();
@@ -105,6 +117,15 @@ describe('HelpAssistant', () => {
     const user = await openPanel();
     await user.click(screen.getByRole('button', { name: 'What can I do on this page?' }));
     expect(await screen.findByText('Here is what you can do.')).toBeInTheDocument();
+  });
+
+  it('does not suggest features the super admin has hidden', async () => {
+    hiddenNavKeys.add('ai-tool:builtin:rollCall');
+    hiddenNavKeys.add('sidebar:phase2');
+    await openPanel();
+    expect(screen.getByRole('button', { name: 'What can I do on this page?' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Roll Call/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /workspace/ })).not.toBeInTheDocument();
   });
 
   it('shows the error and puts the question back in the box when sending fails', async () => {

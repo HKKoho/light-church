@@ -17,6 +17,7 @@ import type { z } from 'zod';
 import type { JwtPayload } from '../auth/auth.types.js';
 import { OneShotLlmService } from '../engine/one-shot/one-shot-llm.service.js';
 import { SearchProviderRegistry } from '../engine/tools/web/search-provider.js';
+import { SystemSettingsService } from '../system-settings/system-settings.service.js';
 import { WorkspaceService } from '../workspace/workspace.service.js';
 import { buildSystemPrompt, withAttachments } from './help-assistant.prompt.js';
 import { HELP_ASSISTANT_TOOLS, runTool, type ToolDeps } from './help-assistant.tools.js';
@@ -54,12 +55,14 @@ export class HelpAssistantService {
     private readonly llm: OneShotLlmService,
     private readonly searchRegistry: SearchProviderRegistry,
     workspace: WorkspaceService,
+    private readonly systemSettings: SystemSettingsService,
   ) {
     this.workspaceSearch = new WorkspaceSearch(workspace);
   }
 
   async chat(user: JwtPayload, input: ChatInput): Promise<HelpAssistantChatResponse> {
     const system = buildSystemPrompt({
+      hiddenNavKeys: await this.hiddenNavKeys(),
       ...(input.currentPage !== undefined ? { currentPage: input.currentPage } : {}),
       ...(input.lang !== undefined ? { lang: input.lang } : {}),
       today: new Date().toISOString().slice(0, 10),
@@ -103,6 +106,15 @@ export class HelpAssistantService {
 
     const final = await this.call(user.sub, flattenToolHistory(messages), false);
     return { reply: final.content?.trim() || FALLBACK_REPLY, sources: dedupeSources(sources) };
+  }
+
+  /** Features the super admin hid; the guide leaves them out. Shows all if settings can't be read. */
+  private async hiddenNavKeys(): Promise<readonly string[]> {
+    try {
+      return (await this.systemSettings.get()).hiddenNavKeys;
+    } catch {
+      return [];
+    }
   }
 
   private call(userId: string, messages: ChatMessage[], withTools: boolean): Promise<LLMResponse> {
