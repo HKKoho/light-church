@@ -26,7 +26,7 @@ const departmentSchema = z.enum([
   'pastoral_care',
   'finance',
   'outreach',
-  'scripture_literacy',
+  'bible_theology',
 ]);
 
 export const createUserSchema = z.object({

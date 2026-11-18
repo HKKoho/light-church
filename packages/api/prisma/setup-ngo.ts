@@ -45,7 +45,7 @@ Your job is to understand what the user needs, then either answer directly (for 
 | \`pastoral-care\` | Pastoral/spiritual support conversations — listening, prayer, Scripture; escalates safety-critical disclosures | "Talk to someone about a member who's struggling", "Route this to pastoral care" |
 | \`finance-assistant\` | Ledger entries, budget-vs-actual reports, ledger export, reconciliation prep — fund-tagged, drafts only | "Log this expense", "How are we doing against budget?", "Export the ledger for our bookkeeper" |
 | \`evangelism-outreach\` | Outreach campaign plans, gospel-proclamation content, church-planting support briefs — voluntary participation always, drafts only | "Plan an outreach event", "Draft a testimony piece", "Help us plant a church in X" |
-| \`scripture-literacy\` | Bible translation project status, Scripture distribution records, mother-tongue literacy programmes | "What's the status of the translation project?", "Log this Scripture distribution", "Plan a literacy programme" |
+| \`bible-theology\` | Bible recitation plans and progress, Sunday School courses, topical Bible studies | "Make a recitation plan for Psalm 23", "Draft a 10-week Sunday School course", "Topical study on forgiveness" |
 | \`church-sermon-prep\` | Passage exegesis, sermon outlines, illustrations, application points, closing prayers | "Help me prepare a sermon on X", "Outline a message for Sunday", "Illustration for this passage" |
 | \`church-sunday-school\` | Age-appropriate lesson plans, crafts, memory verses, VBS curriculum | "Sunday School lesson for age 7-9", "VBS curriculum", "Children's church lesson" |
 | \`church-bible-study\` | Small-group curriculum, multi-week series outlines, discussion questions, passage analysis | "Bible study series on X", "Discussion questions for this passage", "Small group curriculum" |
@@ -127,9 +127,9 @@ outreach/
   testimonies/  — testimony drafts (consent: shareable gates publication)
   church-planting/ — church-planting support briefs
 scripture/
-  translation/  — Bible translation project status by language/portion
-  distribution/ — Scripture distribution records (format, language, community)
-  literacy-programs/ — mother-tongue literacy programme plans (aggregate data only)
+  bible-recitation/     — recitation plans and group progress (aggregate data only)
+  sunday-school-course/ — multi-week Sunday School course syllabi
+  topical-studies/      — topical Bible studies
 consent/
   records/      — consent records (pseudonyms only) — the source of truth, not the frontmatter flag
   keys/         — identity-pseudonym maps (human access only)
@@ -217,9 +217,9 @@ const WORKSPACE_FOLDERS = [
   'outreach/campaigns',
   'outreach/testimonies',
   'outreach/church-planting',
-  'scripture/translation',
-  'scripture/distribution',
-  'scripture/literacy-programs',
+  'scripture/bible-recitation',
+  'scripture/sunday-school-course',
+  'scripture/topical-studies',
   'consent/records',
   'consent/keys',
   'discipleship/sermons',
@@ -359,7 +359,7 @@ This workspace is managed by Clawix. Seventeen specialist agents operate within 
 | \`pastoral-care\` | Pastoral/spiritual support conversations, prayer, Scripture |
 | \`finance-assistant\` | Ledger, budget-vs-actual, ledger export, reconciliation prep |
 | \`evangelism-outreach\` | Outreach campaigns, gospel-proclamation content, church-planting briefs |
-| \`scripture-literacy\` | Bible translation status, Scripture distribution, literacy programmes |
+| \`bible-theology\` | Bible recitation, Sunday School courses, topical studies |
 | \`church-sermon-prep\` | Sermon exegesis, outlines, illustrations |
 | \`church-sunday-school\` | Sunday School and children's ministry lessons |
 | \`church-bible-study\` | Small-group Bible study curriculum |

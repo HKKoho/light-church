@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Loader2, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import type { DirectoryListing, FileEntry } from '@clawix/shared';
@@ -11,28 +11,38 @@ import { FolderColumns, type FolderDef } from '../folder-columns';
 import { ScriptureCards } from './scripture-cards';
 
 const FOLDERS: readonly FolderDef[] = [
-  { path: '/scripture/translation', label: 'translation' },
-  { path: '/scripture/distribution', label: 'distribution' },
-  { path: '/scripture/literacy-programs', label: 'literacy-programs' },
+  { path: '/scripture/bible-recitation', label: 'bible-recitation' },
+  { path: '/scripture/sunday-school-course', label: 'sunday-school-course' },
+  { path: '/scripture/topical-studies', label: 'topical-studies' },
 ];
 
 const messages = {
   en: {
     title: 'Scripture & Learning',
-    subtitle: 'learning · textual · literature',
+    subtitle: 'recitation · courses · studies',
     startConversation: 'Start conversation',
     descBefore:
-      'Bible learning, Scripture development studies, and Hebrew and Greek literacy programmes. Managed by the ',
+      'Bible recitation plans, Sunday School courses, and topical Bible studies. Managed by the ',
     descAgent: 'Scripture & Learning',
     descAfter: ' agent.',
+    folderTitles: {
+      'bible-recitation': 'Bible Recitation',
+      'sunday-school-course': 'Sunday School Course',
+      'topical-studies': 'Topical Studies',
+    },
   },
   'zh-TW': {
     title: '聖經與學習',
-    subtitle: '學習 · 經文 · 文學',
+    subtitle: '背誦 · 課程 · 專題',
     startConversation: '開始對話',
-    descBefore: '聖經學習、聖經發展研究，以及希伯來文與希臘文識字教育計畫。由',
+    descBefore: '聖經背誦計畫、主日學課程，以及專題查經。由',
     descAgent: '聖經與學習',
     descAfter: '代理管理。',
+    folderTitles: {
+      'bible-recitation': '聖經背誦',
+      'sunday-school-course': '主日學課程',
+      'topical-studies': '專題研究',
+    },
   },
 } satisfies Messages<{
   title: string;
@@ -41,10 +51,15 @@ const messages = {
   descBefore: string;
   descAgent: string;
   descAfter: string;
+  folderTitles: Record<string, string>;
 }>;
 
 export default function ScripturePage() {
   const t = useT(messages);
+  const folders = useMemo(() => {
+    const titles: Record<string, string> = t.folderTitles;
+    return FOLDERS.map((f) => ({ ...f, title: titles[f.label] ?? f.label }));
+  }, [t]);
   const [columns, setColumns] = useState<Record<string, readonly FileEntry[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -107,7 +122,7 @@ export default function ScripturePage() {
           <Loader2 className="size-5 animate-spin text-muted-foreground" />
         </div>
       ) : (
-        <FolderColumns folders={FOLDERS} columns={columns} />
+        <FolderColumns folders={folders} columns={columns} />
       )}
     </div>
   );

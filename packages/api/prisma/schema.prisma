@@ -77,7 +77,7 @@ enum Department {
   pastoral_care
   finance
   outreach
-  scripture_literacy
+  bible_theology
   discipleship
   church_administration
 }
