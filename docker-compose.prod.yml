@@ -172,6 +172,128 @@ services:
   #   #           count: 1
   #   #           capabilities: [gpu]
 
+  # Get in Bible (reference/GetinBible) — self-hosted instead of Vercel, with
+  # its own local Supabase (db + rest + storage below). The getinbible server
+  # is the only way in: it serves the app, its AI proxies, and forwards
+  # /rest/v1 + /storage/v1 to Supabase (the job Kong does upstream).
+  # Embedded by the web dashboard at Scripture & Learning → Get in Bible.
+  # Secrets (GETINBIBLE_*) are generated into .env by install/update.
+  # Moving data from supabase.com: infra/docker/getinbible/README.md
+  getinbible:
+    build:
+      context: .
+      dockerfile: infra/docker/getinbible/Dockerfile
+      args:
+        # Same origin as the app: the server proxies Supabase paths.
+        VITE_SUPABASE_URL: ${GETINBIBLE_URL:-http://localhost:3005}
+        VITE_SUPABASE_ANON_KEY: ${GETINBIBLE_ANON_KEY:-}
+        VITE_OPENAI_ENABLED: ${GETINBIBLE_OPENAI_ENABLED:-true}
+        VITE_GEMINI_ENABLED: ${GETINBIBLE_GEMINI_ENABLED:-false}
+        VITE_GOOGLE_CLOUD_TTS_ENABLED: ${GETINBIBLE_GOOGLE_CLOUD_TTS_ENABLED:-false}
+    image: lightchurch-getinbible:latest
+    container_name: lightchurch-getinbible
+    restart: unless-stopped
+    user: '1000:1000'
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges
+    read_only: true
+    mem_limit: 256m
+    ports:
+      - '127.0.0.1:${LIGHTCHURCH_GETINBIBLE_PORT:-3005}:3005'
+    environment:
+      # Server-side only — never reach the browser bundle.
+      OPENAI_API_KEY: ${GETINBIBLE_OPENAI_API_KEY:-${OPENAI_API_KEY:-}}
+      GEMINI_API_KEY: ${GETINBIBLE_GEMINI_API_KEY:-}
+      GOOGLE_CLOUD_TTS_API_KEY: ${GETINBIBLE_GOOGLE_CLOUD_TTS_API_KEY:-}
+      # Only this origin may use the AI proxies.
+      ALLOWED_ORIGINS: ${GETINBIBLE_URL:-http://localhost:3005}
+      SUPABASE_REST_URL: http://getinbible-rest:3000
+      SUPABASE_STORAGE_URL: http://getinbible-storage:5000
+    depends_on:
+      - getinbible-rest
+      - getinbible-storage
+    networks:
+      - default
+      - getinbible-internal
+
+  getinbible-db:
+    image: supabase/postgres:17.6.1.136
+    container_name: lightchurch-getinbible-db
+    restart: unless-stopped
+    command: ['postgres', '-c', 'config_file=/etc/postgresql/postgresql.conf']
+    environment:
+      POSTGRES_HOST: /var/run/postgresql
+      PGPORT: '5432'
+      POSTGRES_PORT: '5432'
+      PGDATABASE: postgres
+      POSTGRES_DB: postgres
+      PGPASSWORD: ${GETINBIBLE_POSTGRES_PASSWORD:?GETINBIBLE_POSTGRES_PASSWORD is required (run update:clawix)}
+      POSTGRES_PASSWORD: ${GETINBIBLE_POSTGRES_PASSWORD:?GETINBIBLE_POSTGRES_PASSWORD is required (run update:clawix)}
+      JWT_SECRET: ${GETINBIBLE_JWT_SECRET:?GETINBIBLE_JWT_SECRET is required (run update:clawix)}
+      JWT_EXP: '3600'
+    volumes:
+      # First start only: set Supabase role passwords + JWT settings.
+      - ./infra/docker/getinbible/supabase/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:ro
+      - ./infra/docker/getinbible/supabase/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:ro
+      - getinbible_db:/var/lib/postgresql/data
+      - getinbible_db_config:/etc/postgresql-custom
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres', '-h', 'localhost']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - getinbible-internal
+
+  getinbible-rest:
+    image: postgrest/postgrest:v14.12
+    container_name: lightchurch-getinbible-rest
+    restart: unless-stopped
+    environment:
+      PGRST_DB_URI: postgres://authenticator:${GETINBIBLE_POSTGRES_PASSWORD}@getinbible-db:5432/postgres
+      PGRST_DB_SCHEMAS: public
+      PGRST_DB_ANON_ROLE: anon
+      PGRST_DB_MAX_ROWS: '1000'
+      PGRST_JWT_SECRET: ${GETINBIBLE_JWT_SECRET}
+      PGRST_DB_USE_LEGACY_GUCS: 'false'
+      PGRST_APP_SETTINGS_JWT_SECRET: ${GETINBIBLE_JWT_SECRET}
+      PGRST_APP_SETTINGS_JWT_EXP: '3600'
+    depends_on:
+      getinbible-db:
+        condition: service_healthy
+    networks:
+      - getinbible-internal
+
+  getinbible-storage:
+    image: supabase/storage-api:v1.60.4
+    container_name: lightchurch-getinbible-storage
+    restart: unless-stopped
+    environment:
+      ANON_KEY: ${GETINBIBLE_ANON_KEY}
+      SERVICE_KEY: ${GETINBIBLE_SERVICE_KEY}
+      POSTGREST_URL: http://getinbible-rest:3000
+      AUTH_JWT_SECRET: ${GETINBIBLE_JWT_SECRET}
+      DATABASE_URL: postgres://supabase_storage_admin:${GETINBIBLE_POSTGRES_PASSWORD}@getinbible-db:5432/postgres
+      STORAGE_PUBLIC_URL: ${GETINBIBLE_URL:-http://localhost:3005}
+      REQUEST_ALLOW_X_FORWARDED_PATH: 'true'
+      FILE_SIZE_LIMIT: '52428800'
+      STORAGE_BACKEND: file
+      GLOBAL_S3_BUCKET: stub
+      FILE_STORAGE_BACKEND_PATH: /var/lib/storage
+      TENANT_ID: stub
+      REGION: stub
+      ENABLE_IMAGE_TRANSFORMATION: 'false'
+    volumes:
+      - getinbible_storage:/var/lib/storage
+    depends_on:
+      getinbible-db:
+        condition: service_healthy
+      getinbible-rest:
+        condition: service_started
+    networks:
+      - getinbible-internal
+
   web:
     build:
       context: .
@@ -179,6 +301,7 @@ services:
       args:
         NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001}
         NEXT_PUBLIC_WS_URL: ${NEXT_PUBLIC_WS_URL}
+        NEXT_PUBLIC_GETINBIBLE_URL: ${GETINBIBLE_URL:-http://localhost:3005}
     image: lightchurch-web:latest
     container_name: lightchurch-web
     restart: unless-stopped
@@ -195,8 +318,17 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  getinbible_db:
+  getinbible_db_config:
+  getinbible_storage:
 
 networks:
+  # Get in Bible's Supabase: no internet, no host ports — only the
+  # getinbible server reaches it.
+  getinbible-internal:
+    name: lightchurch-getinbible-internal
+    driver: bridge
+    internal: true
   # `default` is deliberately left undeclared here so Compose keeps
   # auto-creating it exactly as before (postgres, redis, web stay on it,
   # undisturbed) — only api picks up the two new networks below, by

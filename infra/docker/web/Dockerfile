@@ -15,6 +15,9 @@ ARG NEXT_PUBLIC_API_URL=http://localhost:3001
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
 ARG NEXT_PUBLIC_WS_URL
 ENV NEXT_PUBLIC_WS_URL=${NEXT_PUBLIC_WS_URL}
+# Self-hosted Get in Bible service (docker-compose `getinbible`).
+ARG NEXT_PUBLIC_GETINBIBLE_URL=http://localhost:3005
+ENV NEXT_PUBLIC_GETINBIBLE_URL=${NEXT_PUBLIC_GETINBIBLE_URL}
 
 # Copy workspace config and package manifests first so the install layer is
 # cached when only source code changes.
