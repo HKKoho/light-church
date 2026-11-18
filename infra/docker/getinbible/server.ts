@@ -19,6 +19,7 @@ import {
 } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
 import { Readable } from 'node:stream';
+import { POST as auth } from '../../../reference/GetinBible/api/auth.js';
 import { POST as gemini } from '../../../reference/GetinBible/api/gemini.js';
 import { POST as openai } from '../../../reference/GetinBible/api/openai.js';
 import { POST as tts } from '../../../reference/GetinBible/api/tts.js';
@@ -83,6 +84,7 @@ function proxySupabase(
 }
 
 const API: Record<string, (request: Request) => Promise<Response>> = {
+  auth,
   openai,
   gemini,
   tts,
@@ -113,6 +115,8 @@ function toRequest(req: IncomingMessage): Request {
     if (typeof value === 'string') headers.set(key, value);
     else if (Array.isArray(value)) headers.set(key, value.join(', '));
   }
+  // Client address for the sign-in brute-force guard; never trust the caller's copy.
+  headers.set('x-real-ip', req.socket.remoteAddress ?? 'unknown');
   const hasBody = req.method !== 'GET' && req.method !== 'HEAD';
   return new Request(url, {
     method: req.method,

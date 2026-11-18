@@ -25,73 +25,50 @@ function transformUser(row: any): UserDB {
   };
 }
 
-// Simple encoding for password storage (not production-grade)
-function encodePassword(password: string): string {
-  return btoa(password);
+interface AuthResult {
+  token?: string;
+  user?: Record<string, unknown>;
+  error?: { message?: string };
 }
 
-function decodePassword(hash: string): string {
-  return atob(hash);
-}
-
-/**
- * Verify a user's password
- */
-export async function verifyPassword(name: string, password: string): Promise<{ valid: boolean; user?: UserDB }> {
-  const trimmedName = name.trim();
-
-  const { data: users } = await supabase
-    .from('users')
-    .select('*')
-    .ilike('name', trimmedName);
-
-  const user = users && users.length > 0 ? users[0] : null;
-
-  if (!user) {
-    return { valid: false };
-  }
-
-  // Admin uses hardcoded password
-  if (user.role === 'admin') {
-    if (password === 'CKLBCKOHO') {
-      return { valid: true, user: transformUser(user) };
-    }
-    return { valid: false };
-  }
-
-  // Student with password
-  if (user.has_password && user.password_hash) {
-    const decoded = decodePassword(user.password_hash);
-    if (decoded === password) {
-      return { valid: true, user: transformUser(user) };
-    }
-    return { valid: false };
-  }
-
-  // Student without password - always valid
-  return { valid: true, user: transformUser(user) };
+async function callAuth(path: string, body: unknown, token?: string): Promise<AuthResult> {
+  const res = await fetch(`/api/auth/${path}`, {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json',
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data: AuthResult = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error?.message || '登入失敗');
+  return data;
 }
 
 /**
- * Set password and optional email for a student
+ * Sign in on the server. Passwords are checked in the database (bcrypt) and
+ * never leave the server; a new name without a password creates a student.
+ * Returns the user and a session token for later requests.
  */
-export async function setStudentPassword(userId: string, password: string, email?: string): Promise<void> {
-  const updateData: any = {
-    password_hash: encodePassword(password),
-    has_password: true
-  };
-  if (email) {
-    updateData.email = email;
-  }
+export async function signIn(name: string, password?: string): Promise<{ user: UserDB; token: string }> {
+  const data = await callAuth('login', { name: name.trim(), password: password || undefined });
+  if (!data.token || !data.user) throw new Error('登入失敗');
+  return { user: transformUser(data.user), token: data.token };
+}
 
-  const { error } = await supabase
-    .from('users')
-    .update(updateData)
-    .eq('id', userId);
-
-  if (error) {
-    throw new Error(`Failed to set password: ${error.message}`);
-  }
+/**
+ * Set (or change) the signed-in user's own password and optional email.
+ * `current` is required when the account already has a password.
+ */
+export async function setOwnPassword(
+  token: string,
+  password: string,
+  email?: string,
+  current?: string,
+): Promise<UserDB> {
+  const data = await callAuth('password', { password, email, current }, token);
+  if (!data.user) throw new Error('Failed to set password');
+  return transformUser(data.user);
 }
 
 /**
@@ -102,53 +79,13 @@ export async function checkUserPassword(name: string): Promise<{ exists: boolean
   const { data: users } = await supabase
     .from('users')
     .select('id, has_password')
-    .ilike('name', trimmedName);
+    .ilike('name', trimmedName.replace(/[\\%_]/g, '\\$&'));
 
   const user = users && users.length > 0 ? users[0] : null;
   if (!user) {
     return { exists: false, hasPassword: false };
   }
   return { exists: true, hasPassword: user.has_password || false };
-}
-
-export async function findOrCreateUser(name: string): Promise<UserDB> {
-  const trimmedName = name.trim();
-
-  // First, try to find existing user (case-insensitive search)
-  const { data: users, error: findError } = await supabase
-    .from('users')
-    .select('*')
-    .ilike('name', trimmedName);  // Case-insensitive search
-
-  // If we found user(s), use the first match
-  const existingUser = users && users.length > 0 ? users[0] : null;
-
-  if (existingUser) {
-
-    // Update last_login
-    const { data: updatedUser } = await supabase
-      .from('users')
-      .update({ last_login: new Date().toISOString() })
-      .eq('id', existingUser.id)
-      .select()
-      .single();
-
-    return transformUser(updatedUser || existingUser);
-  }
-
-  // Create new user with trimmed name
-  console.log(`Creating new user: ${trimmedName}`);
-  const { data: newUser, error: createError } = await supabase
-    .from('users')
-    .insert({ name: trimmedName })
-    .select()
-    .single();
-
-  if (createError) {
-    throw new Error(`Failed to create user: ${createError.message}`);
-  }
-
-  return transformUser(newUser);
 }
 
 export async function getUserById(userId: string): Promise<UserDB | null> {

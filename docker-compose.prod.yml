@@ -210,6 +210,10 @@ services:
       ALLOWED_ORIGINS: ${GETINBIBLE_URL:-http://localhost:3005}
       SUPABASE_REST_URL: http://getinbible-rest:3000
       SUPABASE_STORAGE_URL: http://getinbible-storage:5000
+      # Server-side sign-in (api/auth.ts): checks passwords in the database
+      # and issues session tokens. Never reaches the browser.
+      SUPABASE_SERVICE_KEY: ${GETINBIBLE_SERVICE_KEY:-}
+      SUPABASE_JWT_SECRET: ${GETINBIBLE_JWT_SECRET:-}
     depends_on:
       - getinbible-rest
       - getinbible-storage

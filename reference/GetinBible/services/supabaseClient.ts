@@ -7,7 +7,27 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+/** localStorage key holding the signed-in user and their session token. */
+export const SESSION_STORAGE_KEY = 'wisdom_prism_user';
+
+/** Session JWT issued by /api/auth/login, or null when signed out / expired. */
+export function getSessionToken(): string | null {
+  try {
+    const raw = localStorage.getItem(SESSION_STORAGE_KEY);
+    const token: unknown = raw ? JSON.parse(raw).token : null;
+    if (typeof token !== 'string') return null;
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now() ? token : null;
+  } catch {
+    return null;
+  }
+}
+
+// Requests carry the signed-in user's session token, so database row security
+// knows who is asking; signed-out requests use the public anon key.
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  accessToken: async () => getSessionToken() ?? supabaseAnonKey,
+});
 
 // Types matching database schema
 export interface User {

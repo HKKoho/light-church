@@ -5,7 +5,8 @@
  *
  * Steps: dump the `public` schema + data with pg_dump (run from the same
  * supabase/postgres image the stack uses, so nothing is installed) → load it into
- * lightchurch-getinbible-db in one transaction → copy every Storage bucket and
+ * lightchurch-getinbible-db in one transaction → secure sign-in
+ * (sql/secure_auth.sql: bcrypt passwords, locked credentials) → copy every Storage bucket and
  * file through the Storage API → print row counts from both sides.
  *
  * Usage (see infra/docker/getinbible/README.md):
@@ -100,6 +101,30 @@ function pgDump(sourceDbUrl, extraArgs) {
   );
 }
 
+/** Applies reference/GetinBible/sql/secure_auth.sql (idempotent). */
+function applySecureAuth() {
+  const sql = readFileSync(join(ROOT, 'reference/GetinBible/sql/secure_auth.sql'), 'utf8');
+  const r = run(
+    'docker',
+    [
+      'exec',
+      '-i',
+      DB_CONTAINER,
+      'psql',
+      '-U',
+      'postgres',
+      '-d',
+      'postgres',
+      '--single-transaction',
+      '-v',
+      'ON_ERROR_STOP=1',
+      '-q',
+    ],
+    { input: sql },
+  );
+  if (r.status !== 0) fail(`secure_auth.sql failed, nothing was changed:\n${r.stderr.trim()}`);
+}
+
 // ── preflight ────────────────────────────────────────────────────────────────
 step('Checking the local Get in Bible Supabase');
 if (!existsSync(ENV_FILE)) fail('.env not found — run install:clawix first');
@@ -167,6 +192,20 @@ if (!skipDb) {
   // The API reads the schema cache; tell PostgREST about the new tables.
   psqlLocal("notify pgrst, 'reload schema'");
   ok('schema and data loaded');
+
+  step('Securing sign-in (sql/secure_auth.sql)');
+  applySecureAuth();
+  const admins = psqlLocal(
+    "select count(*) from public.users u where role = 'admin' " +
+      'and not exists (select 1 from public.user_credentials c where c.user_id = u.id)',
+  );
+  ok('passwords converted to bcrypt; public key can no longer read them');
+  if (Number(admins) > 0) {
+    console.log(
+      `  ! ${admins} admin account(s) have no password yet (they used the old shared one).\n` +
+        '    Give each one: node scripts/getinbible-set-password.mjs "<admin name>"',
+    );
+  }
 
   tables = psqlLocal("select tablename from pg_tables where schemaname = 'public' order by 1")
     .split('\n')

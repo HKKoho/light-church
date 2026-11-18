@@ -90,11 +90,15 @@ What it does:
    `getinbible-db` in **one transaction**: it either all lands or nothing
    changes. The dump is kept in `data/getinbible-import/<time>/` (mode 600 — it
    contains member data; delete it once you're happy).
-2. **Files** — every Storage bucket (e.g. `scripture-documents`) is recreated
+2. **Secure sign-in** — applies `reference/GetinBible/sql/secure_auth.sql`
+   (see "Sign-in and passwords" below). Existing passwords are converted to
+   bcrypt, so members keep theirs. It lists admin accounts that still need
+   their own password.
+3. **Files** — every Storage bucket (e.g. `scripture-documents`) is recreated
    with the same public/private setting, and every file is downloaded and
    uploaded. The database stores only relative paths (`storage_path`), so
    links keep working without rewriting.
-3. **Check** — prints row counts per table. Compare with **Table Editor** on
+4. **Check** — prints row counts per table. Compare with **Table Editor** on
    supabase.com.
 
 Flags: `--skip-db` (files only — safe to repeat, it overwrites) and
@@ -103,7 +107,20 @@ Flags: `--skip-db` (files only — safe to repeat, it overwrites) and
 The script refuses to load into a database that already has tables, so a
 second run can't double the data.
 
-### 4. Check, then switch over
+### 4. Give each admin their own password
+
+Admins used to share one password written into the app's code (and so
+visible to anyone). That no longer works. For each admin:
+
+```bash
+node scripts/getinbible-set-password.mjs "<admin name>"          # existing account
+node scripts/getinbible-set-password.mjs "<new name>" --admin    # create an admin
+```
+
+The password is typed hidden (8+ characters). The same command resets a
+member's forgotten password.
+
+### 5. Check, then switch over
 
 - Open `http://localhost:3005` (or Light Church → Bible & Ministries →
   Scripture & Learning → Get in Bible), sign in with an existing account, and
@@ -111,6 +128,32 @@ second run can't double the data.
 - When it looks right, point people at the new address, and pause the
   supabase.com project (Project Settings → General → Pause) and the Vercel
   deployment once you're sure you won't need them.
+
+## Sign-in and passwords
+
+`sql/secure_auth.sql` replaced the original browser-side login, which kept
+passwords base64-encoded (reversible) in a table the public key could read,
+used one hard-coded admin password, and let any visitor edit any user.
+
+- **Server-side check** — the app posts to `/api/auth/login`
+  (`reference/GetinBible/api/auth.ts`). The database function `gib_login()`
+  compares the bcrypt hash; only the service key may call it. On success the
+  server issues a 7-day session token that the app sends with every request.
+- **Passwords out of reach** — hashes live in `user_credentials`, which the
+  public and signed-in roles cannot read or write. `users` no longer has a
+  password column.
+- **Admin-only changes** — only admins (checked in the database on every
+  request) can change or delete users, manage lesson documents, or upload to
+  `scripture-documents`. New accounts are created only by signing in.
+- **Brute force** — 10 failed attempts per name (or 50 per address) in 15
+  minutes pauses sign-in for that name/address. Behind a reverse proxy every
+  visitor shares one address, so the per-name limit is the one that counts.
+- **Unchanged on purpose** — students without a password still sign in by
+  name, and a new name still creates a student, as before.
+
+Not yet tightened: the lesson, response, progress and group tables still
+allow any visitor to read and write them (their original "allow all" rules).
+That is the next step.
 
 ## Starting over
 
