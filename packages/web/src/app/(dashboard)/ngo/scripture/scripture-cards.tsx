@@ -12,11 +12,7 @@ type CardKey = 'getInBible' | 'sundaySchool' | 'theologyPlatform';
 const CARDS: readonly { key: CardKey; icon: LucideIcon; href: string }[] = [
   { key: 'getInBible', icon: BookOpen, href: '/ngo/scripture/get-in-bible' },
   { key: 'sundaySchool', icon: School, href: '/ngo/scripture/sunday-school' },
-  {
-    key: 'theologyPlatform',
-    icon: GraduationCap,
-    href: 'https://ai-christianity-platform.vercel.app/',
-  },
+  { key: 'theologyPlatform', icon: GraduationCap, href: '/ngo/scripture/theology' },
 ];
 
 const messages = {

@@ -7,7 +7,11 @@
 
 services:
   postgres:
-    image: postgres:16-alpine
+    # Postgres 16 Alpine + pgvector (Theology Library); see the Dockerfile for
+    # why this is not the Debian-based pgvector/pgvector image.
+    build:
+      context: ./infra/docker/postgres
+    image: lightchurch-postgres:16-pgvector
     container_name: lightchurch-postgres
     restart: unless-stopped
     ports:

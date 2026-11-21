@@ -62,6 +62,9 @@ const OPENAI_SPEC: ProviderSpec = {
     { model: 'o3', inputPerMillion: 10, outputPerMillion: 40 },
     { model: 'o3-mini', inputPerMillion: 1.1, outputPerMillion: 4.4 },
     { model: 'o4-mini', inputPerMillion: 1.1, outputPerMillion: 4.4 },
+    // Embeddings (Theology Library) — input tokens only
+    { model: 'text-embedding-3-small', inputPerMillion: 0.02, outputPerMillion: 0 },
+    { model: 'text-embedding-3-large', inputPerMillion: 0.13, outputPerMillion: 0 },
     // gpt-5 family (Responses API, auto-detected by provider factory)
     { model: 'gpt-5', inputPerMillion: 1.25, outputPerMillion: 10 },
     { model: 'gpt-5-mini', inputPerMillion: 0.25, outputPerMillion: 2 },

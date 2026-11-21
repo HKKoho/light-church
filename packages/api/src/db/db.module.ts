@@ -26,6 +26,7 @@ import { ChurchSiteRepository } from './church-site.repository.js';
 import { SiteContentRepository } from './site-content.repository.js';
 import { SundaySchoolRepository } from './sunday-school.repository.js';
 import { WisdomRepository } from './wisdom.repository.js';
+import { TheologyLibraryRepository } from './theology-library.repository.js';
 
 const repositories = [
   PolicyRepository,
@@ -54,6 +55,7 @@ const repositories = [
   SiteContentRepository,
   WisdomRepository,
   SundaySchoolRepository,
+  TheologyLibraryRepository,
 ];
 
 @Global()

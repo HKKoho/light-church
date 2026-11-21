@@ -58,4 +58,10 @@ describe('renderHelpGuide', () => {
     const guide = renderHelpGuide(new Set(['topbar:bibleMinistries:scripture']));
     expect(guide).not.toContain('Sunday School Studio');
   });
+
+  it('hides the Theology Platform with Scripture & Learning', () => {
+    expect(renderHelpGuide()).toContain('Theology Platform');
+    const guide = renderHelpGuide(new Set(['topbar:bibleMinistries:scripture']));
+    expect(guide).not.toContain('Theology Platform');
+  });
 });
