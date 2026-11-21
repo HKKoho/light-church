@@ -171,6 +171,20 @@ describe('WorkspaceService', () => {
       await expect(service.listDirectory(userId, '/missing')).rejects.toThrow(NotFoundException);
     });
 
+    it('should return an empty listing for a missing directory when emptyIfMissing is set', async () => {
+      mockScopedFs.stat.mockRejectedValue(new Error('ENOENT'));
+
+      const result = await service.listDirectory(userId, '/notes/drafts', undefined, undefined, {
+        emptyIfMissing: true,
+      });
+
+      expect(result).toEqual({
+        path: '/notes/drafts',
+        parent: '/notes',
+        entries: [],
+      });
+    });
+
     it('should return parent path for subdirectories', async () => {
       mockScopedFs.stat.mockResolvedValueOnce({ isDirectory: () => true });
       mockScopedFs.readdir.mockResolvedValue([]);

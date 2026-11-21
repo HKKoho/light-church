@@ -60,12 +60,14 @@ export class WorkspaceController {
   async listFiles(
     @Req() req: { user: JwtPayload },
     @Query('path') dirPath?: string,
+    @Query('missing') missing?: string,
   ): Promise<DirectoryListing> {
     return this.workspaceService.listDirectory(
       req.user.sub,
       dirPath ?? '/',
       req.user.role,
       req.user.department,
+      { emptyIfMissing: missing === 'empty' },
     );
   }
 

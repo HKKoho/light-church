@@ -87,7 +87,9 @@ describe('WorkspaceController', () => {
       const result = await controller.listFiles(mockReq, undefined);
 
       expect(result).toEqual(mockListing);
-      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/', 'admin', undefined);
+      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/', 'admin', undefined, {
+        emptyIfMissing: false,
+      });
     });
 
     it('should list files at specified path', async () => {
@@ -95,7 +97,19 @@ describe('WorkspaceController', () => {
 
       await controller.listFiles(mockReq, '/src');
 
-      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/src', 'admin', undefined);
+      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/src', 'admin', undefined, {
+        emptyIfMissing: false,
+      });
+    });
+
+    it('should pass emptyIfMissing when missing=empty', async () => {
+      mockService.listDirectory.mockResolvedValue(mockListing);
+
+      await controller.listFiles(mockReq, '/src', 'empty');
+
+      expect(mockService.listDirectory).toHaveBeenCalledWith('user-1', '/src', 'admin', undefined, {
+        emptyIfMissing: true,
+      });
     });
 
     it('should propagate NotFoundException', async () => {

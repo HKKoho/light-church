@@ -192,6 +192,7 @@ export class WorkspaceService {
     dirPath: string,
     role: UserRole,
     department: Department,
+    options: { readonly emptyIfMissing?: boolean } = {},
   ): Promise<DirectoryListing> {
     const { fs: sfs, basePath } = await this.createScopedFs(userId);
     const resolved = sfs.resolve(dirPath);
@@ -201,6 +202,16 @@ export class WorkspaceService {
     try {
       stat = await sfs.stat(dirPath);
     } catch {
+      // Dashboard pages list folders the agents create lazily; a folder that
+      // doesn't exist yet is just empty, not an error worth a 404 in the console.
+      if (options.emptyIfMissing) {
+        const parent = '/' + path.relative(basePath, path.dirname(resolved));
+        return {
+          path: '/' + path.relative(basePath, resolved),
+          parent,
+          entries: [],
+        };
+      }
       throw new NotFoundException('Directory not found');
     }
 
