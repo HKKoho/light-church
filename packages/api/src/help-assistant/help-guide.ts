@@ -159,6 +159,10 @@ const SECTIONS: readonly GuideSection[] = [
         text: 'Sunday School Studio (/ngo/scripture/sunday-school/studio): pastors, ministry leaders and admin staff prepare Sunday School lessons with AI. Add a class profile (age, maturity, Bible translation, tradition, lesson length), choose New course and give a Bible book or topic — AI drafts a week-by-week syllabus. Check and approve it, then open each lesson and choose Prepare lesson: passage study, a timed lesson plan and a review of Scripture, age fit, doctrine and pacing. Edit the plan and approve it for class.',
       },
       {
+        navKey: topbar('bibleMinistries', 'scripture'),
+        text: 'Theology Platform (/ngo/scripture/theology): staff and leaders study doctrine and church history. Theology Assistant (/ngo/scripture/theology/assistant) answers only from readings pastors have approved, citing each source as [1], [2]; tabs focus on general questions, church history or systematic theology. Theology Library (/ngo/scripture/theology/library): pastors upload creeds, books or sermons (PDF, Word, Markdown or text, up to 20 MB), confirm the church may use the text, then review each one — approve with doctrine tags (empty = general) or reject with a note. Only approved readings are searched.',
+      },
+      {
         navKey: topbar('bibleMinistries', 'fieldOps'),
         text: 'Bible & Ministries → Mission Field (/ngo/field-ops): field operations.',
       },

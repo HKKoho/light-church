@@ -1069,3 +1069,68 @@ model SundaySchoolLesson {
 
   @@unique([courseId, weekNumber])
 }
+
+// ============================================================================
+// Theology Library (docs/RAGplan.md Option A) — curated, doctrine-reviewed
+// readings searched by meaning (pgvector) for the Theology Platform and agents.
+// Only `approved` sources are ever retrievable.
+// ============================================================================
+
+model ReadingSource {
+  id                 String    @id @default(cuid())
+  title              String
+  author             String?
+  kind               String    @default("book") // TheologySourceKind
+  language           String    @default("zh-TW")
+  fileName           String
+  fileSizeBytes      Int
+  pageCount          Int?
+  ocrPagesUsed       Int       @default(0)
+  /// Extracted Markdown — lets a reviewer read it and lets reprocess re-chunk without re-OCR.
+  content            String    @default("")
+  // processing | pending_review | approved | rejected | failed
+  status             String    @default("processing")
+  statusDetail       String?
+  /// [] = general/uncontested; otherwise the traditions this source speaks for.
+  doctrineTags       String[]  @default([])
+  copyrightConfirmed Boolean   @default(false)
+  copyrightNote      String?
+  reviewNote         String?
+  reviewedById       String?
+  reviewedAt         DateTime?
+  uploadedById       String
+  chunkCount         Int       @default(0)
+  embeddingModel     String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  chunks ReadingChunk[]
+
+  @@index([status])
+  @@index([updatedAt])
+}
+
+model ReadingChunk {
+  id            String                       @id @default(cuid())
+  sourceId      String
+  chunkIndex    Int
+  page          Int?
+  heading       String                       @default("")
+  text          String
+  tokenCount    Int
+  /// Normalised references, e.g. "JHN 3:16-18", "ROM 8".
+  scriptureRefs String[]                     @default([])
+  /// pgvector; 1536 = text-embedding-3-small. Written and searched with raw SQL.
+  embedding     Unsupported("vector(1536)")?
+  createdAt     DateTime                     @default(now())
+
+  source ReadingSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  // The HNSW index on `embedding` lives only in raw SQL (migration
+  // 20261121000000_add_theology_library) — Prisma can't express it. If a later
+  // `prisma migrate diff` proposes `DROP INDEX "ReadingChunk_embedding_hnsw_idx"`,
+  // delete that line from the generated migration.
+
+  @@unique([sourceId, chunkIndex])
+  @@index([text(ops: raw("gin_trgm_ops"))], type: Gin, map: "ReadingChunk_text_trgm_idx")
+  @@index([scriptureRefs], type: Gin, map: "ReadingChunk_scriptureRefs_idx")
+}

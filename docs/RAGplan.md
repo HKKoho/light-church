@@ -27,7 +27,29 @@ Option A (no pgvector needed) and can ship first.
 > extraction (`engine/tools/document-reading/docx-extraction.ts`, mammoth +
 > turndown), registration gated by `toolConfig.documentReadingEnabled`
 > (default on) in `agent-runner.service.ts`, and the `read-document`
-> `SKILL.md` are all in place. Option A remains design-only.
+> `SKILL.md` are all in place.
+>
+> **Status: Option A is partly implemented** (Theology Platform, Phase 1) —
+> rollout steps 1, 2 and 5 below, plus a web Theology Assistant:
+> `ReadingSource`/`ReadingChunk` (migration `20261121000000_add_theology_library`,
+> HNSW + trigram + Scripture-ref indexes), `packages/api/src/theology-library/`
+> (upload of PDF/DOCX/Markdown/text as base64 JSON, background extraction →
+> chunking → Scripture-reference tagging → embedding, review with doctrine
+> tags, reprocess, delete, all audited), hybrid search (pgvector + `pg_trgm` +
+> Scripture refs, reciprocal-rank fusion) and `POST /ask` answering only from
+> approved passages with [n] citations. Embeddings go through
+> `engine/embeddings/embedding.service.ts` (token-accounted). Web UI:
+> `/ngo/scripture/theology` (Assistant, Library). Curators are
+> `THEOLOGY_CURATOR_ROLES` (super_admin, senior_pastor, pastor), not admin-only.
+> **Still to do:** rollout steps 3–4 (the `search_theological_reading` agent
+> tool, `toolConfig.theologyLibraryEnabled`, the SKILL.md wrapper) and the
+> Option B → A "Submit to theological library" bridge.
+>
+> **Deviation — Postgres image.** Not `pgvector/pgvector:pg16`: that image is
+> Debian/glibc, while existing volumes were initialised on Alpine/musl with the
+> libc `en_US.utf8` collation, so swapping would change text sort order under
+> every existing text index. `infra/docker/postgres/Dockerfile` builds pgvector
+> into `postgres:16-alpine` instead, keeping the volume untouched.
 
 ## Why this isn't a bigger skill
 
